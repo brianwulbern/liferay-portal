@@ -2314,7 +2314,13 @@
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
 
-		<execute macro="Workflow#viewDefaultMyWorkflowTasksCP" />
+		<execute macro="Workflow#gotoAssignedToMe" />
+
+		<execute macro="Workflow#viewCompletedTask">
+			<var name="workflowAssetTitle" value="${kfProcessName}" />
+			<var name="workflowAssetType" value="${workflowAssetType}" />
+			<var name="workflowTask" value="Review" />
+		</execute>
 
 		<execute macro="MockMock#viewMail">
 			<var name="asset" value="Updater Modification Notification Description" />
