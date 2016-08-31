@@ -2594,8 +2594,8 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -2612,8 +2612,8 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -6983,7 +6983,7 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
+		<execute macro="WorkflowAsset#viewNotification">
 			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
@@ -7001,7 +7001,7 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
+		<execute macro="WorkflowAsset#viewNotification">
 			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
@@ -7019,8 +7019,8 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Your submission was rejected by Test Test, please modify and resubmit." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Your submission was rejected by Test Test, please modify and resubmit." />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -7048,8 +7048,8 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -7346,8 +7346,8 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Submission reviewed. The reviewer left the following: ${comment}." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Submission reviewed. The reviewer left the following: ${comment}." />
 		</execute>
 	</command>
 
@@ -8270,12 +8270,19 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
-		<execute macro="Notifications#navigateToContent">
-			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="Notifications#viewBadgeCount">
+			<var name="notificationCount" value="1" />
+		</execute>
+
+		<execute macro="WorkflowAsset#gotoViaNotification">
+			<var name="assetType" value="Kaleo Forms Process" />
+			<var name="user" value="Test Test" />
 		</execute>
 
 		<execute macro="Workflow#viewTaskHeaderTitle">
@@ -8297,12 +8304,13 @@
 			<var name="portletName" value="Notifications" />
 		</execute>
 
-		<execute macro="Notifications#viewNotification">
-			<var name="bodyContent" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#viewNotification">
+			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
 		</execute>
 
-		<execute macro="Notifications#navigateToContent">
-			<var name="contentBody" value="Test Test sent you a Kaleo Forms Process for review in the workflow." />
+		<execute macro="WorkflowAsset#gotoViaNotification">
+			<var name="assetType" value="Kaleo Forms Process" />
+			<var name="user" value="Test Test" />
 		</execute>
 
 		<execute macro="Workflow#viewTaskHeaderTitle">
