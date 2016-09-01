@@ -43,6 +43,15 @@
 	<command name="viewSuccessMessage">
 		<execute macro-mobile="MobileNavigator#clickRemoveIcon" />
 
+		<while max-iterations="150">
+			<not>
+				<condition function="IsVisible" locator1="Message#SUCCESS" />
+			</not>
+			<then>
+				<execute function="Pause" locator1="1000" />
+			</then>
+		</while>
+
 		<execute function="AssertVisible" locator1="Message#SUCCESS" />
 
 		<execute function="Pause" locator1="10000" />
