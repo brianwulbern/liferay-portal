@@ -2649,6 +2649,7 @@
 
 	<command name="DisableRSSFeedForSiteCalendar" priority="3">
 		<description message="This is a use case for LPS-67928." />
+		<property name="portal.acceptance" value="brian" />
 
 		<execute macro="TestCase#getSiteName">
 			<return from="siteName" name="siteName" />
