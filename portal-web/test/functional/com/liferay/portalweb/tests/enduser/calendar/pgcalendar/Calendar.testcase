@@ -2649,6 +2649,7 @@
 
 	<command name="DisableRSSFeedForSiteCalendar" priority="3">
 		<description message="This is a use case for LPS-67928." />
+		<property name="portal.acceptance" value="brian" />
 
 		<execute macro="TestCase#getSiteName">
 			<return from="siteName" name="siteName" />
@@ -2689,6 +2690,7 @@
 			<var name="eventTitle" value="Current Day Event" />
 			<var name="pageName" value="${pageName}" />
 			<var name="siteCalendarName" value="${siteName}" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<var method="selenium#getLocation()" name="rssURL" />
