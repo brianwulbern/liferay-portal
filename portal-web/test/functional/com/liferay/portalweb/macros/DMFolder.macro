@@ -128,7 +128,7 @@
 	</command>
 
 	<command name="addSubfolderPG">
-		<execute function="Click#makeVisibleClickAt" locator1="Portlet#ICON_PLUS_SIGN" />
+		<execute function="Click#makeVisibleClickAt" locator1="Button#PLUS" />
 
 		<execute function="AssertClick#assertTextClickAt" locator1="MenuItem#SUBFOLDER" value1="Subfolder" />
 
