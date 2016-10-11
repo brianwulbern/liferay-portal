@@ -338,6 +338,8 @@
 	</command>
 
 	<command name="DeleteDocumentInSubfolder" priority="5">
+		<property name="portal.acceptance" value="brian" />
+
 		<execute macro="DMRepository#gotoCP">
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
 		</execute>
@@ -392,6 +394,8 @@
 	</command>
 
 	<command name="DeleteSubfolder" priority="5">
+		<property name="portal.acceptance" value="brian" />
+
 		<execute macro="DMRepository#gotoCP">
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
 		</execute>
