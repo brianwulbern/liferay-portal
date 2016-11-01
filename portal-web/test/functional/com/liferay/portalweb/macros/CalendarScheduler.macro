@@ -510,6 +510,13 @@
 				<equals arg1="${frequency}" arg2="Daily" />
 			</and>
 			<then>
+				<if>
+					<condition function="IsElementNotPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_REPEATING_DAILY_REPEATED_EVENT_WEEK_AND_MONTH_VIEW" />
+					<then>
+						<execute function="Click" locator1="Calendar#VIEW_NEXT_BUTTON" />
+					</then>
+				</if>
+
 				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_REPEATING_DAILY_REPEATED_EVENT_WEEK_AND_MONTH_VIEW" value1="${eventTitle}" />
 			</then>
 		</if>
@@ -520,6 +527,13 @@
 				<equals arg1="${frequency}" arg2="Weekly" />
 			</and>
 			<then>
+				<if>
+					<condition function="IsElementNotPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_REPEATING_WEEKLY_REPEATED_EVENT_WEEK_AND_MONTH_VIEW" />
+					<then>
+						<execute function="Click" locator1="Calendar#VIEW_NEXT_BUTTON" />
+					</then>
+				</if>
+				
 				<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_REPEATING_WEEKLY_REPEATED_EVENT_WEEK_AND_MONTH_VIEW" value1="${eventTitle}" />
 			</then>
 		</if>
