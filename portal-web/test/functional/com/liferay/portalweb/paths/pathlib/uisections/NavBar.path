@@ -215,7 +215,7 @@
 </tr>
 <tr>
 	<td>USER_GROUPS</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'navbar-nav')]/li/a[contains(.,'User Groups')]</td>
+	<td>//ul[contains(@class,'nav nav-tabs')]/li/a[contains(.,'User Groups')]</td>
 	<td></td>
 </tr>
 </tbody>
