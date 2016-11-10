@@ -923,10 +923,17 @@ AUI.add(
 				'keyword': Liferay.Language.get('yes')
 			};
 
-			if (type == 'ddm-text-html' || type == 'text' || type == 'textarea') {
+			if (type == 'text') {
 				indexTypeOptions = {
 					'': Liferay.Language.get('not-indexable'),
 					'keyword': Liferay.Language.get('indexable-keyword'),
+					'text': Liferay.Language.get('indexable-text')
+				};
+			}
+
+			if (type == 'ddm-text-html' || type == 'textarea') {
+				indexTypeOptions = {
+					'': Liferay.Language.get('not-indexable'),
 					'text': Liferay.Language.get('indexable-text')
 				};
 			}
@@ -1406,6 +1413,10 @@ AUI.add(
 
 					fieldNamespace: {
 						value: 'ddm'
+					},
+
+					indexType: {
+						value: 'text'
 					}
 				},
 
@@ -1485,6 +1496,20 @@ AUI.add(
 			}
 		);
 
+		var DDMTextAreaField = A.Component.create(
+			{
+				ATTRS: {
+					indexType: {
+						value: 'text'
+					}
+				},
+
+				EXTENDS: A.FormBuilderTextAreaField,
+
+				NAME: 'textarea'
+			}
+		);
+
 		var plugins = [
 			DDMDateField,
 			DDMDecimalField,
@@ -1497,7 +1522,8 @@ AUI.add(
 			DDMNumberField,
 			DDMParagraphField,
 			DDMSeparatorField,
-			DDMHTMLTextField
+			DDMHTMLTextField,
+			DDMTextAreaField
 		];
 
 		plugins.forEach(
