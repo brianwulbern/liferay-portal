@@ -3,6 +3,8 @@
 	<property name="custom.properties" value="default.layout.template.id=1_column${line.separator}company.default.time.zone=America/Los_Angeles" />
 	<property name="testray.main.component.name" value="Workflow" />
 
+	<property name="brian" value="true" />
+
 	<set-up>
 		<execute macro="TestCase#setUpPortalInstance" />
 
