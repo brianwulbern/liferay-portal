@@ -243,6 +243,13 @@
 						</then>
 					</if>
 
+					<if>
+						<condition function="IsElementNotPresent" locator1="Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY" />
+						<then>
+							<execute function="Click" locator1="Calendar#VIEW_NEXT_BUTTON" />
+						</then>
+					</if>
+
 					<execute function="ScrollWebElementIntoView" locator1="Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY" />
 
 					<execute function="AssertClick#assertPartialTextClickAt" locator1="Calendar#SCHEDULER_VIEW_EVENT_NOT_TODAY" value1="${eventTitle}" />
