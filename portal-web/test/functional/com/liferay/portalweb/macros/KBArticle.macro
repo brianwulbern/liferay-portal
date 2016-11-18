@@ -687,6 +687,8 @@
 			</then>
 		</if>
 
+		<execute function="Pause" locator1="5000" />
+
 		<if>
 			<equals arg1="${cancel}" arg2="true" />
 			<then>
