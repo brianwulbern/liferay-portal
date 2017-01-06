@@ -265,6 +265,10 @@
 			<var name="uploadFileName" value="Document_3.jpg" />
 		</execute>
 
+		<execute function="AssertVisible" locator1="BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED">
+			<var name="key_uploadFileName" value="Document_3" />
+		</execute>
+
 		<execute macro="PortletEntry#publish" />
 
 		<execute macro="BlogsNavigator#gotoEntryCP">
