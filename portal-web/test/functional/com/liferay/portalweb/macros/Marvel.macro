@@ -14,6 +14,8 @@
 
 		<execute function="SelectFrame" locator1="IFrame#MARVEL" />
 
+		<execute function="ScrollWebElementIntoView" locator1="Portlet#TITLE" />
+
 		<execute function="AssertElementPresent" locator1="Portlet#TITLE" />
 		<execute function="AssertElementPresent" locator1="Marvel#WELCOME_MESSAGE" />
 
