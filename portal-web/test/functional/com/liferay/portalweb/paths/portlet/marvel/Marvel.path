@@ -25,11 +25,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>HOME_HEADER</td>
-	<td>//div[@class='marvel-home']//following-sibling::h1</td>
-	<td></td>
-</tr>
-<tr>
 	<td>WELCOME_MESSAGE</td>
 	<td>//marvel-welcome-message//h3</td>
 	<td></td>

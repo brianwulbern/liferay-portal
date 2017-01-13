@@ -10,9 +10,11 @@
 	</command>
 
 	<command name="viewPG">
+		<var name="key_portletName" value="Marvel" />
+
 		<execute function="SelectFrame" locator1="IFrame#MARVEL" />
 
-		<execute function="AssertElementPresent" locator1="Marvel#HOME_HEADER" />
+		<execute function="AssertElementPresent" locator1="Portlet#TITLE" />
 		<execute function="AssertElementPresent" locator1="Marvel#WELCOME_MESSAGE" />
 
 		<execute function="AssertClick" locator1="Marvel#CLUSTER_NAME" value1="LiferayElasticsearchCluster" />
