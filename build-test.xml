@@ -9989,6 +9989,15 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 				<echo file="${liferay.home}/osgi/modules/com.liferay.simple.socks.proxy.SocksProxyConfiguration.cfg">allowedHostnames=${env.HOSTNAME},test.able.com,www.able.com,www.baker.com,www.charlie.com,www.dog.com,www.easy.com,www.fox.com</echo>
 
+				<get-testcase-property property.name="socks.proxy.hosts" />
+
+				<if>
+					<isset property="socks.proxy.hosts" />
+					<then>
+						<echo append="true" file="${liferay.home}/osgi/modules/com.liferay.simple.socks.proxy.SocksProxyConfiguration.cfg">,${socks.proxy.hosts}</echo>
+					</then>
+				</if>
+
 				<print-file file.name="${liferay.home}/osgi/modules/com.liferay.simple.socks.proxy.SocksProxyConfiguration.cfg" />
 			</then>
 		</if>
