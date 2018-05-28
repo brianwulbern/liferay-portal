@@ -1,5 +1,6 @@
 <definition component-name="portal-deployment-mysql">
 	<property name="database.types" value="mysql" />
+	<property name="portal.acceptance" value="setupwizard" />
 	<property name="portal.release" value="true" />
 	<property name="portal.upstream" value="true" />
 	<property name="setup.wizard.enabled" value="true" />
