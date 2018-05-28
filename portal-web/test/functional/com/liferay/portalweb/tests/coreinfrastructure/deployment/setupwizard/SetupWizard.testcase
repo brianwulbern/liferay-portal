@@ -1,5 +1,5 @@
 <definition component-name="portal-deployment-hypersonic">
-	<property name="portal.acceptance" value="true" />
+	<property name="portal.acceptance" value="setupwizard" />
 	<property name="portal.release" value="true" />
 	<property name="portal.upstream" value="true" />
 	<property name="test.prepare.bundle.properties" value="false" />
