@@ -5,7 +5,7 @@ definition {
 	property portal.smoke = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Smoke";
-	property test.assert.warning.exceptions = "true";
+	property test.assert.warning.exceptions = "false";
 
 	setUp {
 		TestCase.setUpPortalInstance();
