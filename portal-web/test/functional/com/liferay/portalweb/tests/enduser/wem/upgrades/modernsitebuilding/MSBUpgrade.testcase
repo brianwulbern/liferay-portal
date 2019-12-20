@@ -24,6 +24,7 @@ definition {
 	test ViewMSBAndAddContentPageAfterUpgrade713 {
 		property data.archive.type = "data-archive-msb";
 		property database.types = "mariadb,mysql,postgresql";
+		property portal.upgrades = "brian";
 		property portal.version = "7.1.3";
 
 		Upgrade.viewMSBUpgrade();
