@@ -19,6 +19,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SAVE_FORM_BUTTON_LOCALE</td>
+	<td>//button[contains(.,'${key_localeSaveForm}') and not (contains(@class,'disabled'))]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SAVE_FORM_BUTTON_LOCALIZED</td>
 	<td>//div[contains(@class,'button-holder')]//button[contains(.,'${key_saveButton}') and not (contains(@class,'disabled'))]</td>
 	<td></td>
@@ -232,6 +237,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SIDEBAR_ADVANCED_TAB_LOCALE</td>
+	<td>//a[contains(@class,'tab') and .='${key_localeAdvanced}'] | //a[contains(@aria-controls,'sidebarLightDetails')]//*[contains(text(),'${key_localeAdvanced}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SIDEBAR_PROPERTIES_TAB</td>
 	<td>//a[contains(@class,'tab') and .='Properties'] | //a[contains(@aria-controls,'sidebarLightDetails')]//*[contains(text(),'Properties')]</td>
 	<td></td>
@@ -247,8 +257,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SIDEBAR_BASIC_TAB_LOCALE</td>
+	<td>//a[contains(@class,'tab') and .='${key_localeBasic}'] | //a[contains(@aria-controls,'sidebarLightDetails')]//*[contains(text(),'${key_localeBasic}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SIDEBAR_ELEMENTS_TAB</td>
 	<td>//a[contains(@class,'tab') and .='Elements'] | //a[contains(@class,'nav-link active') and .='Elements']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIDEBAR_ELEMENTS_TAB_LOCALE</td>
+	<td>//a[contains(@class,'tab') and .='${key_localeElements}'] | //a[contains(@class,'nav-link active') and .='${key_localeElements}']</td>
 	<td></td>
 </tr>
 <tr>
