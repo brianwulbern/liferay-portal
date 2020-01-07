@@ -530,14 +530,23 @@ definition {
 	}
 
 	macro viewFieldName {
-
-		Form.gotoAdvancedTab();
+		if (isSet(localeAdvanced)) {
+			Form.gotoAdvancedTab(key_localeAdvanced = "${localeAdvanced}");
+		}
+		else {
+			Form.gotoAdvancedTab();
+		}
 
 		AssertTextEquals(
 			locator1 = "FormFields#FIELD_NAME_EDIT",
 			value1 = "${fieldName}");
 
-		Form.gotoBasicTab();
+		if (isSet(localeBasic)) {
+			Form.gotoBasicTab(key_localeBasic = "${localeBasic}");
+		}
+		else {
+			Form.gotoBasicTab();
+		}
 	}
 
 	macro viewFieldValidationErrorMessage {
