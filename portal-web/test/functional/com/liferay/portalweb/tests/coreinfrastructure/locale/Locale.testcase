@@ -24,6 +24,45 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-92222."
+	@priority = "5"
+	test AddFormWithSpanishAsOnlyLocale {
+		property custom.properties = "locales=es_ES";
+		property custom.properties = "locales.enabled=es_ES";
+		property custom.properties = "company.default.locale=es_ES";
+
+		User.firstLoginPG(
+			localization = "ES",
+			localizedAgree = "Acepto",
+			localizedAnswer = "Respuesta",
+			localizedSaveButton = "Guardar");
+
+		ProductMenu.gotoPortlet(
+			category = "Contenido",
+			panel = "Site Administration",
+			portlet = "Formularios");
+
+		FormsAdminNavigator.gotoAddForm();
+
+		Form.editName();
+
+		Form.editDescription();
+
+		Form.gotoAddField(
+			fieldType = "Campo de texto",
+			localeBasic = "Básico",
+			localeElements = "Elementos");
+
+		Form.editFieldLabelMetal(
+			fieldValue = "label",
+			localeAdvanced = "Avanzado",
+			localeBasic = "Básico");
+
+		Form.closeSidebar();
+
+		Form.save(localeSaveForm = "Guardar formulario");
+	}
+
 	@priority = "4"
 	test ChangesToInstanceTimeZoneDoNotPropagateToExistingUsers {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
