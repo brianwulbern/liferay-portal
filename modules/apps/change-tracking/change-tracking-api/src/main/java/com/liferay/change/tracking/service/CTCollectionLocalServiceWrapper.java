@@ -337,14 +337,6 @@ public class CTCollectionLocalServiceWrapper
 	}
 
 	@Override
-	public boolean isCTEntryEnclosed(
-		long ctCollectionId, long modelClassNameId, long modelClassPK) {
-
-		return _ctCollectionLocalService.isCTEntryEnclosed(
-			ctCollectionId, modelClassNameId, modelClassPK);
-	}
-
-	@Override
 	public com.liferay.change.tracking.model.CTCollection undoCTCollection(
 			long ctCollectionId, long userId, String name, String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
