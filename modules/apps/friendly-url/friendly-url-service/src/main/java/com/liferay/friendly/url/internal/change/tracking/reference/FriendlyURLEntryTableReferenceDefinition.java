@@ -16,7 +16,6 @@ package com.liferay.friendly.url.internal.change.tracking.reference;
 
 import com.liferay.change.tracking.reference.TableReferenceDefinition;
 import com.liferay.change.tracking.reference.builder.TableReferenceInfoBuilder;
-import com.liferay.friendly.url.model.FriendlyURLEntryLocalizationTable;
 import com.liferay.friendly.url.model.FriendlyURLEntryMappingTable;
 import com.liferay.friendly.url.model.FriendlyURLEntryTable;
 import com.liferay.friendly.url.service.persistence.FriendlyURLEntryPersistence;
@@ -60,18 +59,6 @@ public class FriendlyURLEntryTableReferenceDefinition
 				).and(
 					FriendlyURLEntryTable.INSTANCE.classPK.eq(
 						FriendlyURLEntryMappingTable.INSTANCE.classPK)
-				)
-			)
-		).referenceInnerJoin(
-			fromStep -> fromStep.from(
-				FriendlyURLEntryLocalizationTable.INSTANCE
-			).innerJoinON(
-				FriendlyURLEntryTable.INSTANCE,
-				FriendlyURLEntryTable.INSTANCE.classNameId.eq(
-					FriendlyURLEntryLocalizationTable.INSTANCE.classNameId
-				).and(
-					FriendlyURLEntryTable.INSTANCE.classPK.eq(
-						FriendlyURLEntryLocalizationTable.INSTANCE.classPK)
 				)
 			)
 		);

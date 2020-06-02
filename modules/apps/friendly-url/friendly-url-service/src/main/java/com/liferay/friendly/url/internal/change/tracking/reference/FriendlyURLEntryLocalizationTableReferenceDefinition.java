@@ -50,9 +50,18 @@ public class FriendlyURLEntryLocalizationTableReferenceDefinition
 		).singleColumnReference(
 			FriendlyURLEntryLocalizationTable.INSTANCE.groupId,
 			GroupTable.INSTANCE.groupId
-		).nonreferenceColumns(
-			FriendlyURLEntryLocalizationTable.INSTANCE.classNameId,
-			FriendlyURLEntryLocalizationTable.INSTANCE.classPK
+		).referenceInnerJoin(
+			fromStep -> fromStep.from(
+				FriendlyURLEntryTable.INSTANCE
+			).innerJoinON(
+				FriendlyURLEntryLocalizationTable.INSTANCE,
+				FriendlyURLEntryLocalizationTable.INSTANCE.classNameId.eq(
+					FriendlyURLEntryTable.INSTANCE.classNameId
+				).and(
+					FriendlyURLEntryLocalizationTable.INSTANCE.classPK.eq(
+						FriendlyURLEntryTable.INSTANCE.classPK)
+				)
+			)
 		);
 	}
 
