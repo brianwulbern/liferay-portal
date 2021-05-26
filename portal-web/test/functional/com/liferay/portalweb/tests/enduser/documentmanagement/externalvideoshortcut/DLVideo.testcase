@@ -376,6 +376,7 @@ definition {
 	@description = "This test ensures that the video preview generated for a document remains intact after FFmpeg is disabled."
 	@priority = "4"
 	test PreviewRemainsAfterDisablingFFmpeg {
+		property portal.smoke = "preview";
 		property test.name.skip.portal.instance = "DLVideo#PreviewRemainsAfterDisablingFFmpeg";
 
 		DMNavigator.openToEntryInAdmin(
