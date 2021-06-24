@@ -1,0 +1,47 @@
+definition {
+
+	property testray.main.component.name = "Forms";
+
+	test SubmitFormWithEmptyRequiredField {
+		Navigator.openSpecificURL(url = "https://forms.liferay.com/web/forms/shared/-/form/122548?p_p_state=pop_up&p_p_auth=YU7Qg68z");
+
+        FormFields.editText(
+			fieldName = "WhatIsYourName",
+			fieldValue = "Tony");
+
+        FormFields.editDate(
+			fieldName = "WhatIsTheDateOfYourBirth",
+			fieldValue = "01/01/2016");
+
+        Button.clickSubmitButton();
+
+        Alert.viewRequiredField();
+	}
+
+	test SubmitFormWithRequiredField {
+		Navigator.openSpecificURL(url = "https://forms.liferay.com/web/forms/shared/-/form/122548?p_p_state=pop_up&p_p_auth=YU7Qg68z");
+
+        FormFields.editText(
+			fieldName = "WhatIsYourName",
+			fieldValue = "Tony");
+
+        FormFields.editDate(
+			fieldName = "WhatIsTheDateOfYourBirth",
+			fieldValue = "01/01/2016");
+
+		FormFields.editTextMultiline(
+			fieldName = "WhyDidYouJoinTheTestingArea",
+			fieldValue = "I don't know.");
+
+        Button.clickSubmitButton();
+
+		AssertTextEquals(
+			locator1 = "//div[contains(@class,'success-page')]//h1",
+			value1 = "Information sent");
+
+		AssertTextEquals(
+			locator1 = "//div[contains(@class,'success-page')]//h5",
+			value1 = "Information sent successfully!");
+	}
+
+}
