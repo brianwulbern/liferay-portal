@@ -562,6 +562,81 @@ definition {
 			fieldValue = "United States");
 	}
 
+	@description = "LPS-71112 - Verify that can see the entry when deleting the Form option after publishing"
+	@priority = "4"
+	test CanSeeEntryWhenSelectedOptionIsDeleted {
+		property forms.functional = "true";
+
+		FormsAdmin.addForm();
+
+		Form.editName(formName = "Form 1");
+
+		Form.gotoAddField(
+			fieldPositionNumber = "0",
+			fieldType = "Select from List");
+
+		FormFields.editOptionsRow(
+			optionName = "Option1",
+			optionValue = "Option 1",
+			rowNumber = "1");
+
+		FormFields.editOptionsRow(
+			optionName = "Option2",
+			optionValue = "Option 2",
+			rowNumber = "2");
+
+		FormFields.editOptionsRow(
+			optionName = "Option3",
+			optionValue = "Option 3",
+			rowNumber = "3");
+
+		Form.publishForm();
+
+		FormsAdminNavigator.gotoPublishedForm();
+
+		FormPortlet.waitFormRenderer(text = "Submit");
+
+		FormFields.selectSelectOption(
+			fieldName = "Select from List",
+			selectOption = "Option 2");
+
+		FormPortlet.submitSuccessfully();
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content & Data",
+			portlet = "Forms");
+
+		FormsAdminNavigator.gotoEditFormByName(formName = "Form 1");
+
+		FormsAdminNavigator.gotoEditField(fieldName = "Select from List");
+
+		FormFields.deleteOptionsRow(rowNumber = "2");
+
+		FormFields.viewSelectOptionsRowFieldValue(
+			fieldValue = "Option 1",
+			rowNumber = "1");
+
+		FormFields.viewSelectOptionsRowFieldValue(
+			fieldValue = "Option 3",
+			rowNumber = "2");
+
+		FormFields.viewDeletedSelectOptionsRowFieldValue(
+			fieldValue = "Option 2",
+			rowNumber = "2");
+
+		Form.save();
+
+		FormsAdminNavigator.gotoBack();
+
+		FormsAdminNavigator.gotoViewEntries();
+
+		FormsAdmin.viewFormTableEntry(
+			fieldLabel = "Select",
+			fieldValue = "Option 2");
+	}
+
 	@description = "Verify that changes to a Field can be canceled"
 	@ignore = "Test Stub"
 	@priority = "4"
