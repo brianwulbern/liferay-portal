@@ -1270,7 +1270,7 @@ definition {
 			key_fieldReferenceValue = "Text1234");
 	}
 
-	@description = "LRQA-43072 - Verify that Text Field can be autosaved"
+	@description = "LPS-84111 - Verify that Text Field can be autosaved on form builder"
 	@priority = "5"
 	test TextFieldCanBeAutosaved {
 		property forms.functional = "true";
