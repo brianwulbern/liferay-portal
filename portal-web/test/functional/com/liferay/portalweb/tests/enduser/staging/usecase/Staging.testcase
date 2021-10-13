@@ -331,6 +331,74 @@ definition {
 		Staging.deletePublishTemplate(publishTemplateName = "Publish Template Name");
 	}
 
+	@description = "LPS-83795 Disabled content cannot be published in Asset Publisher in Staging."
+	@priority = "4"
+	test DisabledContentCannotBePublishedInStaging {
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentContent = "WC Web Content Content",
+			webContentTitle = "WC Web Content Title");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		Portlet.addPG(
+			pageName = "Staging Test Page",
+			portletName = "Calendar");
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		CalendarNavigator.gotoAddEvent();
+
+		CalendarEvent.editTitle(eventTitle = "Calendar Event Title");
+
+		CalendarEvent.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		Portlet.addPG(
+			pageName = "Staging Test Page",
+			portletName = "Asset Publisher");
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "Calendar Event Title");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "WC Web Content Title");
+
+		Staging.openStagingAdmin(siteURLKey = "site-name");
+
+		Staging.activateStagingCP(
+			siteName = "Site Name",
+			uncheckContent = "Calendar");
+
+		ProductMenu.gotoLiveSite(site = "Site Name");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "Calendar Event Title");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "WC Web Content Title");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "WC Web Content Title");
+
+		AssetPublisherPortlet.viewAssetNotPresentPG(assetTitle = "Calendar Event Title");
+	}
+
 	@description = "This is a use case for LPS-100807."
 	@priority = "4"
 	@uitest
