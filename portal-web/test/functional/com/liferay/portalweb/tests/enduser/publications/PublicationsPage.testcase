@@ -29,6 +29,36 @@ definition {
 		}
 	}
 
+	@description = "LPS-138726 - Pages created on Production appear on Publications"
+	@priority = "5"
+	test PagesCreatedOnProductionAppearOnPublications {
+		Navigator.openURL();
+
+		Publications.createNewPublication(publicationName = "Publication Name");
+
+		Publications.workOnProduction();
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			portlet = "Pages");
+
+		ContentPages.addPage(pageName = "Test Content Page Name");
+
+		PageEditor.clickPublish();
+
+		Publications.selectPublication(publicationName = "Publication Name");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			portlet = "Pages");
+
+		SitePages.viewPageItems(pageName = "Test Content Page Name");
+	}
+
 	@priority = "4"
 	test PublishDeletedPageWithTag {
 		JSONLayout.addPublicLayout(
