@@ -2466,6 +2466,22 @@ definition {
 		}
 	}
 
+	@description = "LPS-139477 - Guest Accounts appear when Filter by Active"
+	@priority = "3"
+	test GuestAccountsAppearWhenFilterByActive {
+		Accounts.openAccountsAdmin();
+
+		Accounts.addGuestAccount(accountName = "Guest Account");
+
+		Accounts.openAccountsAdmin();
+
+		ManagementBar.setFilterAndOrder(filterBy = "Active");
+
+		LexiconEntry.viewEntryStatus(
+			rowEntry = "Guest Account",
+			rowStatus = "Active");
+	}
+
 	@description = "This is a use case for LPS-117171. It asserts that Filter By Navigation does not display when assigning a user to a Person Account since domains are not applicable for this type of account."
 	@priority = "3"
 	test NoFilterByNavigationForPersonAccount {
