@@ -985,6 +985,54 @@ Welcome to Liferay Community Edition Portal 7.4.0 CE GA1''';
 		Portlet.addPG(portletName = "Web Content Display");
 	}
 
+	@description = "This is a test for LPS-64814. Validate remote code execution via untrusted Java Deserialization in templates cannot cause out of memory errors."
+	@priority = "5"
+	test ValidateRemoteCodeViaTemplatesCannotCauseOutOfMemoryErrors {
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(structureName = "WC Structure Name");
+
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		WebContentStructures.saveCP(structureName = "WC Structure Name");
+
+		NavItem.gotoTemplates();
+
+		var templateScript = '''
+${company.setKey("rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cH////c=")}
+
+${company.getKeyObj()}
+''';
+		WebContentTemplates.addCP(
+			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
+			templateScript = "${templateScript}");
+
+		NavItem.gotoWebContent();
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+		WebContent.addWithStructureCP(webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Web Content Display Page",
+			siteName = "Test Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC WebContent Title");
+
+		IFrame.closeFrame();
+
+		Portlet.viewTitle(portletName = "WC WebContent Title");
+
+		AssertConsoleTextNotPresent(value1 = "java.lang.OutOfMemoryError");
+	}
+
 	@priority = "4"
 	test ViewAllFileTypesEnabled {
 		property test.name.skip.portal.instance = "WebContentDisplay#ViewAllFileTypesEnabled";
