@@ -313,6 +313,34 @@ definition {
 		PortletEntry.save();
 	}
 
+	macro addGuestAccount {
+		LexiconEntry.gotoAdd();
+
+		PortletEntry.inputName(name = "${accountName}");
+
+		SelectField.select(
+			selectFieldLabel = "Type",
+			selectFieldValue = "Guest");
+
+		if (isSet(accountDescription)) {
+			PortletEntry.inputDescription(description = "${accountDescription}");
+		}
+
+		if (isSet(accountLogo)) {
+			User.changeProfileImage(imageName = "${accountLogo}");
+		}
+
+		if (isSet(accountTaxID)) {
+			PortletEntry.inputText(
+				fieldLabel = "Tax ID",
+				text = "${accountTaxID}");
+		}
+
+		Button.clickSave();
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro addInactiveBusinessAccount {
 		LexiconEntry.gotoAdd();
 
