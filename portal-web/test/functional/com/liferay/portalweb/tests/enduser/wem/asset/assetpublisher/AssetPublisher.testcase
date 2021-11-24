@@ -1005,4 +1005,45 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-135554. This test assert the Web Content Article Structures should appear after uncheck Search With Index configuration."
+	@priority = "4"
+	test CanWebContentArticleStructuresAppearAfterUncheckSearchWithIndexConfiguration {
+		property test.name.skip.portal.instance = "SystemSettings#CanWebContentArticleStructuresAppearAfterUncheckSearchWithIndexConfiguration";
+
+		task ("Uncheck Search with Index Configuration") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
+
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Assets",
+				configurationName = "Asset Publisher",
+				configurationScope = "System Scope");
+
+			FormFields.disableCheckbox(fieldName = "searchWithIndex");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Assert the Web Content Article Structures selector appear.") {
+			
+			Navigator.gotoSitePage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.configureAssetTypePG(
+				assetSubtype = "Any",
+				selectedAsset = "Web Content Article");
+
+			Navigator.gotoSitePage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.viewSelectedPG(
+				assetSubtypeConfiguration = "Any",
+				selectedAsset = "Basic Web Content",
+				selectedAssetConfiguration = "Web Content Article");
+		}
+	}
 }
