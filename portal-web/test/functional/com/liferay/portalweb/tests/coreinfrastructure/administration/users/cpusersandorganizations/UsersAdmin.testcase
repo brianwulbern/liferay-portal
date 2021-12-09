@@ -838,7 +838,7 @@ definition {
 
 	@description = "This is a use case for LPS-79937. Portlet options are visible from Control Panel when direct.servlet.context.enabled=false."
 	@priority = "4"
-	test CanBeExportUsers {
+	test CanExportUsersWithDirectServletContextDisabled {
 		property custom.properties = "direct.servlet.context.enabled=false";
 
 		ApplicationsMenu.gotoPortlet(
