@@ -77,7 +77,7 @@ definition {
 			webContentTitleEscapeCharacter = '''&lt;!-- --&gt;''');
 	}
 
-	@description = "This is a test for LPS-125458. The web content created via Headless should be assigned to the default display page."
+	@description = "This is a test for LPS-125458 and LPS-81244. The web content created via Headless should be assigned to the default display page."
 	@priority = "4"
 	test AddWebContentViaHeadlessAssignedToDefaultDisplayPage {
 		task ("Add a web content folder") {
@@ -134,6 +134,31 @@ definition {
 			AssertTextEquals(
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
+		}
+
+		task ("Add an Asset Publisher widget to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Configure Asset Link Behavior to View in Context") {
+			Navigator.gotoSitePage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.configureAssetLinkBehaviorPG(assetLinkBehavior = "View in Context");
+		}
+
+		task ("View web content should be rendered in the default display page") {
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Web Content Title");
+
+			ControlMenu.viewHeaderTitle(headerTitle = "Display Page Name");
 		}
 	}
 
