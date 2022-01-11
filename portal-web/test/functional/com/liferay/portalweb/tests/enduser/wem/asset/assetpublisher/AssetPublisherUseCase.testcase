@@ -1455,7 +1455,7 @@ definition {
 			assetTitle = "WC WebContent English Title");
 
 		AssertLocation.assertPartialLocation(value1 = "-/webcontentenglish");
-		
+
 		LanguagePortlet.selectLanguagePG(
 			locale = "de-DE",
 			textIcon = "deutsch-Deutschland");
