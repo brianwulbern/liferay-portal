@@ -32,7 +32,7 @@ definition {
 		}
 	}
 
-	@description = "This test checks that an inline image can be added to a blog."
+	@description = "This is a usecase for LPS-110117. This test checks that an inline image can be added to a blog."
 	@priority = "4"
 	@refactordone
 	@uitest
@@ -45,6 +45,24 @@ definition {
 			entryContent = "Blogs Entry Content",
 			navTab = "Upload Image",
 			uploadFileName = "Document_1.jpg");
+
+		Click(
+			key_uploadFileName = "Document_1",
+			locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+
+		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK");
+
+		Type(
+			locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT",
+			value1 = "www.liferay.com");
+
+		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
+
+		Click(
+			key_uploadFileName = "Document_1",
+			locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+
+		AssertVisible(locator1 = "AlloyEditor#IMAGE_TOOLBAR");
 
 		PortletEntry.publish();
 
