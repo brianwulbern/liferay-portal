@@ -420,6 +420,28 @@ definition {
 			entryContentEdit = "${entryContentEdit}");
 	}
 
+	macro editEntryInlineImageURL {
+		if (isSet(uploadFileName)) {
+			Click(
+				key_uploadFileName = "${uploadFileName}",
+				locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+
+			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK");
+
+			Type(
+				locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT",
+				value1 = "${entryInlineImageUrl}");
+
+			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
+
+			Click(
+				key_uploadFileName = "${uploadFileName}",
+				locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+
+			AssertVisible(locator1 = "AlloyEditor#IMAGE_TOOLBAR");
+		}
+	}
+
 	macro editNoPermissionPG {
 		var key_entryTitle = "${entryTitle}";
 
