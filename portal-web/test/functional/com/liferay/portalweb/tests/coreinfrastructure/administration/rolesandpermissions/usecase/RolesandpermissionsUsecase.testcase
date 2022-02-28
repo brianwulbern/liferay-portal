@@ -44,6 +44,33 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-132482."
+	@priority = "5"
+	test AssertSelectAllCheckboxDisplayPorperlyUnderDefinePermissionsTab {
+		property test.name.skip.portal.instance = "RolesandpermissionsUsecase#AssertSelectAllCheckboxDisplayPorperlyUnderDefinePermissionsTab";
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
+
+		Role.viewCP(
+			roleKey = "Guest",
+			roleType = "Regular");
+
+		Navigator.gotoNavItem(navItem = "Define Permissions");
+
+		Type(
+			locator1 = "RolesPermissionsNavigation#SEARCH_FIELD",
+			value1 = "Users and Organizations");
+
+		AssertClick(
+			locator1 = "RolesPermissionsNavigation#CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS",
+			value1 = "Users and Organizations");
+
+		AssertElementPresent.assertVisible(locator1 = "RolesPermissions#CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS_APLICATION_PERMISSION_ACTION_CHECKBOX");
+	}
+
 	@description = "This is a use case for LPS-133818. Able to add Site Administration permissions for specific site."
 	@priority = "4"
 	test CanAddSitePermissionForSpecificSite {
