@@ -1808,30 +1808,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/mime4j-core.jar</file-name>
-				<version>0.8.3</version>
-				<project-name>Mime4j</project-name>
-				<project-url>http://james.apache.org/mime4j</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/mime4j-dom.jar</file-name>
-				<version>0.8.3</version>
-				<project-name>Mime4j</project-name>
-				<project-url>http://james.apache.org/mime4j</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/mimepull.jar</file-name>
 				<version>1.3</version>
 				<project-name>MIME pull</project-name>
@@ -1888,58 +1864,6 @@
 					<license>
 						<license-name>Common Development and Distribution License 1.0</license-name>
 						<license-url>https://opensource.org/licenses/CDDL-1.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/poi.jar</file-name>
-				<version>4.1.2</version>
-				<project-name>POI</project-name>
-				<project-url>http://poi.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2009 The Apache Software Foundation</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/poi-ooxml.jar</file-name>
-				<version>4.1.2</version>
-				<project-name>POI</project-name>
-				<project-url>http://poi.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2009 The Apache Software Foundation</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/poi-ooxml-schemas.jar</file-name>
-				<version>4.1.2</version>
-				<project-name>POI</project-name>
-				<project-url>http://poi.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2009 The Apache Software Foundation</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/poi-scratchpad.jar</file-name>
-				<version>4.1.2</version>
-				<project-name>POI</project-name>
-				<project-url>http://poi.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2009 The Apache Software Foundation</copyright-notice>
 					</license>
 				</licenses>
 			</library>
