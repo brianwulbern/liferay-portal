@@ -282,7 +282,7 @@ public class DLFileEntryLocalServiceTest {
 
 		dlFileEntry =
 			DLFileEntryLocalServiceUtil.getDLFileEntryByExternalReferenceCode(
-				_group.getGroupId(), externalReferenceCode);
+				externalReferenceCode, _group.getGroupId());
 
 		Assert.assertEquals(
 			externalReferenceCode, dlFileEntry.getExternalReferenceCode());
@@ -308,7 +308,7 @@ public class DLFileEntryLocalServiceTest {
 
 		DLFileEntry dlFileEntry2 =
 			DLFileEntryLocalServiceUtil.getDLFileEntryByExternalReferenceCode(
-				_group.getGroupId(), externalReferenceCode);
+				externalReferenceCode, _group.getGroupId());
 
 		Assert.assertEquals(dlFileEntry1, dlFileEntry2);
 	}

@@ -557,7 +557,7 @@ public class KBArticleLocalServiceTest {
 
 		KBArticle kbArticle2 =
 			_kbArticleLocalService.getLatestKBArticleByExternalReferenceCode(
-				_group.getGroupId(), externalReferenceCode);
+				externalReferenceCode, _group.getGroupId());
 
 		Assert.assertEquals(kbArticle1, kbArticle2);
 	}

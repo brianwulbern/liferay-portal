@@ -183,7 +183,7 @@ public class JournalArticleServiceTest {
 
 		_latestArticle =
 			JournalArticleServiceUtil.fetchLatestArticleByExternalReferenceCode(
-				_group.getGroupId(), externalReferenceCode);
+				externalReferenceCode, _group.getGroupId());
 
 		Assert.assertNotNull(_latestArticle);
 		Assert.assertEquals(
@@ -217,7 +217,7 @@ public class JournalArticleServiceTest {
 
 		_latestArticle =
 			JournalArticleServiceUtil.fetchLatestArticleByExternalReferenceCode(
-				_group.getGroupId(), externalReferenceCode);
+				externalReferenceCode, _group.getGroupId());
 
 		Assert.assertNotNull(_latestArticle);
 		Assert.assertEquals(_article, _latestArticle);
