@@ -668,6 +668,13 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 		</if>
 	</target>
 
+	<target name="format-source-language-keys-context">
+		<antcall target="format-source-files">
+			<param name="format.current.branch" value="true" />
+			<param name="source.check.names" value="PropertiesLanguageKeysContextCheck" />
+		</antcall>
+	</target>
+
 	<target name="format-source-latest-author">
 		<antcall target="format-source-files">
 			<param name="format.latest.author" value="true" />
