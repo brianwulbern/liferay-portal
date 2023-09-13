@@ -145,7 +145,8 @@ public class PortletQNameImpl implements PortletQName {
 		String publicRenderParameterName, String identifier) {
 
 		if (!Objects.equals(
-				identifier, _identifiers.get(publicRenderParameterName))) {
+				identifier,
+				_identifiers.get(publicRenderParameterName))) {
 
 			_identifiers.put(publicRenderParameterName, identifier);
 		}
