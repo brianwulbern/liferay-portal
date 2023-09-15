@@ -99,8 +99,8 @@ public class CPDefinitionOptionRelCacheModel
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
-		sb.append(", DDMFormFieldTypeName=");
-		sb.append(DDMFormFieldTypeName);
+		sb.append(", commerceOptionTypeKey=");
+		sb.append(commerceOptionTypeKey);
 		sb.append(", infoItemServiceKey=");
 		sb.append(infoItemServiceKey);
 		sb.append(", priority=");
@@ -183,12 +183,12 @@ public class CPDefinitionOptionRelCacheModel
 			cpDefinitionOptionRelImpl.setDescription(description);
 		}
 
-		if (DDMFormFieldTypeName == null) {
-			cpDefinitionOptionRelImpl.setDDMFormFieldTypeName("");
+		if (commerceOptionTypeKey == null) {
+			cpDefinitionOptionRelImpl.setCommerceOptionTypeKey("");
 		}
 		else {
-			cpDefinitionOptionRelImpl.setDDMFormFieldTypeName(
-				DDMFormFieldTypeName);
+			cpDefinitionOptionRelImpl.setCommerceOptionTypeKey(
+				commerceOptionTypeKey);
 		}
 
 		if (infoItemServiceKey == null) {
@@ -231,7 +231,9 @@ public class CPDefinitionOptionRelCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 
 		ctCollectionId = objectInput.readLong();
@@ -253,7 +255,7 @@ public class CPDefinitionOptionRelCacheModel
 		CPOptionId = objectInput.readLong();
 		name = objectInput.readUTF();
 		description = objectInput.readUTF();
-		DDMFormFieldTypeName = objectInput.readUTF();
+		commerceOptionTypeKey = objectInput.readUTF();
 		infoItemServiceKey = objectInput.readUTF();
 
 		priority = objectInput.readDouble();
@@ -267,7 +269,7 @@ public class CPDefinitionOptionRelCacheModel
 		skuContributor = objectInput.readBoolean();
 		key = objectInput.readUTF();
 		priceType = objectInput.readUTF();
-		typeSettings = objectInput.readUTF();
+		typeSettings = (String)objectInput.readObject();
 	}
 
 	@Override
@@ -319,11 +321,11 @@ public class CPDefinitionOptionRelCacheModel
 			objectOutput.writeUTF(description);
 		}
 
-		if (DDMFormFieldTypeName == null) {
+		if (commerceOptionTypeKey == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(DDMFormFieldTypeName);
+			objectOutput.writeUTF(commerceOptionTypeKey);
 		}
 
 		if (infoItemServiceKey == null) {
@@ -358,10 +360,10 @@ public class CPDefinitionOptionRelCacheModel
 		}
 
 		if (typeSettings == null) {
-			objectOutput.writeUTF("");
+			objectOutput.writeObject("");
 		}
 		else {
-			objectOutput.writeUTF(typeSettings);
+			objectOutput.writeObject(typeSettings);
 		}
 	}
 
@@ -379,7 +381,7 @@ public class CPDefinitionOptionRelCacheModel
 	public long CPOptionId;
 	public String name;
 	public String description;
-	public String DDMFormFieldTypeName;
+	public String commerceOptionTypeKey;
 	public String infoItemServiceKey;
 	public double priority;
 	public boolean definedExternally;

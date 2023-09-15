@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.StrutsAction;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -68,6 +69,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.text.SimpleDateFormat;
 
@@ -229,7 +231,7 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 			String displayPageURL = _getDisplayPageURL(
 				className,
 				ParamUtil.getString(httpServletRequest, "displayPage"),
-				infoItem);
+				httpServletRequest, infoItem);
 
 			redirect = ParamUtil.getString(httpServletRequest, "redirect");
 
@@ -287,8 +289,14 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 				_log.debug(infoFormValidationException);
 			}
 
-			SessionErrors.add(
-				httpServletRequest, formItemId, infoFormValidationException);
+			if (!FeatureFlagManagerUtil.isEnabled("LPS-182728")) {
+				SessionErrors.add(
+					httpServletRequest, formItemId,
+					infoFormValidationException);
+			}
+
+			boolean hasInfoFormValidationExceptionCustomValidationErrors =
+				false;
 
 			if (infoFormValidationException instanceof
 					InfoFormValidationException.RuleValidation) {
@@ -313,7 +321,22 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 								getInfoFieldUniqueId(),
 							infoFormValidationExceptionCustomValidation);
 					}
+					else {
+						SessionErrors.add(
+							httpServletRequest, formItemId,
+							infoFormValidationExceptionCustomValidation);
+					}
+
+					hasInfoFormValidationExceptionCustomValidationErrors = true;
 				}
+			}
+
+			if (!FeatureFlagManagerUtil.isEnabled("LPS-182728") ||
+				!hasInfoFormValidationExceptionCustomValidationErrors) {
+
+				SessionErrors.add(
+					httpServletRequest, formItemId,
+					infoFormValidationException);
 			}
 
 			if (Validator.isNotNull(
@@ -457,7 +480,8 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 	}
 
 	private String _getDisplayPageURL(
-		String className, String displayPage, Object infoItem) {
+		String className, String displayPage,
+		HttpServletRequest httpServletRequest, Object infoItem) {
 
 		if (infoItem == null) {
 			return StringPool.BLANK;
@@ -480,7 +504,12 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 				return StringPool.BLANK;
 			}
 
-			return GetterUtil.getString(infoFieldValue.getValue());
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			return GetterUtil.getString(
+				infoFieldValue.getValue(themeDisplay.getLocale()));
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

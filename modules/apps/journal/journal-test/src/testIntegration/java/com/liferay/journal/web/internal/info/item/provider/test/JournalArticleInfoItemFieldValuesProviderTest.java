@@ -203,7 +203,7 @@ public class JournalArticleInfoItemFieldValuesProviderTest {
 
 			Assert.assertEquals(
 				journalArticle.getArticleImageURL(themeDisplay),
-				webImage.getUrl());
+				webImage.getURL());
 		}
 		finally {
 			ServiceContextThreadLocal.pushServiceContext(

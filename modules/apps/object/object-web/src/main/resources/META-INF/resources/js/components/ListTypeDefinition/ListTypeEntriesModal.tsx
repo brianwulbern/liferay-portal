@@ -20,6 +20,7 @@ import {defaultLanguageId} from '../../utils/constants';
 import {specialCharactersInString, toCamelCase} from '../../utils/string';
 import {ObjectValidationErrors} from './ListTypeFormBase';
 import {fixLocaleKeys} from './utils';
+
 export interface IModalState extends Partial<PickListItem> {
 	header?: string;
 	itemExternalReferenceCode?: string;
@@ -29,6 +30,7 @@ export interface IModalState extends Partial<PickListItem> {
 	pickListId?: number;
 	readOnly?: boolean;
 	reloadIframeWindow?: () => void;
+	system?: boolean;
 }
 
 function ListTypeEntriesModal() {
@@ -43,6 +45,7 @@ function ListTypeEntriesModal() {
 			pickListId,
 			readOnly,
 			reloadIframeWindow,
+			system,
 		},
 		setState,
 	] = useState<IModalState>({});
@@ -241,6 +244,7 @@ function ListTypeEntriesModal() {
 
 				{modalType === 'edit' && (
 					<Input
+						disabled={system}
 						error={errors.externalReferenceCode}
 						label={Liferay.Language.get('external-reference-code')}
 						name="externalReferenceCode"

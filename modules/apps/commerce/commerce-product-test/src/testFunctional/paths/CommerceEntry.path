@@ -227,7 +227,7 @@
 </tr>
 <tr>
 	<td>FIELD_TYPE_SELECT</td>
-	<td>//div/select[contains(@id,'FieldTypeName')]</td>
+	<td>//div/select[contains(@id,'commerceOptionTypeKey')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -688,6 +688,11 @@
 <tr>
 	<td>ENTRY_CONTENT_ROW_NUMBER</td>
 	<td>//table[@class='table table-autofit']/tbody/tr[${key_rowNumber}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_CONTENT_ROW_NUMBER_DATASET</td>
+	<td>//table[@class='table table-autofit']/tbody/tr[${key_rowNumber}]/td[text()="${key_entry}"]</td>
 	<td></td>
 </tr>
 <tr>

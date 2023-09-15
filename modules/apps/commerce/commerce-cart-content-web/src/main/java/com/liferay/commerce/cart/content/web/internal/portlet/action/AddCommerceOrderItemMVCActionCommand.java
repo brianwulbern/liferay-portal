@@ -66,25 +66,20 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			actionRequest);
-
 		HttpServletResponse httpServletResponse =
 			_portal.getHttpServletResponse(actionResponse);
 
-		BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
-			actionRequest, "quantity", BigDecimal.ZERO);
-		String unitOfMeasureKey = ParamUtil.getString(
-			actionRequest, "unitOfMeasureKey");
-		String ddmFormValues = ParamUtil.getString(
-			actionRequest, "ddmFormValues");
-
 		long cpInstanceId = ParamUtil.getLong(actionRequest, "cpInstanceId");
+
+		String formFieldValues = ParamUtil.getString(
+			actionRequest, "formFieldValues");
 
 		if (cpInstanceId == 0) {
 			long cpDefinitionId = ParamUtil.getLong(
 				actionRequest, "cpDefinitionId");
 
 			CPInstance cpInstance = _cpInstanceHelper.fetchCPInstance(
-				cpDefinitionId, ddmFormValues);
+				cpDefinitionId, formFieldValues);
 
 			if (cpInstance != null) {
 				cpInstanceId = cpInstance.getCPInstanceId();
@@ -101,6 +96,11 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 					httpServletRequest);
 			}
 
+			BigDecimal quantity = (BigDecimal)ParamUtil.getNumber(
+				actionRequest, "quantity", BigDecimal.ZERO);
+			String unitOfMeasureKey = ParamUtil.getString(
+				actionRequest, "unitOfMeasureKey");
+
 			CommerceContext commerceContext =
 				(CommerceContext)httpServletRequest.getAttribute(
 					CommerceWebKeys.COMMERCE_CONTEXT);
@@ -111,8 +111,8 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 			CommerceOrderItem commerceOrderItem =
 				_commerceOrderItemService.addOrUpdateCommerceOrderItem(
 					commerceOrder.getCommerceOrderId(), cpInstanceId,
-					ddmFormValues, quantity, 0, 0, unitOfMeasureKey,
-					commerceContext, serviceContext);
+					formFieldValues, quantity, 0, BigDecimal.ZERO,
+					unitOfMeasureKey, commerceContext, serviceContext);
 
 			jsonObject.put(
 				"commerceOrderItemId",

@@ -6,6 +6,7 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalService;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
@@ -53,8 +54,9 @@ public class GetLayoutPageTemplateCollectionsMVCResourceCommand
 		List<LayoutPageTemplateCollection> layoutPageTemplateCollections =
 			_layoutPageTemplateCollectionLocalService.
 				getLayoutPageTemplateCollections(
-					themeDisplay.getScopeGroupId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS,
+					themeDisplay.getScopeGroupId(),
+					LayoutPageTemplateEntryTypeConstants.TYPE_BASIC,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 					new LayoutPageTemplateCollectionNameComparator(true));
 
 		for (LayoutPageTemplateCollection layoutPageTemplateCollection :

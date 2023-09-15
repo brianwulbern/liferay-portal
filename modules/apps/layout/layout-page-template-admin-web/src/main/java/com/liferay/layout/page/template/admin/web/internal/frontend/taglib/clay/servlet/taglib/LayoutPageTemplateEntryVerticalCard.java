@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutPrototypeServiceUtil;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -85,6 +86,8 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 				return null;
 			}
 
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 			if (Objects.equals(
 					_layoutPageTemplateEntry.getType(),
 					LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE)) {
@@ -99,24 +102,20 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 
 				Group layoutPrototypeGroup = layoutPrototype.getGroup();
 
-				String layoutFullURL = layoutPrototypeGroup.getDisplayURL(
-					themeDisplay, true);
-
-				return HttpComponentsUtil.setParameter(
-					layoutFullURL, "p_l_back_url",
-					themeDisplay.getURLCurrent());
+				return HttpComponentsUtil.addParameters(
+					layoutPrototypeGroup.getDisplayURL(themeDisplay, true),
+					"p_l_back_url", themeDisplay.getURLCurrent(),
+					"p_l_back_url_title", portletDisplay.getTitle());
 			}
 
-			String layoutFullURL = PortalUtil.getLayoutFullURL(
-				LayoutLocalServiceUtil.fetchDraftLayout(
-					_layoutPageTemplateEntry.getPlid()),
-				themeDisplay);
-
-			layoutFullURL = HttpComponentsUtil.setParameter(
-				layoutFullURL, "p_l_mode", Constants.EDIT);
-
-			return HttpComponentsUtil.setParameter(
-				layoutFullURL, "p_l_back_url", themeDisplay.getURLCurrent());
+			return HttpComponentsUtil.addParameters(
+				PortalUtil.getLayoutFullURL(
+					LayoutLocalServiceUtil.fetchDraftLayout(
+						_layoutPageTemplateEntry.getPlid()),
+					themeDisplay),
+				"p_l_back_url", themeDisplay.getURLCurrent(),
+				"p_l_back_url_title", portletDisplay.getTitle(), "p_l_mode",
+				Constants.EDIT);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

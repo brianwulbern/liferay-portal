@@ -1561,7 +1561,8 @@ public class LayoutsAdminDisplayContext {
 		for (LayoutPageTemplateCollection layoutPageTemplateCollection :
 				LayoutPageTemplateCollectionServiceUtil.
 					getLayoutPageTemplateCollections(
-						themeDisplay.getScopeGroupId())) {
+						themeDisplay.getScopeGroupId(),
+						LayoutPageTemplateEntryTypeConstants.TYPE_BASIC)) {
 
 			int layoutPageTemplateEntriesCount =
 				LayoutPageTemplateEntryServiceUtil.
@@ -2286,12 +2287,12 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	private String _getDraftLayoutURL(Layout layout) throws Exception {
-		String layoutFullURL = HttpComponentsUtil.setParameter(
-			PortalUtil.getLayoutFullURL(getDraftLayout(layout), themeDisplay),
-			"p_l_back_url", _getBackURL());
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-		return HttpComponentsUtil.setParameter(
-			layoutFullURL, "p_l_mode", Constants.EDIT);
+		return HttpComponentsUtil.addParameters(
+			PortalUtil.getLayoutFullURL(getDraftLayout(layout), themeDisplay),
+			"p_l_back_url", _getBackURL(), "p_l_back_url_title",
+			portletDisplay.getTitle(), "p_l_mode", Constants.EDIT);
 	}
 
 	private String _getFriendlyURLWarningURL() {

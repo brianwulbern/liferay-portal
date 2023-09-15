@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -89,14 +90,13 @@ public class DisplayPageVerticalCard
 	@Override
 	public String getHref() {
 		try {
-			String layoutFullURL = PortalUtil.getLayoutFullURL(
-				_draftLayout, _themeDisplay);
+			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
 
-			layoutFullURL = HttpComponentsUtil.setParameter(
-				layoutFullURL, "p_l_mode", Constants.EDIT);
-
-			return HttpComponentsUtil.setParameter(
-				layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
+			return HttpComponentsUtil.addParameters(
+				PortalUtil.getLayoutFullURL(_draftLayout, _themeDisplay),
+				"p_l_back_url", _themeDisplay.getURLCurrent(),
+				"p_l_back_url_title", portletDisplay.getTitle(), "p_l_mode",
+				Constants.EDIT);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

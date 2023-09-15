@@ -136,7 +136,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 		else if (fieldValue instanceof WebImage) {
 			WebImage webImage = (WebImage)fieldValue;
 
-			return GetterUtil.getString(webImage.getUrl());
+			return GetterUtil.getString(webImage.getURL());
 		}
 
 		return StringPool.BLANK;

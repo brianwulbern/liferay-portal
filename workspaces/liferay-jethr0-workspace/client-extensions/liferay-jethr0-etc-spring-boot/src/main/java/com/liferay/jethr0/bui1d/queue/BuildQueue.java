@@ -11,10 +11,10 @@ import com.liferay.jethr0.bui1d.repository.BuildParameterEntityRepository;
 import com.liferay.jethr0.bui1d.repository.BuildRunEntityRepository;
 import com.liferay.jethr0.environment.repository.EnvironmentEntityRepository;
 import com.liferay.jethr0.jenkins.node.JenkinsNodeEntity;
-import com.liferay.jethr0.project.ProjectEntity;
-import com.liferay.jethr0.project.dalo.ProjectToBuildsEntityRelationshipDALO;
-import com.liferay.jethr0.project.queue.ProjectQueue;
-import com.liferay.jethr0.project.repository.ProjectEntityRepository;
+import com.liferay.jethr0.job.JobEntity;
+import com.liferay.jethr0.job.dalo.JobToBuildsEntityRelationshipDALO;
+import com.liferay.jethr0.job.queue.JobQueue;
+import com.liferay.jethr0.job.repository.JobEntityRepository;
 import com.liferay.jethr0.task.repository.TaskEntityRepository;
 
 import java.util.ArrayList;
@@ -58,16 +58,16 @@ public class BuildQueue {
 		sort();
 	}
 
-	public void addProjectEntities(Set<ProjectEntity> projectEntities) {
-		for (ProjectEntity projectEntity : projectEntities) {
-			_projectQueue.addProjectEntity(projectEntity);
+	public void addJobEntities(Set<JobEntity> jobEntities) {
+		for (JobEntity jobEntity : jobEntities) {
+			_jobQueue.addJobEntity(jobEntity);
 		}
 
 		sort();
 	}
 
-	public void addProjectEntity(ProjectEntity projectEntity) {
-		addProjectEntities(Collections.singleton(projectEntity));
+	public void addJobEntity(JobEntity jobEntity) {
+		addJobEntities(Collections.singleton(jobEntity));
 	}
 
 	public List<BuildEntity> getBuildEntities() {
@@ -76,13 +76,13 @@ public class BuildQueue {
 		}
 	}
 
-	public ProjectQueue getProjectQueue() {
-		return _projectQueue;
+	public JobQueue getJobQueue() {
+		return _jobQueue;
 	}
 
 	public void initialize() {
-		for (ProjectEntity projectEntity : _projectQueue.getProjectEntities()) {
-			for (BuildEntity buildEntity : projectEntity.getBuildEntities()) {
+		for (JobEntity jobEntity : _jobQueue.getJobEntities()) {
+			for (BuildEntity buildEntity : jobEntity.getBuildEntities()) {
 				_buildRunEntityRepository.getAll(buildEntity);
 				_buildParameterEntityRepository.getAll(buildEntity);
 				_environmentEntityRepository.getAll(buildEntity);
@@ -117,8 +117,8 @@ public class BuildQueue {
 		}
 	}
 
-	public void setProjectQueue(ProjectQueue projectQueue) {
-		_projectQueue = projectQueue;
+	public void setJobQueue(JobQueue jobQueue) {
+		_jobQueue = jobQueue;
 
 		sort();
 	}
@@ -127,13 +127,11 @@ public class BuildQueue {
 		synchronized (_sortedBuildEntities) {
 			_sortedBuildEntities.clear();
 
-			_projectQueue.sort();
+			_jobQueue.sort();
 
-			for (ProjectEntity projectEntity :
-					_projectQueue.getProjectEntities()) {
-
+			for (JobEntity jobEntity : _jobQueue.getJobEntities()) {
 				List<BuildEntity> buildEntities = new ArrayList<>(
-					projectEntity.getBuildEntities());
+					jobEntity.getBuildEntities());
 
 				buildEntities.removeAll(Collections.singleton(null));
 
@@ -181,14 +179,14 @@ public class BuildQueue {
 	private EnvironmentEntityRepository _environmentEntityRepository;
 
 	@Autowired
-	private ProjectEntityRepository _projectEntityRepository;
+	private JobEntityRepository _jobEntityRepository;
 
 	@Autowired
-	private ProjectQueue _projectQueue;
+	private JobQueue _jobQueue;
 
 	@Autowired
-	private ProjectToBuildsEntityRelationshipDALO
-		_projectToBuildsEntityRelationshipDALO;
+	private JobToBuildsEntityRelationshipDALO
+		_jobToBuildsEntityRelationshipDALO;
 
 	private final List<BuildEntity> _sortedBuildEntities = new ArrayList<>();
 

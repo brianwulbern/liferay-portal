@@ -10,10 +10,11 @@ import com.liferay.jethr0.bui1d.run.BuildRunEntity;
 import com.liferay.jethr0.entity.Entity;
 import com.liferay.jethr0.environment.EnvironmentEntity;
 import com.liferay.jethr0.jenkins.node.JenkinsNodeEntity;
-import com.liferay.jethr0.project.ProjectEntity;
+import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.task.TaskEntity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,8 +44,6 @@ public interface BuildEntity extends Entity {
 
 	public void addTaskEntity(TaskEntity taskEntity);
 
-	public String getBuildName();
-
 	public Set<BuildParameterEntity> getBuildParameterEntities();
 
 	public BuildParameterEntity getBuildParameterEntity(String name);
@@ -55,19 +54,23 @@ public interface BuildEntity extends Entity {
 
 	public Set<EnvironmentEntity> getEnvironmentEntities();
 
+	public List<BuildRunEntity> getHistoryBuildRunEntities();
+
+	public String getJenkinsJobName();
+
 	public JenkinsNodeEntity.Type getJenkinsNodeType();
 
-	public String getJobName();
+	public JobEntity getJobEntity();
+
+	public long getJobEntityId();
 
 	public int getMaxNodeCount();
 
 	public int getMinNodeRAM();
 
+	public String getName();
+
 	public Set<BuildEntity> getParentBuildEntities();
-
-	public ProjectEntity getProjectEntity();
-
-	public long getProjectEntityId();
 
 	public State getState();
 
@@ -98,16 +101,17 @@ public interface BuildEntity extends Entity {
 
 	public boolean requiresGoodBattery();
 
-	public void setJobName(String jobName);
+	public void setJenkinsJobName(String jenkinsJobName);
 
-	public void setProjectEntity(ProjectEntity projectEntity);
+	public void setJobEntity(JobEntity jobEntity);
 
 	public void setState(State state);
 
 	public enum State {
 
-		BLOCKED("blocked"), COMPLETED("completed"), OPENED("opened"),
-		QUEUED("queued"), RUNNING("running");
+		BLOCKED("blocked", "Blocked"), COMPLETED("completed", "Completed"),
+		OPENED("opened", "Opened"), QUEUED("queued", "Queued"),
+		RUNNING("running", "Running");
 
 		public static State get(JSONObject jsonObject) {
 			return getByKey(jsonObject.getString("key"));
@@ -118,15 +122,24 @@ public interface BuildEntity extends Entity {
 		}
 
 		public JSONObject getJSONObject() {
-			return new JSONObject("{\"key\": \"" + getKey() + "\"}");
+			JSONObject jsonObject = new JSONObject();
+
+			jsonObject.put(
+				"key", _key
+			).put(
+				"name", _name
+			);
+
+			return jsonObject;
 		}
 
 		public String getKey() {
 			return _key;
 		}
 
-		private State(String key) {
+		private State(String key, String name) {
 			_key = key;
+			_name = name;
 		}
 
 		private static final Map<String, State> _states = new HashMap<>();
@@ -138,6 +151,7 @@ public interface BuildEntity extends Entity {
 		}
 
 		private final String _key;
+		private final String _name;
 
 	}
 

@@ -71,7 +71,6 @@ import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 import java.math.BigDecimal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -125,7 +124,8 @@ public class ObjectEntryInfoItemFormProvider
 			return _getInfoForm(
 				0,
 				_displayPageInfoItemFieldSetProvider.getInfoFieldSet(
-					_getModelClassName(0), StringPool.BLANK, 0));
+					_getModelClassName(0), StringPool.BLANK,
+					ObjectEntry.class.getSimpleName(), 0));
 		}
 		catch (NoSuchFormVariationException noSuchFormVariationException) {
 			throw new RuntimeException(noSuchFormVariationException);
@@ -141,7 +141,7 @@ public class ObjectEntryInfoItemFormProvider
 				objectDefinitionId,
 				_displayPageInfoItemFieldSetProvider.getInfoFieldSet(
 					_getModelClassName(objectDefinitionId), StringPool.BLANK,
-					0));
+					ObjectEntry.class.getSimpleName(), 0));
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(
@@ -166,7 +166,7 @@ public class ObjectEntryInfoItemFormProvider
 			objectDefinitionId,
 			_displayPageInfoItemFieldSetProvider.getInfoFieldSet(
 				_getModelClassName(objectDefinitionId), StringPool.BLANK,
-				groupId));
+				ObjectEntry.class.getSimpleName(), groupId));
 	}
 
 	private InfoField<?> _addAttributes(
@@ -541,13 +541,13 @@ public class ObjectEntryInfoItemFormProvider
 			_templateInfoItemFieldSetProvider.getInfoFieldSet(modelClassName)
 		).infoFieldSetEntry(
 			unsafeConsumer -> {
-				if (!FeatureFlagManagerUtil.isEnabled("LPS-183727")) {
+				if (!FeatureFlagManagerUtil.isEnabled("LPS-195205")) {
 					unsafeConsumer.accept(_getDisplayPageInfoFieldSet());
 				}
 			}
 		).infoFieldSetEntry(
 			unsafeConsumer -> {
-				if (FeatureFlagManagerUtil.isEnabled("LPS-183727")) {
+				if (FeatureFlagManagerUtil.isEnabled("LPS-195205")) {
 					unsafeConsumer.accept(displayPageInfoFieldSet);
 				}
 			}
@@ -610,10 +610,6 @@ public class ObjectEntryInfoItemFormProvider
 	}
 
 	private List<InfoFieldSetEntry> _getObjectActionInfoFieldSetEntries() {
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-169992")) {
-			return Collections.emptyList();
-		}
-
 		InfoFieldSet.Builder infoFieldSetBuilder = InfoFieldSet.builder(
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.localize(

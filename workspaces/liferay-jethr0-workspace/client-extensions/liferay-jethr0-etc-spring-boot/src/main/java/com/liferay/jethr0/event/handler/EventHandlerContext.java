@@ -9,12 +9,12 @@ import com.liferay.jethr0.bui1d.queue.BuildQueue;
 import com.liferay.jethr0.bui1d.repository.BuildEntityRepository;
 import com.liferay.jethr0.bui1d.repository.BuildParameterEntityRepository;
 import com.liferay.jethr0.bui1d.repository.BuildRunEntityRepository;
+import com.liferay.jethr0.event.controller.EventJmsController;
 import com.liferay.jethr0.jenkins.JenkinsQueue;
 import com.liferay.jethr0.jenkins.repository.JenkinsCohortEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsNodeEntityRepository;
 import com.liferay.jethr0.jenkins.repository.JenkinsServerEntityRepository;
-import com.liferay.jethr0.jms.JMSEventHandler;
-import com.liferay.jethr0.project.repository.ProjectEntityRepository;
+import com.liferay.jethr0.job.repository.JobEntityRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +41,10 @@ public class EventHandlerContext {
 		return _buildRunEntityRepository;
 	}
 
+	public EventJmsController getEventJmsController() {
+		return _eventJmsController;
+	}
+
 	public JenkinsCohortEntityRepository getJenkinsCohortEntityRepository() {
 		return _jenkinsCohortEntityRepository;
 	}
@@ -57,16 +61,12 @@ public class EventHandlerContext {
 		return _jenkinsServerEntityRepository;
 	}
 
-	public JMSEventHandler getJMSEventHandler() {
-		return _jmsEventHandler;
+	public JobEntityRepository getJobEntityRepository() {
+		return _jobEntityRepository;
 	}
 
-	public ProjectEntityRepository getProjectEntityRepository() {
-		return _projectEntityRepository;
-	}
-
-	public void setJMSEventHandler(JMSEventHandler jmsEventHandler) {
-		_jmsEventHandler = jmsEventHandler;
+	public void setEventJmsController(EventJmsController eventJmsController) {
+		_eventJmsController = eventJmsController;
 	}
 
 	@Autowired
@@ -81,6 +81,8 @@ public class EventHandlerContext {
 	@Autowired
 	private BuildRunEntityRepository _buildRunEntityRepository;
 
+	private EventJmsController _eventJmsController;
+
 	@Autowired
 	private JenkinsCohortEntityRepository _jenkinsCohortEntityRepository;
 
@@ -93,9 +95,7 @@ public class EventHandlerContext {
 	@Autowired
 	private JenkinsServerEntityRepository _jenkinsServerEntityRepository;
 
-	private JMSEventHandler _jmsEventHandler;
-
 	@Autowired
-	private ProjectEntityRepository _projectEntityRepository;
+	private JobEntityRepository _jobEntityRepository;
 
 }

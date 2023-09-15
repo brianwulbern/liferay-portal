@@ -7,28 +7,38 @@ import ClayForm from '@clayui/form';
 import {FieldArray, Formik} from 'formik';
 import {useEffect, useState} from 'react';
 import SearchBuilder from '~/common/core/SearchBuilder';
+import {useCustomerPortal} from '../../../routes/customer-portal/context';
 import useCurrentKoroneikiAccount from '../../hooks/useCurrentKoroneikiAccount';
 import {getHighPriorityContacts} from '../../services/liferay/api';
 import HighPriorityContactsInput from './HighPriorityContactsInput';
-
-export const HIGH_PRIORITY_CONTACT_CATEGORIES = {
-	criticalIncidentContact: 'Critical Incident',
-	privacyBreachContact: 'Privacy Breach',
-	securityBreachContact: 'Security Breach',
-};
 
 const SetupHighPriorityContact = ({
 	addContactList,
 	disableSubmit,
 	filter,
+	isCriticalIncidentCard,
 	removedContactList,
 }) => {
 	const {data} = useCurrentKoroneikiAccount();
+	const [{project}] = useCustomerPortal();
 	const koroneikiAccount = data?.koroneikiAccountByExternalReferenceCode;
 	const [
 		currentHighPriorityContacts,
 		setCurrentHighPriorityContacts,
 	] = useState([]);
+
+	const getContactRoleByFilter = (filter) => {
+		if (filter.includes('Privacy')) {
+			return 'Data Breach Contact';
+		}
+
+		if (filter.includes('Security')) {
+			return 'Security Incident Contact';
+		}
+		if (filter.includes('Critical')) {
+			return 'Critical Incident Contact';
+		}
+	};
 
 	const mapFilterToContactsCategory = (filter) => {
 		const _filter = (
@@ -38,9 +48,17 @@ const SetupHighPriorityContact = ({
 		return {
 			contactsCategory: {
 				key: _filter,
-				name: `${filter}`,
+				name: filter,
+				role: getContactRoleByFilter(filter),
 			},
-			filterRequest: SearchBuilder.eq('contactsCategory', _filter),
+			filterRequest: new SearchBuilder()
+				.eq('contactsCategory', _filter)
+				.and()
+				.eq(
+					'r_accountEntryToHighPriorityContacts_accountEntryERC',
+					project.accountKey
+				)
+				.build(),
 		};
 	};
 
@@ -132,6 +150,7 @@ const SetupHighPriorityContact = ({
 						}
 						disableSubmit={handleMetaErrorChange}
 						inputName={filter}
+						isCriticalIncidentCard={isCriticalIncidentCard}
 						koroneikiAccount={koroneikiAccount}
 						setContactList={updateContacts}
 					/>

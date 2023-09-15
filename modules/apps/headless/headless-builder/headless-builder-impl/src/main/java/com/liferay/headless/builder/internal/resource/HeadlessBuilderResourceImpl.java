@@ -10,10 +10,11 @@ import com.liferay.headless.builder.constants.HeadlessBuilderConstants;
 import com.liferay.headless.builder.internal.application.endpoint.EndpointMatcher;
 import com.liferay.headless.builder.internal.helper.EndpointHelper;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Pagination;
+
+import java.util.function.Function;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,10 +30,11 @@ import javax.ws.rs.core.Response;
 public class HeadlessBuilderResourceImpl {
 
 	public HeadlessBuilderResourceImpl(
-		EndpointHelper endpointHelper, EndpointMatcher endpointMatcher) {
+		EndpointHelper endpointHelper,
+		Function<Long, EndpointMatcher> endpointMatcherFunction) {
 
 		_endpointHelper = endpointHelper;
-		_endpointMatcher = endpointMatcher;
+		_endpointMatcherFunction = endpointMatcherFunction;
 	}
 
 	@GET
@@ -90,12 +92,12 @@ public class HeadlessBuilderResourceImpl {
 				successUnsafeFunction)
 		throws Exception {
 
-		APIApplication.Endpoint endpoint = _endpointMatcher.getEndpoint(
-			"/" + path);
+		APIApplication.Endpoint endpoint = _getEndpoint(path, scope);
 
-		if ((endpoint == null) || (endpoint.getScope() != scope)) {
-			throw new NoSuchModelException(
-				"Endpoint /%s does not exist for " + path);
+		if (endpoint == null) {
+			return Response.status(
+				Response.Status.NOT_FOUND
+			).build();
 		}
 
 		if (endpoint.getResponseSchema() == null) {
@@ -108,6 +110,19 @@ public class HeadlessBuilderResourceImpl {
 		).build();
 	}
 
+	private APIApplication.Endpoint _getEndpoint(
+		String path, APIApplication.Endpoint.Scope scope) {
+
+		EndpointMatcher endpointMatcher = _endpointMatcherFunction.apply(
+			_company.getCompanyId());
+
+		if (endpointMatcher == null) {
+			return null;
+		}
+
+		return endpointMatcher.getEndpoint("/" + path, scope);
+	}
+
 	@Context
 	private AcceptLanguage _acceptLanguage;
 
@@ -115,6 +130,6 @@ public class HeadlessBuilderResourceImpl {
 	private Company _company;
 
 	private final EndpointHelper _endpointHelper;
-	private final EndpointMatcher _endpointMatcher;
+	private final Function<Long, EndpointMatcher> _endpointMatcherFunction;
 
 }

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import SourceDataRenderer from './FDSDataRenderers/SourceDataRenderer';
+
 interface MultiselectPicklistDataRendererProps {
 	value: {
 		key: string;
@@ -21,6 +23,7 @@ export default function MultiselectPicklistFDSPropsTransformer({
 				value,
 			}: MultiselectPicklistDataRendererProps) =>
 				value ? value.map((v) => v.name).join(', ') : '',
+			sourceDataRenderer: SourceDataRenderer,
 		},
 	};
 }

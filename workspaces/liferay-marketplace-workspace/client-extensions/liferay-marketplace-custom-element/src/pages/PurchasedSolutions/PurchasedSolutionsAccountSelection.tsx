@@ -36,9 +36,12 @@ const productCustomFields = [
 	'Site Initializer',
 ];
 
-const PurchasedSolutionsAccountSelection: React.FC<
-	PurchasedSolutionsccountSelectionProps
-> = ({accounts, currentUserAccount, orderInfo, setStep}) => {
+const PurchasedSolutionsAccountSelection: React.FC<PurchasedSolutionsccountSelectionProps> = ({
+	accounts,
+	currentUserAccount,
+	orderInfo,
+	setStep,
+}) => {
 	const [radio, setRadio] = useState<RadioOption>();
 	const [orderType, setOrderType] = useState<OrderType>();
 	const [disabledButton, setDisabledButton] = useState<boolean>(false);
@@ -60,6 +63,13 @@ const PurchasedSolutionsAccountSelection: React.FC<
 		type: '',
 	});
 
+	const trialLenght =
+		orderInfo?.specifications &&
+		orderInfo?.specifications?.find(
+			(specification) =>
+				specification?.specificationKey === 'trial-length'
+		);
+
 	const renderToastMessage = () => {
 		renderToast(
 			'We are unable to start your trial. Please contact our sales team via email - sales@liferay.com',
@@ -74,10 +84,11 @@ const PurchasedSolutionsAccountSelection: React.FC<
 
 	const findOrderTypeByName = (
 		orderTypes: OrderType[],
-		nameOrderType: string
+		nameOrderType = 'SOLUTIONS7'
 	) => {
 		return orderTypes.find(
-			({name}: OrderType) => name['en_US'] === nameOrderType
+			({externalReferenceCode}: OrderType) =>
+				externalReferenceCode === nameOrderType
 		);
 	};
 
@@ -85,7 +96,7 @@ const PurchasedSolutionsAccountSelection: React.FC<
 		const channels = await getChannels();
 		const orderTypes = await getOrderTypes();
 
-		if (!channels.length || !orderTypes.length || !orderInfo?.sku) {
+		if (!channels.length || !orderTypes.length) {
 			setDisabledButton(true);
 
 			renderToastMessage();
@@ -99,7 +110,7 @@ const PurchasedSolutionsAccountSelection: React.FC<
 
 		const projectOrderType = findOrderTypeByName(
 			orderTypes,
-			'Solutions - 30 day trial'
+			trialLenght?.value?.en_US as string
 		);
 
 		setOrderType(projectOrderType);
@@ -108,7 +119,7 @@ const PurchasedSolutionsAccountSelection: React.FC<
 	useEffect(() => {
 		fetchDataAndSetState();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [trialLenght]);
 
 	const customFields =
 		orderInfo?.product?.customFields?.filter((item) =>
@@ -153,6 +164,7 @@ const PurchasedSolutionsAccountSelection: React.FC<
 				},
 			],
 			orderStatus: 1,
+			orderTypeExternalReferenceCode: orderType?.externalReferenceCode,
 			orderTypeId: Number(orderType?.id),
 			shippingAmount: 0,
 			shippingWithTaxAmount: 0,
@@ -268,7 +280,9 @@ const PurchasedSolutionsAccountSelection: React.FC<
 
 									<ClayButton
 										disabled={
-											!radio?.value || disabledButton
+											!radio?.value ||
+											disabledButton ||
+											!orderInfo?.sku
 										}
 										onClick={() =>
 											orderInfo?.sku && onsubmit()

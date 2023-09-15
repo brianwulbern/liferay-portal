@@ -15,7 +15,6 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.PortletCategory;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -28,13 +27,12 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.portal.util.WebAppPool;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 
@@ -69,9 +67,7 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 	public void setUp() throws Exception {
 		_company = CompanyTestUtil.addCompany();
 
-		WebAppPool.put(
-			_company.getCompanyId(), WebKeys.PORTLET_CATEGORY,
-			new PortletCategory());
+		PortalInstances.initCompany(_company);
 
 		User user = UserTestUtil.addCompanyAdminUser(_company);
 
@@ -182,11 +178,6 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				label = Collections.singletonMap("en_US", "O" + finalName);
-
-				if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
-					modifiable = !finalSystem;
-				}
-
 				name = "O" + finalName;
 				objectFields = new ObjectField[] {_createObjectField()};
 				panelAppOrder = StringUtil.toLowerCase(
@@ -200,18 +191,27 @@ public class ObjectDefinitionVulcanBatchEngineTaskItemDelegateTest {
 				restContextPath = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				scope = ObjectDefinitionConstants.SCOPE_COMPANY;
-
-				if (FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-					storageType = StringUtil.toLowerCase(
-						RandomTestUtil.randomString());
-				}
-				else {
-					storageType = StringPool.BLANK;
-				}
-
 				system = finalSystem;
 				titleObjectFieldName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+
+				setModifiable(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+							return null;
+						}
+
+						return !finalSystem;
+					});
+				setStorageType(
+					() -> {
+						if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
+							return StringPool.BLANK;
+						}
+
+						return StringUtil.toLowerCase(
+							RandomTestUtil.randomString());
+					});
 			}
 		};
 	}

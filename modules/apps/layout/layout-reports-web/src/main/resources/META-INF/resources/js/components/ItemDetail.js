@@ -81,7 +81,7 @@ function FragmentDetail({fragment}) {
 				/>
 
 				<TextSection
-					labelType="primary"
+					labelType="secondary"
 					text={
 						cached
 							? Liferay.Language.get('cached')
@@ -137,10 +137,20 @@ function DetailPanel({badge, children, title}) {
 						{badge ? (
 							<ClayLayout.ContentCol>
 								<ClayBadge
+									aria-hidden={true}
 									displayType={badge.type}
 									label={badge.label}
 									title={badge.title}
 								/>
+
+								<span className="sr-only">
+									{sub(
+										Liferay.Language.get(
+											'number-of-warnings-x'
+										),
+										badge.label
+									)}
+								</span>
 							</ClayLayout.ContentCol>
 						) : null}
 					</ClayLayout.ContentRow>
@@ -267,7 +277,7 @@ function TextSection({labelType, text, title}) {
 function Warning({item}) {
 	return (
 		<ClayList.Item className="border-0 c-p-0">
-			<ClayAlert displayType="warning" variant="feedback">
+			<ClayAlert displayType="warning" role="none" variant="feedback">
 				{item}
 			</ClayAlert>
 		</ClayList.Item>

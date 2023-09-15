@@ -9,9 +9,9 @@ import com.liferay.jethr0.bui1d.BuildEntity;
 import com.liferay.jethr0.bui1d.dalo.BuildEntityDALO;
 import com.liferay.jethr0.entity.dalo.EntityDALO;
 import com.liferay.jethr0.entity.repository.BaseEntityRepository;
-import com.liferay.jethr0.project.ProjectEntity;
-import com.liferay.jethr0.project.dalo.ProjectToBuildsEntityRelationshipDALO;
-import com.liferay.jethr0.project.repository.ProjectEntityRepository;
+import com.liferay.jethr0.job.JobEntity;
+import com.liferay.jethr0.job.dalo.JobToBuildsEntityRelationshipDALO;
+import com.liferay.jethr0.job.repository.JobEntityRepository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,42 +27,41 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class BuildEntityRepository extends BaseEntityRepository<BuildEntity> {
 
-	public BuildEntity add(ProjectEntity projectEntity, JSONObject jsonObject) {
-		jsonObject.put("r_projectToBuilds_c_projectId", projectEntity.getId());
+	public BuildEntity add(JobEntity jobEntity, JSONObject jsonObject) {
+		jsonObject.put("r_jobToBuilds_c_jobId", jobEntity.getId());
 
 		BuildEntity buildEntity = add(jsonObject);
 
-		buildEntity.setProjectEntity(projectEntity);
+		buildEntity.setJobEntity(jobEntity);
 
-		projectEntity.addBuildEntity(buildEntity);
+		jobEntity.addBuildEntity(buildEntity);
 
 		return buildEntity;
 	}
 
 	public BuildEntity add(
-		ProjectEntity projectEntity, String buildName, String jobName,
+		JobEntity jobEntity, String name, String jenkinsJobName,
 		BuildEntity.State state) {
 
 		JSONObject jsonObject = new JSONObject();
 
 		jsonObject.put(
-			"buildName", buildName
+			"jenkinsJobName", jenkinsJobName
 		).put(
-			"jobName", jobName
+			"name", name
 		).put(
 			"state", state.getJSONObject()
 		);
 
-		return add(projectEntity, jsonObject);
+		return add(jobEntity, jsonObject);
 	}
 
-	public Set<BuildEntity> getAll(ProjectEntity projectEntity) {
+	public Set<BuildEntity> getAll(JobEntity jobEntity) {
 		Set<BuildEntity> buildEntities = new HashSet<>(
-			_projectToBuildsEntityRelationshipDALO.getChildEntities(
-				projectEntity));
+			_jobToBuildsEntityRelationshipDALO.getChildEntities(jobEntity));
 
 		for (BuildEntity buildEntity : buildEntities) {
-			buildEntity.setProjectEntity(projectEntity);
+			buildEntity.setJobEntity(jobEntity);
 		}
 
 		return addAll(buildEntities);
@@ -83,18 +82,18 @@ public class BuildEntityRepository extends BaseEntityRepository<BuildEntity> {
 			return;
 		}
 
-		_projectEntityRepository.initializeRelationships();
+		_jobEntityRepository.initializeRelationships();
 
 		for (BuildEntity buildEntity : getAll()) {
-			ProjectEntity projectEntity = null;
+			JobEntity jobEntity = null;
 
-			long projectId = buildEntity.getProjectEntityId();
+			long jobEntityId = buildEntity.getJobEntityId();
 
-			if (projectId != 0) {
-				projectEntity = _projectEntityRepository.getById(projectId);
+			if (jobEntityId != 0) {
+				jobEntity = _jobEntityRepository.getById(jobEntityId);
 			}
 
-			buildEntity.setProjectEntity(projectEntity);
+			buildEntity.setJobEntity(jobEntity);
 
 			buildEntity.addBuildParameterEntities(
 				_buildParameterEntityRepository.getAll(buildEntity));
@@ -118,10 +117,10 @@ public class BuildEntityRepository extends BaseEntityRepository<BuildEntity> {
 		_buildRunEntityRepository = buildRunEntityRepository;
 	}
 
-	public void setProjectEntityRepository(
-		ProjectEntityRepository projectEntityRepository) {
+	public void setJobEntityRepository(
+		JobEntityRepository jobEntityRepository) {
 
-		_projectEntityRepository = projectEntityRepository;
+		_jobEntityRepository = jobEntityRepository;
 	}
 
 	@Autowired
@@ -130,10 +129,10 @@ public class BuildEntityRepository extends BaseEntityRepository<BuildEntity> {
 	private BuildParameterEntityRepository _buildParameterEntityRepository;
 	private BuildRunEntityRepository _buildRunEntityRepository;
 	private boolean _initializedRelationships;
-	private ProjectEntityRepository _projectEntityRepository;
+	private JobEntityRepository _jobEntityRepository;
 
 	@Autowired
-	private ProjectToBuildsEntityRelationshipDALO
-		_projectToBuildsEntityRelationshipDALO;
+	private JobToBuildsEntityRelationshipDALO
+		_jobToBuildsEntityRelationshipDALO;
 
 }

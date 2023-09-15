@@ -968,23 +968,19 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 
 	@Test
 	public void testPostObjectDefinitionPublish() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ObjectDefinition objectDefinition =
-			testPostObjectDefinitionPublish_addObjectDefinition();
+		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
 
-		assertHttpResponseStatusCode(
-			204,
-			objectDefinitionResource.postObjectDefinitionPublishHttpResponse(
-				objectDefinition.getId()));
+		ObjectDefinition postObjectDefinition =
+			testPostObjectDefinitionPublish_addObjectDefinition(
+				randomObjectDefinition);
 
-		assertHttpResponseStatusCode(
-			404,
-			objectDefinitionResource.postObjectDefinitionPublishHttpResponse(
-				0L));
+		assertEquals(randomObjectDefinition, postObjectDefinition);
+		assertValid(postObjectDefinition);
 	}
 
 	protected ObjectDefinition
-			testPostObjectDefinitionPublish_addObjectDefinition()
+			testPostObjectDefinitionPublish_addObjectDefinition(
+				ObjectDefinition objectDefinition)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -1167,6 +1163,16 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 					"enableLocalization", additionalAssertFieldName)) {
 
 				if (objectDefinition.getEnableLocalization() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"enableObjectEntryDraft", additionalAssertFieldName)) {
+
+				if (objectDefinition.getEnableObjectEntryDraft() == null) {
 					valid = false;
 				}
 
@@ -1625,6 +1631,19 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				if (!Objects.deepEquals(
 						objectDefinition1.getEnableLocalization(),
 						objectDefinition2.getEnableLocalization())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"enableObjectEntryDraft", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						objectDefinition1.getEnableObjectEntryDraft(),
+						objectDefinition2.getEnableObjectEntryDraft())) {
 
 					return false;
 				}
@@ -2223,6 +2242,11 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("enableObjectEntryDraft")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("enableObjectEntryHistory")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2817,6 +2841,7 @@ public abstract class BaseObjectDefinitionResourceTestCase {
 				enableCategorization = RandomTestUtil.randomBoolean();
 				enableComments = RandomTestUtil.randomBoolean();
 				enableLocalization = RandomTestUtil.randomBoolean();
+				enableObjectEntryDraft = RandomTestUtil.randomBoolean();
 				enableObjectEntryHistory = RandomTestUtil.randomBoolean();
 				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());

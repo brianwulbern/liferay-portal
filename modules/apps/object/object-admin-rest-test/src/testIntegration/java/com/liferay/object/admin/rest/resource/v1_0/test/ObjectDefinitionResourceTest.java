@@ -57,7 +57,10 @@ import org.junit.runner.RunWith;
  * @author Javier Gamarra
  */
 @FeatureFlags(
-	{"LPS-148856", "LPS-167253", "LPS-170122", "LPS-172017", "LPS-187142"}
+	{
+		"LPS-148856", "LPS-167253", "LPS-170122", "LPS-172017", "LPS-181663",
+		"LPS-187142"
+	}
 )
 @RunWith(Arquillian.class)
 public class ObjectDefinitionResourceTest
@@ -500,10 +503,11 @@ public class ObjectDefinitionResourceTest
 
 	@Override
 	protected ObjectDefinition
-			testPostObjectDefinitionPublish_addObjectDefinition()
+			testPostObjectDefinitionPublish_addObjectDefinition(
+				ObjectDefinition objectDefinition)
 		throws Exception {
 
-		return _addObjectDefinition(randomObjectDefinition());
+		return _addObjectDefinition(objectDefinition);
 	}
 
 	@Override

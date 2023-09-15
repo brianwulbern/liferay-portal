@@ -10,11 +10,15 @@ import com.liferay.jethr0.bui1d.run.BuildRunEntity;
 import com.liferay.jethr0.entity.BaseEntity;
 import com.liferay.jethr0.environment.EnvironmentEntity;
 import com.liferay.jethr0.jenkins.node.JenkinsNodeEntity;
-import com.liferay.jethr0.project.ProjectEntity;
+import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.task.TaskEntity;
 import com.liferay.jethr0.util.StringUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -73,11 +77,6 @@ public abstract class BaseBuildEntity
 	}
 
 	@Override
-	public String getBuildName() {
-		return _buildName;
-	}
-
-	@Override
 	public Set<BuildParameterEntity> getBuildParameterEntities() {
 		return getRelatedEntities(BuildParameterEntity.class);
 	}
@@ -111,6 +110,23 @@ public abstract class BaseBuildEntity
 	}
 
 	@Override
+	public List<BuildRunEntity> getHistoryBuildRunEntities() {
+		List<BuildRunEntity> historyBuildRunEntities = new ArrayList<>(
+			getBuildRunEntities());
+
+		Collections.sort(
+			historyBuildRunEntities,
+			Comparator.comparing(BuildRunEntity::getCreatedDate));
+
+		return historyBuildRunEntities;
+	}
+
+	@Override
+	public String getJenkinsJobName() {
+		return _jenkinsJobName;
+	}
+
+	@Override
 	public JenkinsNodeEntity.Type getJenkinsNodeType() {
 		BuildParameterEntity buildParameterEntity = getBuildParameterEntity(
 			"NODE_TYPE");
@@ -130,8 +146,13 @@ public abstract class BaseBuildEntity
 	}
 
 	@Override
-	public String getJobName() {
-		return _jobName;
+	public JobEntity getJobEntity() {
+		return _jobEntity;
+	}
+
+	@Override
+	public long getJobEntityId() {
+		return _jobEntityId;
 	}
 
 	@Override
@@ -141,11 +162,11 @@ public abstract class BaseBuildEntity
 		State state = getState();
 
 		jsonObject.put(
-			"buildName", getBuildName()
+			"jenkinsJobName", getJenkinsJobName()
 		).put(
-			"jobName", getJobName()
+			"name", getName()
 		).put(
-			"r_projectToBuilds_c_projectId", getProjectEntityId()
+			"r_jobToBuilds_c_jobId", getJobEntityId()
 		).put(
 			"state", state.getJSONObject()
 		);
@@ -189,18 +210,13 @@ public abstract class BaseBuildEntity
 		return Integer.valueOf(value);
 	}
 
+	@Override
+	public String getName() {
+		return _name;
+	}
+
 	public Set<BuildEntity> getParentBuildEntities() {
 		return _parentBuildEntities;
-	}
-
-	@Override
-	public ProjectEntity getProjectEntity() {
-		return _projectEntity;
-	}
-
-	@Override
-	public long getProjectEntityId() {
-		return _projectEntityId;
 	}
 
 	@Override
@@ -295,19 +311,19 @@ public abstract class BaseBuildEntity
 	}
 
 	@Override
-	public void setJobName(String jobName) {
-		_jobName = jobName;
+	public void setJenkinsJobName(String jenkinsJobName) {
+		_jenkinsJobName = jenkinsJobName;
 	}
 
 	@Override
-	public void setProjectEntity(ProjectEntity projectEntity) {
-		_projectEntity = projectEntity;
+	public void setJobEntity(JobEntity jobEntity) {
+		_jobEntity = jobEntity;
 
-		if (_projectEntity != null) {
-			_projectEntityId = _projectEntity.getId();
+		if (_jobEntity != null) {
+			_jobEntityId = _jobEntity.getId();
 		}
 		else {
-			_projectEntityId = 0;
+			_jobEntityId = 0;
 		}
 	}
 
@@ -319,9 +335,9 @@ public abstract class BaseBuildEntity
 	protected BaseBuildEntity(JSONObject jsonObject) {
 		super(jsonObject);
 
-		_buildName = jsonObject.getString("buildName");
-		_jobName = jsonObject.getString("jobName");
-		_projectEntityId = jsonObject.optLong("r_projectToBuilds_c_projectId");
+		_name = jsonObject.getString("name");
+		_jenkinsJobName = jsonObject.getString("jenkinsJobName");
+		_jobEntityId = jsonObject.optLong("r_jobToBuilds_c_jobId");
 		_state = State.get(jsonObject.getJSONObject("state"));
 	}
 
@@ -352,12 +368,12 @@ public abstract class BaseBuildEntity
 
 	private static final int _DEFAULT_MIN_NODE_RAM = 12;
 
-	private final String _buildName;
 	private final Set<BuildEntity> _childBuildEntities = new HashSet<>();
-	private String _jobName;
+	private String _jenkinsJobName;
+	private JobEntity _jobEntity;
+	private long _jobEntityId;
+	private final String _name;
 	private final Set<BuildEntity> _parentBuildEntities = new HashSet<>();
-	private ProjectEntity _projectEntity;
-	private long _projectEntityId;
 	private State _state;
 
 }

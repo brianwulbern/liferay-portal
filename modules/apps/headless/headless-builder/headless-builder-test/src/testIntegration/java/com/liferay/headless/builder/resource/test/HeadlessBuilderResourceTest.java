@@ -134,7 +134,7 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 				null, TestPropsValues.getUserId(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
-				listTypeEntries);
+				false, listTypeEntries);
 
 		_objectDefinition1 = _addObjectDefinition(
 			1, ObjectDefinitionConstants.SCOPE_COMPANY);
@@ -171,6 +171,60 @@ public class HeadlessBuilderResourceTest extends BaseTestCase {
 		_addAggregationObjectField(
 			_siteScopedObjectDefinition2,
 			_siteScopedObjectRelationship2.getName());
+	}
+
+	@Test
+	public void testGetInDifferentCompany() throws Exception {
+		_addAPIApplication(
+			_API_APPLICATION_ERC_1, _API_ENDPOINT_ERC_1, _BASE_URL_1,
+			_objectDefinition1.getExternalReferenceCode(),
+			_objectRelationship1.getName(), _objectRelationship2.getName(),
+			_API_APPLICATION_PATH_1, null, "collection",
+			APIApplication.Endpoint.Scope.COMPANY);
+		_publishAPIApplication(_API_APPLICATION_ERC_1);
+
+		assertSuccessfulHttpCode(
+			null, "c/" + _BASE_URL_1 + _API_APPLICATION_PATH_1,
+			Http.Method.GET);
+
+		Assert.assertTrue(
+			HTTPTestUtil.invokeToJSONObject(
+				null, "openapi", Http.Method.GET
+			).has(
+				"/c/" + _BASE_URL_1
+			));
+
+		HTTPTestUtil.invokeToJSONObject(
+			JSONUtil.put(
+				"domain", "able.com"
+			).put(
+				"portalInstanceId", "able.com"
+			).put(
+				"virtualHost", "www.able.com"
+			).toString(),
+			"headless-portal-instances/v1.0/portal-instances",
+			Http.Method.POST);
+
+		HTTPTestUtil.customize(
+		).withBaseURL(
+			"http://www.able.com:8080"
+		).withCredentials(
+			"test@able.com", "test"
+		).apply(
+			() -> {
+				Assert.assertEquals(
+					404,
+					HTTPTestUtil.invokeToHttpCode(
+						null, "c/" + _BASE_URL_1 + _API_APPLICATION_PATH_1,
+						Http.Method.GET));
+				Assert.assertFalse(
+					HTTPTestUtil.invokeToJSONObject(
+						null, "openapi", Http.Method.GET
+					).has(
+						"/c/" + _BASE_URL_1
+					));
+			}
+		);
 	}
 
 	@Test

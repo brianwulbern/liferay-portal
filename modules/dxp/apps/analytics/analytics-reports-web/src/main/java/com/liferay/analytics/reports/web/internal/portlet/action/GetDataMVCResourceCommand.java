@@ -192,13 +192,13 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 		WebImage webImage = analyticsReportsInfoItem.getAuthorWebImage(
 			object, locale);
 
-		if ((webImage == null) || Validator.isNull(webImage.getUrl())) {
+		if ((webImage == null) || Validator.isNull(webImage.getURL())) {
 			return null;
 		}
 
 		long portraitId = GetterUtil.getLong(
 			HttpComponentsUtil.getParameter(
-				HtmlUtil.escape(webImage.getUrl()), "img_id"));
+				HtmlUtil.escape(webImage.getURL()), "img_id"));
 
 		if (portraitId > 0) {
 			return JSONUtil.put(
@@ -206,7 +206,7 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 			).put(
 				"name", analyticsReportsInfoItem.getAuthorName(object)
 			).put(
-				"url", webImage.getUrl()
+				"url", webImage.getURL()
 			);
 		}
 

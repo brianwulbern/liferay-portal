@@ -78,7 +78,7 @@ public class OpenGraphImageProvider {
 
 		public String getMimeType();
 
-		public String getUrl();
+		public String getURL();
 
 	}
 
@@ -136,7 +136,7 @@ public class OpenGraphImageProvider {
 				}
 
 				@Override
-				public String getUrl() {
+				public String getURL() {
 					return imagePreviewURL;
 				}
 
@@ -232,9 +232,9 @@ public class OpenGraphImageProvider {
 				}
 
 				@Override
-				public String getUrl() {
+				public String getURL() {
 					return _getAbsoluteURL(
-						themeDisplay, mappedWebImage.getUrl());
+						themeDisplay, mappedWebImage.getURL());
 				}
 
 			};

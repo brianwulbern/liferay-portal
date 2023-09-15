@@ -25,6 +25,7 @@ import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
+import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.filter.factory.FilterFactory;
 import com.liferay.object.rest.filter.parser.ObjectDefinitionFilterParser;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
@@ -787,6 +788,10 @@ public class DefaultObjectEntryManagerImpl
 			existingObjectEntry.setProperties(properties);
 		}
 
+		if (objectEntry.getStatus() != null) {
+			existingObjectEntry.setStatus(objectEntry.getStatus());
+		}
+
 		if (objectEntry.getTaxonomyCategoryIds() != null) {
 			existingObjectEntry.setTaxonomyCategoryIds(
 				objectEntry.getTaxonomyCategoryIds());
@@ -1045,6 +1050,11 @@ public class DefaultObjectEntryManagerImpl
 		}
 
 		serviceContext.setUserId(userId);
+
+		if (_isObjectEntryDraft(objectEntry.getStatus())) {
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+		}
 
 		return serviceContext;
 	}
@@ -1329,6 +1339,16 @@ public class DefaultObjectEntryManagerImpl
 		return false;
 	}
 
+	private boolean _isObjectEntryDraft(Status status) {
+		if ((status != null) &&
+			(status.getCode() == WorkflowConstants.STATUS_DRAFT)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void _processVulcanAggregation(
 		Aggregations aggregations, Queries queries,
 		SearchRequestBuilder searchRequestBuilder,
@@ -1567,7 +1587,10 @@ public class DefaultObjectEntryManagerImpl
 				continue;
 			}
 
-			if ((value == null) && !objectField.isRequired()) {
+			if ((value == null) &&
+				(!objectField.isRequired() ||
+				 _isObjectEntryDraft(objectEntry.getStatus()))) {
+
 				continue;
 			}
 

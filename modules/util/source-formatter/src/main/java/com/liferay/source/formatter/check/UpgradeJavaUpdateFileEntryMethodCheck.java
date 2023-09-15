@@ -63,16 +63,24 @@ public class UpgradeJavaUpdateFileEntryMethodCheck extends BaseUpgradeCheck {
 					continue;
 				}
 
+				String className = getVariableTypeName(
+					newContent, newContent, parameterList.get(8), true);
+
+				if (!className.equals("byte[]")) {
+					continue;
+				}
+
+				String newMethod = null;
+
 				String message = StringBundler.concat(
 					"Unable to format method updateFileEntry from ",
 					"DLAppLocalService and DLAppLocalServiceUtil. Fill the ",
 					"new parameters manually, see LPS-194134.");
 
-				String newMethod = null;
+				String parameterClass = getVariableTypeName(
+					content, content, parameterList.get(7));
 
-				String parameter = parameterList.get(7);
-
-				if (parameter.equals("dlVersionNumberIncrease")) {
+				if (parameterClass.equals("DLVersionNumberIncrease")) {
 					String[] parameterTypes = {
 						"long", "long", "String", "String", "String", "String",
 						"String", "DLVersionNumberIncrease", "byte[]",
@@ -80,8 +88,8 @@ public class UpgradeJavaUpdateFileEntryMethodCheck extends BaseUpgradeCheck {
 					};
 
 					if (!hasValidParameters(
-							10, fileName, javaMethodContent, message,
-							parameterList, parameterTypes)) {
+							parameterTypes.length, fileName, javaMethodContent,
+							message, parameterList, parameterTypes)) {
 
 						continue;
 					}
@@ -94,15 +102,15 @@ public class UpgradeJavaUpdateFileEntryMethodCheck extends BaseUpgradeCheck {
 					newContent = StringUtil.replace(
 						newContent, methodCall, newMethod);
 				}
-				else if (parameter.equals("majorVersion")) {
+				else {
 					String[] parameterTypes = {
 						"long", "long", "String", "String", "String", "String",
 						"String", "boolean", "byte[]", "ServiceContext"
 					};
 
 					if (!hasValidParameters(
-							10, fileName, javaMethodContent, message,
-							parameterList, parameterTypes)) {
+							parameterTypes.length, fileName, javaMethodContent,
+							message, parameterList, parameterTypes)) {
 
 						continue;
 					}

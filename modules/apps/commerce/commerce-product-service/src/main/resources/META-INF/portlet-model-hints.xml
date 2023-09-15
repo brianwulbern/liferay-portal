@@ -242,7 +242,7 @@
 			<validator name="required" />
 		</field>
 		<field localized="true" name="description" type="String" />
-		<field name="DDMFormFieldTypeName" type="String">
+		<field name="commerceOptionTypeKey" type="String">
 			<validator name="required" />
 		</field>
 		<field name="infoItemServiceKey" type="String">
@@ -259,7 +259,9 @@
 			<validator name="required" />
 		</field>
 		<field name="priceType" type="String" />
-		<field name="typeSettings" type="String" />
+		<field name="typeSettings" type="String">
+			<hint-collection name="CLOB" />
+		</field>
 	</model>
 	<model name="com.liferay.commerce.product.model.CPDefinitionOptionValueRel">
 		<field name="mvccVersion" type="long" />
@@ -490,7 +492,7 @@
 		<field localized="true" name="description" type="String">
 			<hint-collection name="TEXTAREA" />
 		</field>
-		<field name="DDMFormFieldTypeName" type="String">
+		<field name="commerceOptionTypeKey" type="String">
 			<validator name="required" />
 		</field>
 		<field name="facetable" type="boolean" />

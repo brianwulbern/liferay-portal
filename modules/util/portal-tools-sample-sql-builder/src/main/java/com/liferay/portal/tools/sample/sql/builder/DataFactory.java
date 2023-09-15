@@ -579,6 +579,10 @@ public class DataFactory {
 		return getClassNameId(DLFileEntry.class);
 	}
 
+	public RoleModel getGuestRoleModel() {
+		return _guestRoleModel;
+	}
+
 	public long getJournalArticleClassNameId() {
 		return getClassNameId(JournalArticle.class);
 	}
@@ -1765,7 +1769,7 @@ public class DataFactory {
 		commerceOrderItemModel.setParentCommerceOrderItemId(0);
 		commerceOrderItemModel.setName("Commerce Order Item Name");
 		commerceOrderItemModel.setQuantity(BigDecimal.ONE);
-		commerceOrderItemModel.setShippedQuantity(0);
+		commerceOrderItemModel.setShippedQuantity(BigDecimal.ONE);
 		commerceOrderItemModel.setShipSeparately(true);
 		commerceOrderItemModel.setShippable(true);
 		commerceOrderItemModel.setDiscountAmount(BigDecimal.valueOf(0));
@@ -2865,7 +2869,7 @@ public class DataFactory {
 	}
 
 	public CPOptionModel newCPOptionModel(
-		String ddmFormFieldTypeName, int index) {
+		String commerceOptionTypeKey, int index) {
 
 		CPOptionModel cpOptionModel = new CPOptionModelImpl();
 
@@ -2890,7 +2894,7 @@ public class DataFactory {
 				"<Name language-id=\"en_US\">Option Name ", index,
 				"</Name></root>"));
 		cpOptionModel.setDescription("Option Description");
-		cpOptionModel.setDDMFormFieldTypeName(ddmFormFieldTypeName);
+		cpOptionModel.setCommerceOptionTypeKey(commerceOptionTypeKey);
 		cpOptionModel.setFacetable(true);
 		cpOptionModel.setRequired(true);
 		cpOptionModel.setSkuContributor(true);
@@ -6646,9 +6650,15 @@ public class DataFactory {
 
 		mbCategoryModel.setParentCategoryId(
 			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
-		mbCategoryModel.setName("Test Category " + index);
+
+		String name = "Test Category " + index;
+
+		mbCategoryModel.setName(name);
+
 		mbCategoryModel.setDisplayStyle(
 			MBCategoryConstants.DEFAULT_DISPLAY_STYLE);
+		mbCategoryModel.setFriendlyURL(
+			StringUtil.replace(name, CharPool.SPACE, StringPool.DASH));
 		mbCategoryModel.setLastPublishDate(new Date());
 		mbCategoryModel.setStatusDate(new Date());
 

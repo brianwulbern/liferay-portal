@@ -118,10 +118,14 @@ const TeamMembersTable = ({
 				key: lowerCaseFirstLetter.replace(/\s/g, ''),
 				name: filter,
 			},
-			filterRequest: SearchBuilder.eq(
-				'contactsCategory',
-				lowerCaseFirstLetter.replace(/\s/g, '')
-			),
+			filterRequest: new SearchBuilder()
+				.eq('contactsCategory', lowerCaseFirstLetter.replace(/\s/g, ''))
+				.and()
+				.eq(
+					'r_accountEntryToHighPriorityContacts_accountEntryERC',
+					koroneikiAccount.accountKey
+				)
+				.build(),
 		};
 	};
 
@@ -130,7 +134,6 @@ const TeamMembersTable = ({
 			const {filterRequest} = mapFilterToContactsCategory(filter);
 			const response = await getHighPriorityContacts(filterRequest);
 			const highPriorityContactsFiltered = response?.items;
-
 			const mappedContacts = highPriorityContactsFiltered?.map(
 				(contact, index) => {
 					const {r_userToHighPriorityContacts_user} = contact;

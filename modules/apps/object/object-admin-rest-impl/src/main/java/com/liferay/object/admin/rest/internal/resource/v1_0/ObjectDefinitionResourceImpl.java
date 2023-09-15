@@ -235,6 +235,12 @@ public class ObjectDefinitionResourceImpl
 			throw new ObjectDefinitionEnableLocalizationException();
 		}
 
+		if (Validator.isNotNull(objectDefinition.getEnableObjectEntryDraft()) &&
+			!FeatureFlagManagerUtil.isEnabled("LPS-181663")) {
+
+			throw new UnsupportedOperationException();
+		}
+
 		if (Validator.isNotNull(objectDefinition.getModifiable()) &&
 			!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
 
@@ -297,6 +303,8 @@ public class ObjectDefinitionResourceImpl
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableLocalization()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableObjectEntryDraft()),
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition.getLabel()),
 					objectDefinition.getName(),
@@ -407,7 +415,7 @@ public class ObjectDefinitionResourceImpl
 	}
 
 	@Override
-	public void postObjectDefinitionPublish(Long objectDefinitionId)
+	public ObjectDefinition postObjectDefinitionPublish(Long objectDefinitionId)
 		throws Exception {
 
 		com.liferay.object.model.ObjectDefinition
@@ -418,13 +426,14 @@ public class ObjectDefinitionResourceImpl
 		if (GetterUtil.getBoolean(serviceBuilderObjectDefinition.getSystem()) &&
 			FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
 
-			_objectDefinitionService.publishSystemObjectDefinition(
-				objectDefinitionId);
+			return _toObjectDefinition(
+				_objectDefinitionService.publishSystemObjectDefinition(
+					objectDefinitionId));
 		}
-		else {
+
+		return _toObjectDefinition(
 			_objectDefinitionService.publishCustomObjectDefinition(
-				objectDefinitionId);
-		}
+				objectDefinitionId));
 	}
 
 	@Override
@@ -433,6 +442,12 @@ public class ObjectDefinitionResourceImpl
 		throws Exception {
 
 		// TODO Move logic to service
+
+		if (Validator.isNotNull(objectDefinition.getEnableObjectEntryDraft()) &&
+			!FeatureFlagManagerUtil.isEnabled("LPS-181663")) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		if (Validator.isNotNull(objectDefinition.getModifiable()) &&
 			!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
@@ -518,6 +533,8 @@ public class ObjectDefinitionResourceImpl
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableLocalization()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableObjectEntryDraft()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableObjectEntryHistory()),
 					LocalizedMapUtil.getLocalizedMap(
@@ -998,6 +1015,11 @@ public class ObjectDefinitionResourceImpl
 				if (FeatureFlagManagerUtil.isEnabled("LPS-172017")) {
 					enableLocalization =
 						objectDefinition.getEnableLocalization();
+				}
+
+				if (FeatureFlagManagerUtil.isEnabled("LPS-181663")) {
+					enableObjectEntryDraft =
+						objectDefinition.getEnableObjectEntryDraft();
 				}
 
 				enableObjectEntryHistory =

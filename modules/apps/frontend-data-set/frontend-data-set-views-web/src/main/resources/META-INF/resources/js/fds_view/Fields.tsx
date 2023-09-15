@@ -11,14 +11,13 @@ import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayModal from '@clayui/modal';
 import {FDS_INTERNAL_CELL_RENDERERS} from '@liferay/frontend-data-set-web';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import {InputLocalized, ManagementToolbar} from 'frontend-js-components-web';
 import {
 	IClientExtensionRenderer,
 	IInternalRenderer,
 	fetch,
 	navigate,
 	openModal,
-	openToast,
 } from 'frontend-js-web';
 import fuzzy from 'fuzzy';
 import React, {useEffect, useRef, useState} from 'react';
@@ -28,13 +27,19 @@ import {IFDSViewSectionInterface} from '../FDSView';
 import {FDSViewType} from '../FDSViews';
 import {getFields} from '../api';
 import OrderableTable from '../components/OrderableTable';
+import openDefaultFailureToast from '../utils/openDefaultFailureToast';
+import openDefaultSuccessToast from '../utils/openDefaultSuccessToast';
 
 import '../../css/FDSEntries.scss';
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
 
 interface IFDSField {
 	externalReferenceCode: string;
 	id: number;
 	label: string;
+	label_i18n: LocalizedValue<string>;
 	name: string;
 	renderer: string;
 	rendererLabel?: string;
@@ -186,12 +191,7 @@ const SaveFDSFieldsModalContent = ({
 		});
 
 		if (!response.ok) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
 
 			return;
 		}
@@ -200,12 +200,7 @@ const SaveFDSFieldsModalContent = ({
 
 		closeModal();
 
-		openToast({
-			message: Liferay.Language.get(
-				'your-request-completed-successfully'
-			),
-			type: 'success',
-		});
+		openDefaultSuccessToast();
 
 		onSave({
 			createdFDSFields: createdFDSFields.map((fdsField) => ({
@@ -409,9 +404,26 @@ const EditFDSFieldModalContent = ({
 		(cellRenderer: IInternalRenderer) => cellRenderer.name
 	);
 
+	const fdsFieldTranslations = fdsField.label_i18n;
+
+	let fieldLabel: string;
+
+	if (Liferay.FeatureFlags['LPS-172017']) {
+		fieldLabel = fdsField.label_i18n[defaultLanguageId] ?? fdsField.name;
+	}
+	else {
+		fieldLabel = fdsField.label;
+	}
+
+	const [i18nFieldLabels, setI18nFieldLabels] = useState(
+		fdsFieldTranslations
+	);
+
+	const [errorMessage, setErrorMessage] = useState('');
+
 	const editFDSField = async () => {
-		const body = {
-			label: fdsFieldLabelRef.current?.value,
+		let body;
+		const bodyTmp = {
 			renderer: selectedFDSFieldRenderer,
 			rendererType: !fdsInternalCellRendererNames.includes(
 				selectedFDSFieldRenderer
@@ -420,6 +432,13 @@ const EditFDSFieldModalContent = ({
 				: 'internal',
 			sortable: fdsFieldSortable,
 		};
+
+		if (Liferay.FeatureFlags['LPS-172017']) {
+			body = {...bodyTmp, label_i18n: i18nFieldLabels};
+		}
+		else {
+			body = {...bodyTmp, label: fdsFieldLabelRef.current?.value};
+		}
 
 		const response = await fetch(
 			`${API_URL.FDS_FIELDS}/by-external-reference-code/${fdsField.externalReferenceCode}`,
@@ -434,26 +453,32 @@ const EditFDSFieldModalContent = ({
 		);
 
 		if (!response.ok) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
+
+			return;
 		}
 
 		const editedFDSField = await response.json();
 
 		closeModal();
 
-		openToast({
-			message: Liferay.Language.get(
-				'your-request-completed-successfully'
-			),
-			type: 'success',
-		});
+		openDefaultSuccessToast();
 
 		onSave({editedFDSField});
+	};
+
+	const validateFDSField = function () {
+		const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
+		if (!i18nFieldLabels[defaultLanguageId]) {
+			setErrorMessage(Liferay.Language.get('required'));
+
+			return;
+		}
+
+		setErrorMessage('');
+
+		editFDSField();
 	};
 
 	const fdsFieldNameInputId = `${namespace}fdsFieldNameInput`;
@@ -538,10 +563,7 @@ const EditFDSFieldModalContent = ({
 	return (
 		<>
 			<ClayModal.Header>
-				{Liferay.Util.sub(
-					Liferay.Language.get('edit-x'),
-					fdsField.label
-				)}
+				{Liferay.Util.sub(Liferay.Language.get('edit-x'), fieldLabel)}
 			</ClayModal.Header>
 
 			<ClayModal.Body>
@@ -558,18 +580,37 @@ const EditFDSFieldModalContent = ({
 					/>
 				</ClayForm.Group>
 
-				<ClayForm.Group>
-					<label htmlFor={fdsFieldLabelInputId}>
-						{Liferay.Language.get('label')}
-					</label>
+				{Liferay.FeatureFlags['LPS-172017'] ? (
+					<ClayForm.Group>
+						<InputLocalized
+							error={errorMessage}
+							id={fdsFieldLabelInputId}
+							label={Liferay.Language.get('label')}
+							name="label"
+							onChange={(newFieldLabel) => {
+								setI18nFieldLabels({
+									...i18nFieldLabels,
+									...newFieldLabel,
+								});
+							}}
+							required
+							translations={i18nFieldLabels}
+						/>
+					</ClayForm.Group>
+				) : (
+					<ClayForm.Group>
+						<label htmlFor={fdsFieldLabelInputId}>
+							{Liferay.Language.get('label')}
+						</label>
 
-					<ClayInput
-						defaultValue={fdsField.label}
-						id={fdsFieldLabelInputId}
-						ref={fdsFieldLabelRef}
-						type="text"
-					/>
-				</ClayForm.Group>
+						<ClayInput
+							defaultValue={fieldLabel}
+							id={fdsFieldLabelInputId}
+							ref={fdsFieldLabelRef}
+							type="text"
+						/>
+					</ClayForm.Group>
+				)}
 
 				<ClayForm.Group>
 					<label htmlFor={fdsFieldRendererSelectId}>
@@ -599,7 +640,7 @@ const EditFDSFieldModalContent = ({
 			<ClayModal.Footer
 				last={
 					<ClayButton.Group spaced>
-						<ClayButton onClick={() => editFDSField()}>
+						<ClayButton onClick={() => validateFDSField()}>
 							{Liferay.Language.get('save')}
 						</ClayButton>
 
@@ -633,12 +674,7 @@ const Fields = ({
 		);
 
 		if (!response.ok) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
 
 			return null;
 		}
@@ -648,12 +684,7 @@ const Fields = ({
 		const storedFDSFields = responseJSON?.items;
 
 		if (!storedFDSFields) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
 
 			return null;
 		}
@@ -727,22 +758,12 @@ const Fields = ({
 						const response = await fetch(url, {method: 'DELETE'});
 
 						if (!response.ok) {
-							openToast({
-								message: Liferay.Language.get(
-									'your-request-failed-to-complete'
-								),
-								type: 'danger',
-							});
+							openDefaultFailureToast();
 
 							return;
 						}
 
-						openToast({
-							message: Liferay.Language.get(
-								'your-request-completed-successfully'
-							),
-							type: 'success',
-						});
+						openDefaultSuccessToast();
 
 						setFDSFields(
 							fdsFields?.filter(
@@ -775,12 +796,7 @@ const Fields = ({
 		);
 
 		if (!response.ok) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
 
 			return null;
 		}
@@ -790,20 +806,10 @@ const Fields = ({
 		const fdsFieldsOrder = responseJSON?.fdsFieldsOrder;
 
 		if (fdsFieldsOrder && fdsFieldsOrder === fdsFieldsOrderRef.current) {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-completed-successfully'
-				),
-				type: 'success',
-			});
+			openDefaultSuccessToast();
 		}
 		else {
-			openToast({
-				message: Liferay.Language.get(
-					'your-request-failed-to-complete'
-				),
-				type: 'danger',
-			});
+			openDefaultFailureToast();
 		}
 	};
 

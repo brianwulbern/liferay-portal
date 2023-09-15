@@ -9,6 +9,7 @@ import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPort
 import com.liferay.asset.categories.admin.web.internal.configuration.AssetCategoriesAdminWebConfiguration;
 import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminDisplayStyleKeys;
 import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminWebKeys;
+import com.liferay.asset.categories.admin.web.internal.item.selector.criterion.AssetVocabularyItemSelectorCriterion;
 import com.liferay.asset.categories.admin.web.internal.util.AssetCategoryTreePathComparator;
 import com.liferay.asset.categories.configuration.AssetCategoriesCompanyConfiguration;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
@@ -34,21 +35,22 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.IconItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.VerticalNavItemList;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
+import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
@@ -82,6 +84,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -152,9 +155,7 @@ public class AssetCategoriesDisplayContext {
 		).buildString();
 	}
 
-	public String getAssetType(AssetVocabulary vocabulary)
-		throws PortalException {
-
+	public String getAssetType(AssetVocabulary vocabulary) {
 		long[] selectedClassNameIds = vocabulary.getSelectedClassNameIds();
 		long[] selectedClassTypePKs = vocabulary.getSelectedClassTypePKs();
 
@@ -182,12 +183,12 @@ public class AssetCategoriesDisplayContext {
 
 						name = classType.getName();
 					}
-					catch (NoSuchModelException noSuchModelException) {
+					catch (PortalException portalException) {
 						if (_log.isDebugEnabled()) {
 							_log.debug(
 								"Unable to get asset type for class type " +
 									"primary key " + classTypePK,
-								noSuchModelException);
+								portalException);
 						}
 
 						continue;
@@ -384,10 +385,6 @@ public class AssetCategoriesDisplayContext {
 			(ItemSelector)_httpServletRequest.getAttribute(
 				ItemSelector.class.getName());
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(_renderRequest);
 
@@ -400,8 +397,8 @@ public class AssetCategoriesDisplayContext {
 
 		return PortletURLBuilder.create(
 			itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, themeDisplay.getScopeGroup(),
-				themeDisplay.getScopeGroupId(),
+				requestBackedPortletURLFactory, _themeDisplay.getScopeGroup(),
+				_themeDisplay.getScopeGroupId(),
 				_renderResponse.getNamespace() + "selectCategory",
 				itemSelectorCriterion)
 		).buildString();
@@ -650,9 +647,39 @@ public class AssetCategoriesDisplayContext {
 	}
 
 	public List<DropdownItem> getVocabulariesDropdownItems() {
+		LiferayPortletURL deleteVocabulariesURL =
+			_renderResponse.createActionURL();
+
+		deleteVocabulariesURL.setCopyCurrentRenderParameters(false);
+		deleteVocabulariesURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/asset_categories_admin/delete_asset_vocabulary");
+		deleteVocabulariesURL.setParameter("redirect", getDefaultRedirect());
+
+		ItemSelector itemSelector =
+			(ItemSelector)_httpServletRequest.getAttribute(
+				ItemSelector.class.getName());
+
+		AssetVocabularyItemSelectorCriterion
+			assetVocabularyItemSelectorCriterion =
+				new AssetVocabularyItemSelectorCriterion();
+
+		assetVocabularyItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new UUIDItemSelectorReturnType());
+
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteVocabularies");
+				dropdownItem.putData(
+					"deleteVocabulariesURL", deleteVocabulariesURL.toString());
+				dropdownItem.putData(
+					"viewVocabulariesURL",
+					String.valueOf(
+						itemSelector.getItemSelectorURL(
+							RequestBackedPortletURLFactoryUtil.create(
+								_httpServletRequest),
+							_renderResponse.getNamespace() + "selectVocabulary",
+							assetVocabularyItemSelectorCriterion)));
 				dropdownItem.setIcon("trash");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));

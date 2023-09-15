@@ -286,7 +286,7 @@
 </tr>
 <tr>
 	<td>EDIT_MODE_SELECTOR</td>
-	<td>//button[contains(@class,'edit-mode-selector')]</td>
+	<td>//button[contains(@aria-label,'Page Edition Mode')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -936,7 +936,7 @@
 
 <tr>
 	<td>PAGE_CONTENTS_CONTENT_FILTER_TOGGLE</td>
-	<td>//div[contains(@class,'page-contents__content-filter')]//button[contains(@class,'dropdown-toggle')]</td>
+	<td>//div[contains(@class,'page-contents__content-filter')]//button[contains(@class,'form-control-select')]</td>
 	<td></td>
 </tr>
 <tr>

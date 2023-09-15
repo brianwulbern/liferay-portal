@@ -5,6 +5,7 @@
 
 package com.liferay.headless.builder.internal.model.listener;
 
+import com.liferay.headless.builder.internal.helper.ObjectEntryHelper;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.model.ObjectDefinition;
@@ -61,75 +62,25 @@ public class APIEndpointRelevantObjectEntryModelListener
 			ObjectEntry originalObjectEntry, ObjectEntry objectEntry)
 		throws ModelListenerException {
 
-		if (_isModified(originalObjectEntry, objectEntry)) {
+		if (!_equals(
+				originalObjectEntry.getValues(), objectEntry.getValues(),
+				"httpMethod", "path",
+				"r_apiApplicationToAPIEndpoints_c_apiApplicationId",
+				"r_requestAPISchemaToAPIEndpoints_c_apiSchemaId",
+				"r_responseAPISchemaToAPIEndpoints_c_apiSchemaId")) {
+
 			_validate(objectEntry);
 		}
 	}
 
-	private boolean _isAPIApplication(long apiApplicationId) throws Exception {
-		if (apiApplicationId == 0) {
-			return false;
-		}
+	private boolean _equals(
+		Map<String, Serializable> map1, Map<String, Serializable> map2,
+		String... keys) {
 
-		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-			apiApplicationId);
-
-		if (objectEntry == null) {
-			return false;
-		}
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectEntry.getObjectDefinitionId());
-
-		if (!Objects.equals(
-				objectDefinition.getExternalReferenceCode(),
-				"L_API_APPLICATION")) {
-
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean _isAPISchema(long apiSchemaId) throws Exception {
-		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-			apiSchemaId);
-
-		if (objectEntry == null) {
-			return false;
-		}
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectEntry.getObjectDefinitionId());
-
-		if (!Objects.equals(
-				objectDefinition.getExternalReferenceCode(), "L_API_SCHEMA")) {
-
-			return false;
-		}
-
-		return true;
-	}
-
-	private boolean _isModified(
-		ObjectEntry originalObjectEntry, ObjectEntry objectEntry) {
-
-		Map<String, Serializable> originalValues =
-			originalObjectEntry.getValues();
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		if (Objects.equals(
-				values.get("httpMethod"), originalValues.get("httpMethod")) &&
-			Objects.equals(values.get("path"), originalValues.get("path")) &&
-			Objects.equals(
-				originalValues.get(
-					"r_apiApplicationToAPIEndpoints_c_apiApplicationId"),
-				values.get(
-					"r_apiApplicationToAPIEndpoints_c_apiApplicationId"))) {
-
-			return false;
+		for (String key : keys) {
+			if (!Objects.equals(map1.get(key), map2.get(key))) {
+				return false;
+			}
 		}
 
 		return true;
@@ -213,9 +164,11 @@ public class APIEndpointRelevantObjectEntryModelListener
 						"path");
 			}
 
-			if (!_isAPIApplication(
-					(long)values.get(
-						"r_apiApplicationToAPIEndpoints_c_apiApplicationId"))) {
+			long apiApplicationId = (long)values.get(
+				"r_apiApplicationToAPIEndpoints_c_apiApplicationId");
+
+			if (!_objectEntryHelper.isValidObjectEntry(
+					apiApplicationId, "L_API_APPLICATION")) {
 
 				throw new ObjectEntryValuesException.InvalidObjectField(
 					null,
@@ -226,27 +179,59 @@ public class APIEndpointRelevantObjectEntryModelListener
 			long requestAPISchemaId = (long)values.get(
 				"r_requestAPISchemaToAPIEndpoints_c_apiSchemaId");
 
-			if ((requestAPISchemaId != 0) &&
-				!_isAPISchema(requestAPISchemaId)) {
-
-				throw new ObjectEntryValuesException.InvalidObjectField(
-					null, "An API endpoint must be related to an API schema",
-					"an-api-endpoint-must-be-related-to-an-api-schema");
+			if (requestAPISchemaId != 0) {
+				_validateAPISchema(apiApplicationId, requestAPISchemaId);
 			}
 
 			long responseAPISchemaId = (long)values.get(
 				"r_responseAPISchemaToAPIEndpoints_c_apiSchemaId");
 
-			if ((responseAPISchemaId != 0) &&
-				!_isAPISchema(responseAPISchemaId)) {
-
-				throw new ObjectEntryValuesException.InvalidObjectField(
-					null, "An API endpoint must be related to an API schema",
-					"an-api-endpoint-must-be-related-to-an-api-schema");
+			if (responseAPISchemaId != 0) {
+				_validateAPISchema(apiApplicationId, responseAPISchemaId);
 			}
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
+		}
+	}
+
+	private void _validateAPISchema(long apiApplicationId, long apiSchemaId)
+		throws Exception {
+
+		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			apiSchemaId);
+
+		if (objectEntry == null) {
+			throw new ObjectEntryValuesException.InvalidObjectField(
+				null, "An API endpoint must be related to an API schema",
+				"an-api-endpoint-must-be-related-to-an-api-schema");
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectEntry.getObjectDefinitionId());
+
+		if (!Objects.equals(
+				objectDefinition.getExternalReferenceCode(), "L_API_SCHEMA")) {
+
+			throw new ObjectEntryValuesException.InvalidObjectField(
+				null, "An API endpoint must be related to an API schema",
+				"an-api-endpoint-must-be-related-to-an-api-schema");
+		}
+
+		Map<String, Serializable> apiSchemaValues = objectEntry.getValues();
+
+		if (!Objects.equals(
+				apiApplicationId,
+				apiSchemaValues.get(
+					"r_apiApplicationToAPISchemas_c_apiApplicationId"))) {
+
+			throw new ObjectEntryValuesException.InvalidObjectField(
+				null,
+				"The API endpoint and the API schema must be related to the " +
+					"same API Application",
+				"the-api-endpoint-and-the-api-schema-must-be-related-to-the-" +
+					"same-api-application");
 		}
 	}
 
@@ -307,6 +292,9 @@ public class APIEndpointRelevantObjectEntryModelListener
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryHelper _objectEntryHelper;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;

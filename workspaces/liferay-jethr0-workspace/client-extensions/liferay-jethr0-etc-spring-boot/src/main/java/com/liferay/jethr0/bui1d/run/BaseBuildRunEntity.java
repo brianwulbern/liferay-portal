@@ -9,7 +9,7 @@ import com.liferay.jethr0.bui1d.BuildEntity;
 import com.liferay.jethr0.bui1d.parameter.BuildParameterEntity;
 import com.liferay.jethr0.entity.BaseEntity;
 import com.liferay.jethr0.jenkins.node.JenkinsNodeEntity;
-import com.liferay.jethr0.project.ProjectEntity;
+import com.liferay.jethr0.job.JobEntity;
 import com.liferay.jethr0.util.StringUtil;
 
 import java.net.URL;
@@ -37,11 +37,6 @@ public abstract class BaseBuildRunEntity
 	}
 
 	@Override
-	public URL getBuildURL() {
-		return _buildURL;
-	}
-
-	@Override
 	public long getDuration() {
 		return _duration;
 	}
@@ -52,7 +47,7 @@ public abstract class BaseBuildRunEntity
 
 		BuildEntity buildEntity = getBuildEntity();
 
-		invokeJSONObject.put("jobName", buildEntity.getJobName());
+		invokeJSONObject.put("jobName", buildEntity.getJenkinsJobName());
 
 		JSONObject jobParametersJSONObject = new JSONObject();
 
@@ -70,11 +65,11 @@ public abstract class BaseBuildRunEntity
 			"BUILD_RUN_ID", String.valueOf(getId())
 		);
 
-		ProjectEntity projectEntity = buildEntity.getProjectEntity();
+		JobEntity jobEntity = buildEntity.getJobEntity();
 
-		if (projectEntity != null) {
+		if (jobEntity != null) {
 			jobParametersJSONObject.put(
-				"PROJECT_ID", String.valueOf(projectEntity.getId()));
+				"JOB_ID", String.valueOf(jobEntity.getId()));
 		}
 
 		invokeJSONObject.put("jobParameters", jobParametersJSONObject);
@@ -88,6 +83,11 @@ public abstract class BaseBuildRunEntity
 	}
 
 	@Override
+	public URL getJenkinsBuildURL() {
+		return _jenkinsBuildURL;
+	}
+
+	@Override
 	public JSONObject getJSONObject() {
 		JSONObject jsonObject = super.getJSONObject();
 
@@ -95,9 +95,9 @@ public abstract class BaseBuildRunEntity
 		State state = getState();
 
 		jsonObject.put(
-			"buildURL", getBuildURL()
-		).put(
 			"duration", getDuration()
+		).put(
+			"jenkinsBuildURL", getJenkinsBuildURL()
 		).put(
 			"r_buildToBuildRuns_c_buildId", getBuildEntityId()
 		);
@@ -156,13 +156,13 @@ public abstract class BaseBuildRunEntity
 	}
 
 	@Override
-	public void setBuildURL(URL buildURL) {
-		_buildURL = buildURL;
+	public void setDuration(long duration) {
+		_duration = duration;
 	}
 
 	@Override
-	public void setDuration(long duration) {
-		_duration = duration;
+	public void setJenkinsBuildURL(URL jenkinsBuildURL) {
+		_jenkinsBuildURL = jenkinsBuildURL;
 	}
 
 	@Override
@@ -180,13 +180,14 @@ public abstract class BaseBuildRunEntity
 
 		_buildEntityId = jsonObject.optLong("r_buildToBuildRuns_c_buildId");
 
-		String buildURL = jsonObject.optString("buildURL", "");
-
-		if (!buildURL.isEmpty()) {
-			_buildURL = StringUtil.toURL(jsonObject.optString("buildURL"));
-		}
-
 		_duration = jsonObject.optLong("duration");
+
+		String jenkinsBuildURL = jsonObject.optString("jenkinsBuildURL", "");
+
+		if (!jenkinsBuildURL.isEmpty()) {
+			_jenkinsBuildURL = StringUtil.toURL(
+				jsonObject.optString("jenkinsBuildURL"));
+		}
 
 		JSONObject resultJSONObject = jsonObject.optJSONObject("result");
 
@@ -201,8 +202,8 @@ public abstract class BaseBuildRunEntity
 
 	private BuildEntity _buildEntity;
 	private long _buildEntityId;
-	private URL _buildURL;
 	private long _duration;
+	private URL _jenkinsBuildURL;
 	private Result _result;
 	private State _state;
 

@@ -255,7 +255,7 @@ public class OpenGraphTopHeadDynamicInclude extends BaseDynamicInclude {
 
 			if (openGraphImage != null) {
 				printWriter.println(
-					_getOpenGraphTag("og:image", openGraphImage.getUrl()));
+					_getOpenGraphTag("og:image", openGraphImage.getURL()));
 
 				String alt = openGraphImage.getAlt();
 
@@ -266,7 +266,7 @@ public class OpenGraphTopHeadDynamicInclude extends BaseDynamicInclude {
 				if (themeDisplay.isSecure()) {
 					printWriter.println(
 						_getOpenGraphTag(
-							"og:image:secure_url", openGraphImage.getUrl()));
+							"og:image:secure_url", openGraphImage.getURL()));
 				}
 
 				String type = openGraphImage.getMimeType();
@@ -277,7 +277,7 @@ public class OpenGraphTopHeadDynamicInclude extends BaseDynamicInclude {
 				}
 
 				printWriter.println(
-					_getOpenGraphTag("og:image:url", openGraphImage.getUrl()));
+					_getOpenGraphTag("og:image:url", openGraphImage.getURL()));
 
 				for (KeyValuePair keyValuePair :
 						openGraphImage.getMetadataTagKeyValuePairs()) {

@@ -56,22 +56,7 @@
 									</c:if>
 								</li>
 								<li>
-									<liferay-portlet:actionURL copyCurrentRenderParameters="<%= false %>" name="/asset_categories_admin/delete_asset_vocabulary" var="deleteVocabulariesURL">
-										<portlet:param name="redirect" value="<%= assetCategoriesDisplayContext.getDefaultRedirect() %>" />
-									</liferay-portlet:actionURL>
-
-									<portlet:renderURL var="viewVocabulariesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-										<portlet:param name="mvcPath" value="/view_asset_vocabularies.jsp" />
-									</portlet:renderURL>
-
 									<clay:dropdown-actions
-										additionalProps='<%=
-											HashMapBuilder.<String, Object>put(
-												"deleteVocabulariesURL", deleteVocabulariesURL.toString()
-											).put(
-												"viewVocabulariesURL", viewVocabulariesURL.toString()
-											).build()
-										%>'
 										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 										dropdownItems="<%= assetCategoriesDisplayContext.getVocabulariesDropdownItems() %>"
 										propsTransformer="js/ActionsComponentPropsTransformer"

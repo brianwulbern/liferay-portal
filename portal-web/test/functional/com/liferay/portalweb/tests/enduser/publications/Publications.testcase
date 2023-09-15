@@ -567,6 +567,44 @@ definition {
 		MenuItem.viewNotPresent(menuItem = "Delete");
 	}
 
+	@description = "This is a use case for LPS-194210 - Fail to publish publication after deleted on publication and production."
+	@priority = 3
+	test CanPublishAfterDeleteOnPublicationAndProduction {
+		task ("Create 2 Pages") {
+			for (var count : list "1,2") {
+				JSONLayout.addPublicLayout(
+					groupName = "Guest",
+					layoutName = "Page ${count}");
+			}
+		}
+
+		task ("Create Publication and delete both pages") {
+			JSONPublications.addPublication(publicationName = "P1");
+
+			JSONPublications.selectPublication(publicationName = "P1");
+
+			for (var count : list "1,2") {
+				JSONLayout.deletePublicLayout(
+					groupName = "Guest",
+					layoutName = "Page ${count}");
+			}
+		}
+
+		task ("Go to production mode, delete Page 1 and Publish Publication") {
+			PublicationsNavigator.openPublicationsAdmin();
+
+			Publications.workOnProduction();
+
+			JSONLayout.deletePublicLayout(
+				groupName = "Guest",
+				layoutName = "Page 1");
+
+			Publications.publishPublication(
+				gotoPublicationsAdmin = "true",
+				publicationName = "P1");
+		}
+	}
+
 	@description = "LPS-136380 - Add localization for translated titles and content."
 	@priority = 4
 	test CanPublishLocalizedContent {
@@ -1381,6 +1419,150 @@ definition {
 				publicationName = "Test Publication");
 
 			AssertElementPresent(locator1 = "PublicationsChanges#MESSAGE_NO_CHANGES");
+		}
+	}
+
+	@description = "This is a use case for LPS-191376 - As a Publication Reviewer I do not want to see information related to portlet preferences on the Review Changes screen."
+	@priority = 3
+	test PortletPreferenceChangesCannotAppearWhenChangedOnContentPage {
+		task ("Create two Web Contents") {
+			for (var order : list "1,2") {
+				JSONWebcontent.addWebContent(
+					content = "WC${order} content",
+					groupName = "Guest",
+					title = "WC${order}");
+			}
+		}
+
+		task ("Create a Content Page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Test Content Page",
+				type = "content");
+
+			JSONLayout.publishLayout(
+				groupName = "Guest",
+				layoutName = "Test Content Page");
+		}
+
+		task ("Add Web Content widget to content page and configure it to display WC1") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page",
+				siteName = "Guest");
+
+			PageEditor.addWidget(
+				collectionName = "Content Management",
+				portletName = "Web Content Display");
+
+			WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC1");
+
+			IFrame.closeFrame();
+
+			PageEditor.publish();
+		}
+
+		task ("Create a Publication, replace to display WC2") {
+			JSONPublications.addPublication(publicationName = "Publication Name");
+
+			JSONPublications.selectPublication(publicationName = "Publication Name");
+
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page",
+				siteName = "Guest");
+
+			WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC2");
+
+			IFrame.closeFrame();
+
+			PageEditor.publish();
+		}
+
+		task ("Go to Review page and assert portlet preference change aren't displayed") {
+			PublicationsNavigator.gotoReviewChanges(
+				gotoPublicationsAdmin = "true",
+				publicationName = "Publication Name");
+
+			PublicationsChanges.viewChangesResultNotPresent(
+				changeCategory = "Portlet Preference Value",
+				changeTitle = "Preferences for Web Content Display on Test Content Page");
+		}
+
+		task ("Turn on Show All Items and assert assert portlet preference change are displayed") {
+			Check.checkToggleSwitch(locator1 = "PublicationsChanges#SHOW_ALL_ITEMS_TOGGLE_SWITCH");
+
+			PublicationsChanges.viewChanges(
+				changeCategory = "Portlet Preference Value",
+				changeSite = "Guest",
+				changeTitle = "Preferences for Web Content Display on Test Content Page",
+				changeType = "Modified",
+				changeUser = "Test Test");
+		}
+	}
+
+	@description = "This is a use case for LPS-191376 - As a Publication Reviewer I do not want to see information related to portlet preferences on the Review Changes screen."
+	@priority = 3
+	test PortletPreferenceChangesCannotAppearWhenChangedOnWidgetPage {
+		task ("Create two Web Contents") {
+			for (var order : list "1,2") {
+				JSONWebcontent.addWebContent(
+					content = "WC${order} content",
+					groupName = "Guest",
+					title = "WC${order}");
+			}
+		}
+
+		task ("Create a Widget Page, add Web Content Display and configure it to display WC1") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Test Widget Page");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Guest",
+				layoutName = "Test Widget Page",
+				widgetName = "Web Content Display");
+
+			Navigator.openSitePage(
+				pageName = "Test Widget Page",
+				siteName = "Guest");
+
+			WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC1");
+
+			IFrame.closeFrame();
+		}
+
+		task ("Create a Publication, replace to display WC2") {
+			JSONPublications.addPublication(publicationName = "Publication Name");
+
+			JSONPublications.selectPublication(publicationName = "Publication Name");
+
+			Navigator.openSitePage(
+				pageName = "Test Widget Page",
+				siteName = "Guest");
+
+			WebContentDisplayPortlet.selectWebContent(webContentTitle = "WC2");
+
+			IFrame.closeFrame();
+		}
+
+		task ("Go to Review page and assert portlet preference change aren't displayed") {
+			PublicationsNavigator.gotoReviewChanges(
+				gotoPublicationsAdmin = "true",
+				publicationName = "Publication Name");
+
+			PublicationsChanges.viewChangesResultNotPresent(
+				changeCategory = "Portlet Preference Value",
+				changeTitle = "Preferences for Web Content Display on Test Widget Page");
+		}
+
+		task ("Turn on Show All Items and assert assert portlet preference change are displayed") {
+			Check.checkToggleSwitch(locator1 = "PublicationsChanges#SHOW_ALL_ITEMS_TOGGLE_SWITCH");
+
+			PublicationsChanges.viewChanges(
+				changeCategory = "Portlet Preference Value",
+				changeSite = "Guest",
+				changeTitle = "Preferences for Web Content Display on Test Widget Page",
+				changeType = "Modified",
+				changeUser = "Test Test");
 		}
 	}
 

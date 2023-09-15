@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
@@ -53,8 +54,11 @@ public abstract class BaseAddLayoutMVCActionCommand
 		String backURL = ParamUtil.getString(actionRequest, "backURL");
 
 		if (Validator.isNotNull(backURL)) {
-			layoutFullURL = HttpComponentsUtil.setParameter(
-				layoutFullURL, "p_l_back_url", backURL);
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			layoutFullURL = HttpComponentsUtil.addParameters(
+				layoutFullURL, "p_l_back_url", backURL, "p_l_back_url_title",
+				portletDisplay.getTitle());
 		}
 
 		return layoutFullURL;

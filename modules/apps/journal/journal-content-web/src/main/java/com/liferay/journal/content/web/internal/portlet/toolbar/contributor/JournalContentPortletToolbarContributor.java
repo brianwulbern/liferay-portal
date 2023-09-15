@@ -17,6 +17,7 @@ import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.content.web.internal.configuration.JournalContentPortletInstanceConfiguration;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
@@ -129,8 +130,9 @@ public class JournalContentPortletToolbarContributor
 
 		JournalContentPortletInstanceConfiguration
 			journalContentPortletInstanceConfiguration =
-				portletDisplay.getPortletInstanceConfiguration(
-					JournalContentPortletInstanceConfiguration.class);
+				_configurationProvider.getPortletInstanceConfiguration(
+					JournalContentPortletInstanceConfiguration.class,
+					themeDisplay);
 
 		if (journalContentPortletInstanceConfiguration.
 				sortStructuresByByName()) {
@@ -309,6 +311,9 @@ public class JournalContentPortletToolbarContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalContentPortletToolbarContributor.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private DDMStructureService _ddmStructureService;

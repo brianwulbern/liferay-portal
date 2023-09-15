@@ -8,8 +8,8 @@ package com.liferay.jethr0.gitbranch.repository;
 import com.liferay.jethr0.entity.repository.BaseEntityRepository;
 import com.liferay.jethr0.gitbranch.GitBranchEntity;
 import com.liferay.jethr0.gitbranch.dalo.GitBranchEntityDALO;
-import com.liferay.jethr0.project.ProjectEntity;
-import com.liferay.jethr0.project.dalo.ProjectsToGitBranchesEntityRelationshipDALO;
+import com.liferay.jethr0.job.JobEntity;
+import com.liferay.jethr0.job.dalo.JobsToGitBranchesEntityRelationshipDALO;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,26 +24,26 @@ import org.springframework.context.annotation.Configuration;
 public class GitBranchEntityRepository
 	extends BaseEntityRepository<GitBranchEntity> {
 
-	public Set<GitBranchEntity> getAll(ProjectEntity projectEntity) {
-		Set<GitBranchEntity> projectGitBranchEntities = new HashSet<>();
+	public Set<GitBranchEntity> getAll(JobEntity jobEntity) {
+		Set<GitBranchEntity> gitBranchEntities = new HashSet<>();
 
 		Set<Long> gitBranchEntityIds =
-			_projectsToGitBranchesEntityRelationshipDALO.getChildEntityIds(
-				projectEntity);
+			_jobsToGitBranchesEntityRelationshipDALO.getChildEntityIds(
+				jobEntity);
 
 		for (GitBranchEntity gitBranchEntity : getAll()) {
 			if (!gitBranchEntityIds.contains(gitBranchEntity.getId())) {
 				continue;
 			}
 
-			gitBranchEntity.addProjectEntity(projectEntity);
+			gitBranchEntity.addJobEntity(jobEntity);
 
-			projectEntity.addGitBranchEntity(gitBranchEntity);
+			jobEntity.addGitBranchEntity(gitBranchEntity);
 
-			projectGitBranchEntities.add(gitBranchEntity);
+			gitBranchEntities.add(gitBranchEntity);
 		}
 
-		return projectGitBranchEntities;
+		return gitBranchEntities;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class GitBranchEntityRepository
 	private GitBranchEntityDALO _gitBranchEntityDALO;
 
 	@Autowired
-	private ProjectsToGitBranchesEntityRelationshipDALO
-		_projectsToGitBranchesEntityRelationshipDALO;
+	private JobsToGitBranchesEntityRelationshipDALO
+		_jobsToGitBranchesEntityRelationshipDALO;
 
 }

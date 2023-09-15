@@ -176,7 +176,7 @@ create table CPDefinitionOptionRel (
 	CPOptionId LONG,
 	name STRING null,
 	description STRING null,
-	DDMFormFieldTypeName VARCHAR(75) null,
+	commerceOptionTypeKey VARCHAR(75) null,
 	infoItemServiceKey VARCHAR(255) null,
 	priority DOUBLE,
 	definedExternally BOOLEAN,
@@ -185,7 +185,7 @@ create table CPDefinitionOptionRel (
 	skuContributor BOOLEAN,
 	key_ VARCHAR(75) null,
 	priceType VARCHAR(75) null,
-	typeSettings VARCHAR(75) null,
+	typeSettings TEXT null,
 	primary key (CPDefinitionOptionRelId, ctCollectionId)
 );
 
@@ -358,7 +358,7 @@ create table CPOption (
 	modifiedDate DATE null,
 	name STRING null,
 	description STRING null,
-	DDMFormFieldTypeName VARCHAR(75) null,
+	commerceOptionTypeKey VARCHAR(75) null,
 	facetable BOOLEAN,
 	required BOOLEAN,
 	skuContributor BOOLEAN,

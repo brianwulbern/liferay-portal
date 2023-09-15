@@ -76,6 +76,7 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.jackson.databind.ser.VulcanPropertyFilter;
@@ -139,6 +140,8 @@ public class BatchEngineBrokerTest {
 			TestPropsValues.getUserId());
 
 		_company2 = CompanyTestUtil.addCompany();
+
+		PortalInstances.initCompany(_company2);
 
 		User user = UserTestUtil.getAdminUser(_company2.getCompanyId());
 
@@ -223,14 +226,28 @@ public class BatchEngineBrokerTest {
 			ServiceContextTestUtil.getServiceContext(companyId, 0, userId));
 	}
 
+	private void _assertActions(JsonNode fieldJsonNode, String fieldName) {
+		JsonNode jsonNode = fieldJsonNode.get(fieldName);
+
+		Assert.assertTrue(!jsonNode.isEmpty());
+	}
+
 	private void _assertEquals(JsonNode expectedJsonNode, JsonNode jsonNode) {
 		for (String fieldName : _fieldNames) {
 			JsonNode expectedFieldJsonNode = expectedJsonNode.get(fieldName);
 
 			JsonNode fieldJsonNode = jsonNode.get(fieldName);
 
-			Assert.assertEquals(
-				expectedFieldJsonNode.toString(), fieldJsonNode.toString());
+			if (Objects.equals(fieldName, "actions")) {
+				_assertActions(fieldJsonNode, "delete");
+				_assertActions(fieldJsonNode, "get");
+				_assertActions(fieldJsonNode, "permissions");
+				_assertActions(fieldJsonNode, "update");
+			}
+			else {
+				Assert.assertEquals(
+					expectedFieldJsonNode.toString(), fieldJsonNode.toString());
+			}
 		}
 	}
 
@@ -353,12 +370,13 @@ public class BatchEngineBrokerTest {
 					null, user.getUserId(),
 					Collections.singletonMap(
 						LocaleUtil.US, RandomTestUtil.randomString()),
-					Arrays.asList(listTypeEntry1, listTypeEntry2));
+					false, Arrays.asList(listTypeEntry1, listTypeEntry2));
 
 			ObjectDefinition objectDefinition =
 				_objectDefinitionLocalService.addCustomObjectDefinition(
 					user.getUserId(),
 					DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, false, false,
+					false,
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					"TestObject", null, null,
@@ -489,7 +507,7 @@ public class BatchEngineBrokerTest {
 	}
 
 	private static final List<String> _fieldNames = Arrays.asList(
-		"dateCreated", "dateModified", "externalReferenceCode", "id",
+		"actions", "dateCreated", "dateModified", "externalReferenceCode", "id",
 		"testAttachmentField", "testBooleanField", "testDateField",
 		"testDateTimeField", "testDecimalField", "testIntegerField",
 		"testLongIntegerField", "testLongTextField",

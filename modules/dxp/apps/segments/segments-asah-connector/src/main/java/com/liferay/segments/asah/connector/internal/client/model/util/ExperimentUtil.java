@@ -114,9 +114,12 @@ public class ExperimentUtil {
 		experiment.setPageRelativePath(layout.getFriendlyURL());
 		experiment.setPageTitle(layout.getTitle(locale));
 		experiment.setPageURL(pageURL);
+		experiment.setPublishable(true);
 
-		if (segmentsExperiment.getStatus() ==
-				SegmentsExperimentConstants.STATUS_COMPLETED) {
+		if ((segmentsExperiment.getStatus() ==
+				SegmentsExperimentConstants.STATUS_COMPLETED) ||
+			(segmentsExperiment.getStatus() ==
+				SegmentsExperimentConstants.STATUS_TERMINATED)) {
 
 			experiment.setPublishedDXPVariantId(
 				segmentsExperiment.getWinnerSegmentsExperienceKey());
