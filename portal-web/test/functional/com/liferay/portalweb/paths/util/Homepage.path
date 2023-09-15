@@ -12,7 +12,7 @@
 <tbody>
 <tr>
 	<td>USER_PROFILE_MENU</td>
-	<td>//div[contains(@class,'personal-menu-dropdown lfr-tooltip-scope')]/div/button/span</td>
+	<td>//div[contains(@class,'personal-menu-dropdown')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -22,7 +22,7 @@
 </tr>
 <tr>
 	<td>PAGE_HEADING</td>
-	<td>//h1[contains(@class,'component-heading mb-0 text-break')]</td>
+	<td>//h1[contains(@class,'component-heading')]</td>
 	<td></td>
 </tr>
 </tbody>

@@ -1,5 +1,6 @@
 definition {
 
+	property portal.upstream = "true";
 	property testray.main.component.name = "Login";
 
 	setUp {
@@ -22,16 +23,12 @@ definition {
 	}
 
 	@description = "LRQA-82341 Post Login Admin can view Welcome to Liferay text"
-	test VerfiyUserName {
-		Click.waitForPersonalMenuJSClick(locator1 = "Homepage#USER_PROFILE_MENU");
+	test AdminCanViewHomepageWelcomeToLiferay {
+		Navigator.viewCurrentUserName(
+			userName = "Test Test");
 
-		AssertTextEquals(
-			locator1 = "Homepage#USER_NAME",
-			value1 = "Test Test");
-
-		AssertTextEquals(
-			locator1 = "Homepage#PAGE_HEADING",
-			value1 = "Welcome to Liferay");
+		Navigator.viewHeadingOfTheLandingPage(
+			landingPageHeading = "Welcome to Liferay");
 	}
 
 }
