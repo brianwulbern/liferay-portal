@@ -407,4 +407,18 @@ definition {
 			locator1 = "NavTab#TAB_LINK");
 	}
 
+	macro viewCurrentUserName {
+		Click.waitForPersonalMenuJSClick(locator1 = "Homepage#USER_PROFILE_MENU");
+
+		AssertTextEquals(
+			locator1 = "Homepage#USER_NAME",
+			value1 = ${userName});
+	}
+
+	macro viewHeadingOfTheLandingPage{
+		AssertTextEquals(
+			locator1 = "Homepage#PAGE_HEADING",
+			value1 = ${landingPageHeading});
+	}
+
 }
