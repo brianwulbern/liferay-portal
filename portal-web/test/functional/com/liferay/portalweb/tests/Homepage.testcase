@@ -24,11 +24,9 @@ definition {
 
 	@description = "LRQA-82341 Post Login Admin can view Welcome to Liferay text"
 	test AdminCanViewHomepageWelcomeToLiferay {
-		Navigator.viewCurrentUserName(
-			userName = "Test Test");
+		Navigator.viewCurrentUserName(userName = "Test Test");
 
-		Navigator.viewHeadingOfTheLandingPage(
-			landingPageHeading = "Welcome to Liferay");
+		Navigator.viewHeadingOfTheLandingPage(landingPageHeading = "Welcome to Liferay");
 	}
 
 }
