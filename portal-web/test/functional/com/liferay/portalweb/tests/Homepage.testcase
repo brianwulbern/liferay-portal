@@ -1,0 +1,32 @@
+definition {
+
+	property portal.upstream = "true";
+	property testray.main.component.name = "Login";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+	}
+
+	tearDown {
+		var testLiferayVirtualInstance = PropsUtil.get("test.liferay.virtual.instance");
+
+		if (${testLiferayVirtualInstance} == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+		}
+	}
+
+	@description = "LRQA-82341 Post Login Admin can view Welcome to Liferay text"
+	test AdminCanViewHomepageWelcomeToLiferay {
+		Navigator.viewCurrentUserName(userName = "Test Test");
+
+		Navigator.viewHeadingOfTheLandingPage(landingPageHeading = "Welcome to Liferay");
+	}
+
+}
