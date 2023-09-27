@@ -523,12 +523,12 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED</td>
-	<td>//*[contains(@class,'panel-header-link collapse-icon') and contains(@class,'collapsed')][normalize-space()='${key_collectionName}']</td>
+	<td>//*[contains(@class,'collapsed')][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED</td>
-	<td>//*[contains(@class,'mb-3') and contains(@class,'panel-header') and contains(@class,'panel-header-link')][normalize-space()='${key_collectionName}']</td>
+	<td>//*[contains(@class,'collapse')][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
