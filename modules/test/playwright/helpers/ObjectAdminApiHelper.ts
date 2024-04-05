@@ -149,6 +149,40 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
+	async postFormulaObjectField(
+		objectFieldLabel: string,
+		objectFieldName: string,
+		outputValue: string,
+		formulaScript: string,
+		objectDefinitionId: number
+	) {
+		const requestBody = {
+			DBType: 'String',
+			businessType: 'Formula',
+			indexed: false,
+			indexedAsKeyword: false,
+			label: {en_US: objectFieldLabel},
+			listTypeDefinitionId: 0,
+			name: objectFieldName,
+			objectFieldSettings: [
+				{
+					name: 'output',
+					value: outputValue,
+				},
+				{
+					name: 'script',
+					value: formulaScript,
+				},
+			],
+			required: false,
+		};
+
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields`,
+			requestBody
+		);
+	}
+
 	async postRandomObjectFolder() {
 		const objectFolderExternalReferenceCode =
 			'objectFolder' + getRandomInt();
