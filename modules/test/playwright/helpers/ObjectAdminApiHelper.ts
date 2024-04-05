@@ -127,6 +127,28 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
+	async postIntegerObjectField(
+		objectFieldLabel: string,
+		objectFieldName: string,
+		objectDefinitionId: number
+	) {
+		const requestBody = {
+			DBType: 'Integer',
+			businessType: 'Integer',
+			indexed: true,
+			indexedAsKeyword: false,
+			label: {en_US: objectFieldLabel},
+			listTypeDefinitionId: 0,
+			name: objectFieldName,
+			required: false,
+		};
+
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields/`,
+			requestBody
+		);
+	}
+
 	async postRandomObjectFolder() {
 		const objectFolderExternalReferenceCode =
 			'objectFolder' + getRandomInt();
