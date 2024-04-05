@@ -205,3 +205,38 @@ test('can delete object relationship from different folders', async ({
 
 	await apiHelpers.objectAdmin.deleteObjectFolder(objectFolder.id);
 });
+
+test('can add object entry with formula object field using id in formula script', async ({
+	apiHelpers,
+}) => {
+	const objectDefinition =
+		await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+
+	await apiHelpers.objectAdmin.postIntegerObjectField(
+		'Integer Field',
+		'integerField',
+		objectDefinition.id
+	);
+
+	await apiHelpers.objectAdmin.postFormulaObjectField(
+		'Formula Field',
+		'formulaField',
+		'Integer',
+		'id + integerField',
+		objectDefinition.id
+	);
+
+	const objectEntry = await apiHelpers.objectAdmin.postObjectEntry(
+		'integerField',
+		1,
+		objectDefinition.restContextPath
+	);
+
+	expect(objectEntry.formulaField).toBe(
+		objectEntry.id + objectEntry.integerField
+	);
+
+	// Clean up
+
+	await apiHelpers.objectAdmin.deleteObjectDefinition(objectDefinition.id);
+});
