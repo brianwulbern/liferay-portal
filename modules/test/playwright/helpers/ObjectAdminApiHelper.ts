@@ -54,6 +54,62 @@ export class ObjectAdminApiHelper {
 		);
 	}
 
+	async postFormulaObjectField(
+		objectFieldLabel: string,
+		objectFieldName: string,
+		outputValue: string,
+		formulaScript: string,
+		objectDefinitionId: number
+	) {
+		const requestBody = {
+			DBType: 'String',
+			businessType: 'Formula',
+			indexed: false,
+			indexedAsKeyword: false,
+			label: {en_US: objectFieldLabel},
+			listTypeDefinitionId: 0,
+			name: objectFieldName,
+			objectFieldSettings: [
+				{
+					name: 'output',
+					value: outputValue,
+				},
+				{
+					name: 'script',
+					value: formulaScript,
+				},
+			],
+			required: false,
+		};
+
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields`,
+			requestBody
+		);
+	}
+
+	async postIntegerObjectField(
+		objectFieldLabel: string,
+		objectFieldName: string,
+		objectDefinitionId: number
+	) {
+		const requestBody = {
+			DBType: 'Integer',
+			businessType: 'Integer',
+			indexed: true,
+			indexedAsKeyword: false,
+			label: {en_US: objectFieldLabel},
+			listTypeDefinitionId: 0,
+			name: objectFieldName,
+			required: false,
+		};
+
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields/`,
+			requestBody
+		);
+	}
+
 	async postObjectDefinition(data: DataObject) {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions`,
@@ -68,6 +124,21 @@ export class ObjectAdminApiHelper {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/by-external-reference-code/${externalReferenceCode}/object-actions`,
 			objectAction
+		);
+	}
+
+	async postObjectEntry(
+		fieldName: any,
+		value: string | number,
+		restContextPath: string
+	) {
+		const requestBody = {
+			[fieldName]: value,
+		};
+
+		return this.apiHelpers.post(
+			`${liferayConfig.environment.baseUrl}${restContextPath}`,
+			requestBody
 		);
 	}
 
@@ -124,77 +195,6 @@ export class ObjectAdminApiHelper {
 
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions`,
-			requestBody
-		);
-	}
-
-	async postIntegerObjectField(
-		objectFieldLabel: string,
-		objectFieldName: string,
-		objectDefinitionId: number
-	) {
-		const requestBody = {
-			DBType: 'Integer',
-			businessType: 'Integer',
-			indexed: true,
-			indexedAsKeyword: false,
-			label: {en_US: objectFieldLabel},
-			listTypeDefinitionId: 0,
-			name: objectFieldName,
-			required: false,
-		};
-
-		return this.apiHelpers.post(
-			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields/`,
-			requestBody
-		);
-	}
-
-	async postFormulaObjectField(
-		objectFieldLabel: string,
-		objectFieldName: string,
-		outputValue: string,
-		formulaScript: string,
-		objectDefinitionId: number
-	) {
-		const requestBody = {
-			DBType: 'String',
-			businessType: 'Formula',
-			indexed: false,
-			indexedAsKeyword: false,
-			label: {en_US: objectFieldLabel},
-			listTypeDefinitionId: 0,
-			name: objectFieldName,
-			objectFieldSettings: [
-				{
-					name: 'output',
-					value: outputValue,
-				},
-				{
-					name: 'script',
-					value: formulaScript,
-				},
-			],
-			required: false,
-		};
-
-		return this.apiHelpers.post(
-			`${this.apiHelpers.baseUrl}${this.basePath}/object-definitions/${objectDefinitionId}/object-fields`,
-			requestBody
-		);
-	}
-
-	async postObjectEntry(
-		fieldName: any,
-		value: string | number,
-		restContextPath: string
-	) {
-		const requestBody = {
-			[fieldName]: value,
-		};
-
-		return this.apiHelpers.post(
-			`${liferayConfig.environment.baseUrl}${restContextPath}`,
 			requestBody
 		);
 	}
