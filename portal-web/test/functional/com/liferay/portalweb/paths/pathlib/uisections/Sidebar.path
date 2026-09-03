@@ -12,7 +12,7 @@
 <tbody>
 <tr>
 	<td>ACTIVE_TAB</td>
-	<td>//div[contains(@class,'sidebar')]//*[@*='${key_tabName}'][contains(@aria-pressed,'true')] | //div[contains(@class,'sidebar')]//*[@*='${key_tabName}'][contains(@aria-selected,'true')]</td>
+	<td>//div[contains(@class,'sidebar')]//*[@*='${key_tabName}'][contains(@aria-pressed,'true')] | //div[contains(@class,'sidebar')]//*[@*='${key_tabName}'][contains(@aria-selected,'true')] | //div[contains(@class,'sidebar')]//button[@role='tab'][contains(@class,'active')][normalize-space(text())='${key_tabName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -117,7 +117,7 @@
 </tr>
 <tr>
 	<td>TAB</td>
-	<td>//div[contains(@class,'sidebar')]//*[@*='${key_tabName}']</td>
+	<td>//div[contains(@class,'sidebar')]//*[@*='${key_tabName}'] | //div[contains(@class,'sidebar')]//button[@role='tab'][normalize-space(text())='${key_tabName}']</td>
 	<td></td>
 </tr>
 <tr>
