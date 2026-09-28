@@ -73,6 +73,10 @@ public class InputTag extends IncludeTag {
 		return _disabled;
 	}
 
+	public Boolean isHistoryDisabled() {
+		return _historyDisabled;
+	}
+
 	public boolean isLanguagesDropdownVisible() {
 		return _languagesDropdownVisible;
 	}
