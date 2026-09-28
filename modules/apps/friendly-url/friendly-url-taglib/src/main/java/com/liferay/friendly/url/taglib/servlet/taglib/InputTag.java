@@ -73,10 +73,6 @@ public class InputTag extends IncludeTag {
 		return _disabled;
 	}
 
-	public Boolean isHistoryDisabled() {
-		return _historyDisabled;
-	}
-
 	public boolean isLanguagesDropdownVisible() {
 		return _languagesDropdownVisible;
 	}
@@ -115,10 +111,6 @@ public class InputTag extends IncludeTag {
 
 	public void setHelpMessage(String helpMessage) {
 		_helpMessage = helpMessage;
-	}
-
-	public void setHistoryDisabled(Boolean historyDisabled) {
-		_historyDisabled = historyDisabled;
 	}
 
 	public void setInputAddon(String inputAddon) {
@@ -162,7 +154,6 @@ public class InputTag extends IncludeTag {
 		_defaultLanguageId = null;
 		_disabled = false;
 		_helpMessage = null;
-		_historyDisabled = null;
 		_inputAddon = null;
 		_languagesDropdownVisible = true;
 		_localizable = true;
@@ -197,8 +188,6 @@ public class InputTag extends IncludeTag {
 			_FRIENDLY_URL_MAX_LENGTH);
 		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:helpMessage", getHelpMessage());
-		httpServletRequest.setAttribute(
-			"liferay-friendly-url:input:historyDisabled", _isHistoryDisabled());
 		httpServletRequest.setAttribute(
 			"liferay-friendly-url:input:inputAddon", getInputAddon());
 		httpServletRequest.setAttribute(
@@ -331,14 +320,6 @@ public class InputTag extends IncludeTag {
 		}
 	}
 
-	private boolean _isHistoryDisabled() {
-		if (_historyDisabled == null) {
-			return isDisabled();
-		}
-
-		return _historyDisabled;
-	}
-
 	private boolean _isShowHistory() {
 		if (isShowHistory() && (getClassPK() != 0)) {
 			return true;
@@ -361,7 +342,6 @@ public class InputTag extends IncludeTag {
 	private String _defaultLanguageId;
 	private boolean _disabled;
 	private String _helpMessage;
-	private Boolean _historyDisabled;
 	private String _inputAddon;
 	private boolean _languagesDropdownVisible = true;
 	private boolean _localizable = true;
