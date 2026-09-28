@@ -104,7 +104,7 @@ public class HistoryTag extends IncludeTag {
 			_getDefaultLanguageId(httpServletRequest));
 		httpServletRequest.setAttribute(
 			"liferay-friendly-url:history:disabled",
-			isDisabled() || !_hasFriendlyURLEntryHistory(httpServletRequest));
+			isDisabled() || !_hasFriendlyURLEntryHistory());
 		httpServletRequest.setAttribute(
 			"liferay-friendly-url:history:elementId", getElementId());
 		httpServletRequest.setAttribute(
@@ -157,19 +157,26 @@ public class HistoryTag extends IncludeTag {
 		return themeDisplay.getSiteGroupId();
 	}
 
-	private boolean _hasFriendlyURLEntryHistory(
-		HttpServletRequest httpServletRequest) {
-
+	private boolean _hasFriendlyURLEntryHistory() {
 		long classPK = getClassPK();
 
 		if (classPK <= 0) {
 			return false;
 		}
 
+		long classNameId = PortalUtil.getClassNameId(getClassName());
+
+		FriendlyURLEntry friendlyURLEntry =
+			FriendlyURLEntryLocalServiceUtil.fetchMainFriendlyURLEntry(
+				classNameId, classPK);
+
+		if (friendlyURLEntry == null) {
+			return false;
+		}
+
 		List<FriendlyURLEntry> friendlyURLEntries =
 			FriendlyURLEntryLocalServiceUtil.getFriendlyURLEntries(
-				_getGroupId(httpServletRequest),
-				PortalUtil.getClassNameId(getClassName()), classPK);
+				friendlyURLEntry.getGroupId(), classNameId, classPK);
 
 		if (friendlyURLEntries.size() > 1) {
 			return true;

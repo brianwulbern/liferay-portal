@@ -244,6 +244,7 @@ renderResponse.setTitle(blogsEditEntryDisplayContext.getPageTitle(resourceBundle
 							className="<%= BlogsEntry.class.getName() %>"
 							classPK="<%= blogsEditEntryDisplayContext.getEntryId() %>"
 							disabled="<%= automaticURL %>"
+							historyDisabled="<%= false %>"
 							inputAddon="<%= inputAddon %>"
 							localizable="<%= false %>"
 							name="urlTitle"
