@@ -26,7 +26,7 @@ if (defaultLanguageId == null) {
 	<liferay-friendly-url:history
 		className='<%= (String)request.getAttribute("liferay-friendly-url:input:className") %>'
 		classPK='<%= (long)request.getAttribute("liferay-friendly-url:input:classPK") %>'
-		disabled='<%= (boolean)request.getAttribute("liferay-friendly-url:input:historyDisabled") %>'
+		disabled="<%= disabled %>"
 		elementId="<%= portletDisplay.getNamespace() + name %>"
 		localizable="<%= localizable %>"
 	/>

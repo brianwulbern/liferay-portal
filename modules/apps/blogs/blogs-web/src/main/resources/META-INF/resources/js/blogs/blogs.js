@@ -185,6 +185,16 @@ export default class Blogs {
 					this._onChangeURLOptions.bind(this)
 				);
 			});
+
+			if (this._automaticURL()) {
+				toggleDisabled(this._getElementById('urlTitle'), true);
+				toggleDisabled(
+					document.querySelector(
+						`[for="${this._config.namespace}urlTitle"]`
+					),
+					true
+				);
+			}
 		}
 
 		const titleInput = this._getElementById('title');
