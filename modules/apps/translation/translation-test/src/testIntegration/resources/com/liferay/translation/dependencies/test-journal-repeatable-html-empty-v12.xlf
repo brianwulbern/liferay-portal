@@ -13,11 +13,7 @@
 			</trans-unit>
 			<trans-unit id="DDMStructure_RichText">
 				<source xml:lang="en-US"><![CDATA[Value AValue C]]></source>
-				<seg-source>
-					<mrk mid="0" mtype="seg"><![CDATA[Value A]]></mrk>
-					<mrk mid="1" mtype="seg"><![CDATA[]]></mrk>
-					<mrk mid="2" mtype="seg"><![CDATA[Value C]]></mrk>
-				</seg-source>
+				<seg-source><mrk mid="0" mtype="seg"><![CDATA[Value A]]></mrk><mrk mid="1" mtype="seg"><![CDATA[]]></mrk><mrk mid="2" mtype="seg"><![CDATA[Value C]]></mrk></seg-source>
 				<target xml:lang="es-ES">
 					<mrk mid="0" mtype="seg"><![CDATA[Valor A]]></mrk>
 					<mrk mid="1" mtype="seg"><![CDATA[]]></mrk>
