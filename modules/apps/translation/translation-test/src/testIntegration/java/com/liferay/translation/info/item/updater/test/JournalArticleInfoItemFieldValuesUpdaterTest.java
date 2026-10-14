@@ -20,6 +20,7 @@ import com.liferay.info.item.updater.InfoItemFieldValuesUpdater;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -40,6 +41,9 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -522,15 +526,34 @@ public class JournalArticleInfoItemFieldValuesUpdaterTest {
 				String xliffFileName)
 		throws Exception {
 
-		_translationEntryLocalService.addOrUpdateTranslationEntry(
-			_group.getGroupId(), JournalArticle.class.getName(),
-			journalArticle.getResourcePrimKey(),
-			StringUtil.replace(
-				TranslationTestUtil.readFileToString(xliffFileName),
-				"[$JOURNAL_ARTICLE_ID$]",
-				String.valueOf(journalArticle.getResourcePrimKey())),
-			"application/xliff+xml", LocaleUtil.toLanguageId(LocaleUtil.SPAIN),
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"net.sf.okapi.filters.xliff.XLIFFFilter",
+				LoggerTestUtil.ERROR)) {
+
+			_translationEntryLocalService.addOrUpdateTranslationEntry(
+				_group.getGroupId(), JournalArticle.class.getName(),
+				journalArticle.getResourcePrimKey(),
+				StringUtil.replace(
+					TranslationTestUtil.readFileToString(xliffFileName),
+					"[$JOURNAL_ARTICLE_ID$]",
+					String.valueOf(journalArticle.getResourcePrimKey())),
+				"application/xliff+xml",
+				LocaleUtil.toLanguageId(LocaleUtil.SPAIN),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+			List<LogEntry> logEntries = logCapture.getLogEntries();
+
+			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
+
+			LogEntry logEntry = logEntries.get(0);
+
+			Assert.assertEquals(
+				StringBundler.concat(
+					"The <seg-source> content for the entry id='DDMStructure_",
+					ddmFormFieldName, "' is different from its <source>. The ",
+					"un-segmented content of <source> will be used."),
+				logEntry.getMessage());
+		}
 
 		journalArticle = _journalArticleLocalService.fetchLatestArticle(
 			journalArticle.getResourcePrimKey());
