@@ -147,12 +147,12 @@ definition {
 
 		Pause(value1 = 3000);
 
-		Type(
+		Type.sendKeys(
 			key_fieldFieldLabel = "Label UF Comunicado",
 			locator1 = "WCEditWebContent#TEXT_INPUT",
 			value1 = "Edited LabelUFComunicado Field");
 
-		Type(
+		Type.sendKeys(
 			key_fieldFieldLabel = "Lista UF Comunicado",
 			locator1 = "WCEditWebContent#TEXT_INPUT",
 			value1 = "Edited ListaUFComunicado Field");
