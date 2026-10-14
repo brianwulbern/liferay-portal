@@ -64,6 +64,19 @@ test(
 	'Cannot enable OpenAI from the Site Settings after disabling it from the Instance Settings',
 	{tag: '@LPS-179484'},
 	async ({aiCreatorInstanceSettingsPage, page, site, siteSettingsPage}) => {
+		await page.route(
+			(url) =>
+				url.href.includes(
+					'configurationScreenKey=ai-creator-openai-company-configuration'
+				),
+			async (route) => {
+				await new Promise((resolve) =>
+					setTimeout(resolve, Number(process.env.SCREEN_DELAY || 0))
+				);
+				await route.continue();
+			}
+		);
+
 		try {
 			await aiCreatorInstanceSettingsPage.disableChatGPTCreateContent();
 
