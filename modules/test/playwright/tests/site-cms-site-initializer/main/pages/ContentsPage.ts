@@ -371,10 +371,40 @@ export class ContentsPage {
 	}
 
 	async waitForSidePanel(panelName: SidePanelName) {
-		await expect(this.page.getByLabel(panelName)).toHaveAttribute(
-			'aria-selected',
-			'true'
-		);
+		if (process.env.ZZ_RAF) {
+			await this.page.waitForFunction(
+				(name) =>
+					document
+						.querySelector(`[aria-label="${name}"]`)
+						?.getAttribute('aria-selected') === 'true',
+				panelName,
+				{polling: 'raf'}
+			);
+
+			await this.page.waitForTimeout(Number(process.env.ZZ_DELAY || 0));
+
+			console.log(
+				'ZZVIS',
+				await this.page
+					.locator('.sidebar-header', {hasText: 'Schedule'})
+					.isVisible(),
+				await this.page.locator('.sidebar-header').count()
+			);
+		}
+		else {
+			await expect(this.page.getByLabel(panelName)).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+		}
+
+		if (process.env.ZZ_FIX) {
+			await expect(
+				this.page.locator(
+					'.content-editor__side-panel .sidebar-header .component-title'
+				)
+			).toHaveText([panelName]);
+		}
 	}
 
 	async viewShowDetails(title: string) {

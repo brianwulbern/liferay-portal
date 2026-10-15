@@ -1499,6 +1499,10 @@ test.describe('Schedule Publication', () => {
 		'Schedule dates are maintained after a failed publication',
 		{tag: '@LPD-68099'},
 		async ({apiHelpers, contentsPage, page}) => {
+			const zzCdp = await page.context().newCDPSession(page);
+
+			await zzCdp.send('Emulation.setCPUThrottlingRate', {rate: Number(process.env.ZZ_CPU || 1)});
+
 
 			// Create a required vocabulary
 
@@ -1573,7 +1577,48 @@ test.describe('Schedule Publication', () => {
 			// Click Schedule. Submission fails on the server because the
 			// required vocabulary has no category selected.
 
+			const zzTimeline = !process.env.ZZ_TL ? null : page.evaluate(
+				() =>
+					new Promise<string[]>((resolve) => {
+						const out: string[] = [];
+						const t0 = performance.now();
+						let last = '';
+						const f = () => {
+							const sel = document
+								.querySelector('[aria-label="Categorization"]')
+								?.getAttribute('aria-selected');
+							const hs = [
+								...document.querySelectorAll(
+									'.content-editor__side-panel .sidebar-header .component-title'
+								),
+							]
+								.map((e) => {
+									const r = e.getBoundingClientRect();
+
+									return `${e.textContent}@${Math.round(r.x)}w${Math.round(r.width)}`;
+								})
+								.join(',');
+							const st = `cat=${sel} headers=${hs}`;
+							if (st !== last) {
+								out.push(`${Math.round(performance.now() - t0)}ms ${st}`);
+								last = st;
+							}
+							if (performance.now() - t0 < 3000) {
+								requestAnimationFrame(f);
+							}
+							else {
+								resolve(out);
+							}
+						};
+						f();
+					})
+			);
+
 			await page.getByRole('button', {name: 'Schedule'}).click();
+
+			if (zzTimeline) {
+				console.log('ZZTL\n' + (await zzTimeline).join('\n'));
+			}
 
 			// The failed submit moves the side panel to Categorization. Wait
 			// for that switch before going back to Schedule, otherwise the
