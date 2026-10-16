@@ -197,8 +197,13 @@ public class AssetListFiltersUtil {
 	}
 
 	private static boolean _isCommonFieldRow(JSONObject jsonObject) {
-		return Validator.isNull(
-			jsonObject.getString("objectDefinitionExternalReferenceCode"));
+		if ((jsonObject.getLong("classNameId") <= 0) &&
+			(jsonObject.getLong("classTypeId") <= 0)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static boolean _isDateTimeField(ObjectField objectField) {
@@ -407,8 +412,7 @@ public class AssetListFiltersUtil {
 		}
 
 		ObjectField objectField = AssetListObjectFieldUtil.fetchObjectField(
-			companyId, propertyName,
-			jsonObject.getString("objectDefinitionExternalReferenceCode"));
+			jsonObject.getLong("classNameId"), companyId, propertyName);
 
 		if (objectField == null) {
 			return null;

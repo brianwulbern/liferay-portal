@@ -27,7 +27,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.upgrade.test.util.UpgradeTestUtil;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -51,11 +50,6 @@ public class ObjectDefinitionSettingUpgradeProcessTest {
 	public void setUp() throws Exception {
 		FrontendDataSetTestUtil.initialize(
 			ObjectDefinitionSettingUpgradeProcessTest.class);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		FrontendDataSetTestUtil.tearDown();
 	}
 
 	@Test

@@ -6,7 +6,7 @@
 				"externalReferenceCode": "TESTSITENAVIGATIONMENUITEM1",
 				"friendlyURL": "/test-public-layout",
 				"name_i18n": {
-					"[$FOR_EACH_LANGUAGE_ID$]": "layout"
+					"en_US": "Test Layout"
 				},
 				"privateLayout": false,
 				"type": "layout",

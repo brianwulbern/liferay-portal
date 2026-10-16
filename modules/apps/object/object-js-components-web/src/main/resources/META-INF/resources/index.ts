@@ -28,14 +28,6 @@ export {
 	ExpressionBuilderModal,
 } from './components/ExpressionBuilder';
 export {Input} from './components/Input';
-export {LocationInput} from './components/Location/LocationInput';
-export {
-	LocationValue,
-	MAP_PROVIDER,
-	MapProviderKey,
-	parseLocationValue,
-	stringifyLocationValue,
-} from './components/Location/locationUtil';
 export {ManagementToolbarSearch} from './components/ManagementToolbar/ManagementToolbarSearch';
 export {ModalEditObjectDefinitionExternalReferenceCode} from './components/ManagementToolbar/ModalEditObjectDefinitionExternalReferenceCode';
 export {ManagementToolbar} from './components/ManagementToolbar/index';

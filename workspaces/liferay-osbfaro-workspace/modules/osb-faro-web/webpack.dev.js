@@ -24,10 +24,8 @@ module.exports = merge(common.config, {
 			{
 				changeOrigin: true,
 				context: ['**'],
-				on: {
-					proxyReq: createOnProxyReq(COOKIE, TARGET),
-					proxyRes: createOnProxyRes(TARGET),
-				},
+				onProxyReq: createOnProxyReq(COOKIE, TARGET),
+				onProxyRes: createOnProxyRes(TARGET),
 				selfHandleResponse: true,
 				target: TARGET,
 			},

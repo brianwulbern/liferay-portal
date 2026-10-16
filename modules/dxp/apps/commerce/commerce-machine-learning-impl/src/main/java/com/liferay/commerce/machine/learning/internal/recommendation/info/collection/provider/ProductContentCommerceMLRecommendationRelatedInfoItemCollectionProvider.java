@@ -55,10 +55,6 @@ public class
 		CPDefinition cpDefinition = (CPDefinition)relatedItem;
 
 		try {
-			if (!isGuestBrowsingEnabled()) {
-				return InfoPage.of(Collections.emptyList(), pagination, 0);
-			}
-
 			List<ProductContentCommerceMLRecommendation>
 				productContentCommerceMLRecommendations =
 					_productContentCommerceMLRecommendationManager.

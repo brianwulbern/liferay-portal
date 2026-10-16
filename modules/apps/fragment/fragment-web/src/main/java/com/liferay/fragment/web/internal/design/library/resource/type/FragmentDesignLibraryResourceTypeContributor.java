@@ -80,11 +80,6 @@ public class FragmentDesignLibraryResourceTypeContributor
 	}
 
 	@Override
-	public String getCreationItemsGroupLabel(Locale locale) {
-		return LanguageUtil.get(locale, "fragments");
-	}
-
-	@Override
 	public String getDefaultActionId() {
 		return "view";
 	}

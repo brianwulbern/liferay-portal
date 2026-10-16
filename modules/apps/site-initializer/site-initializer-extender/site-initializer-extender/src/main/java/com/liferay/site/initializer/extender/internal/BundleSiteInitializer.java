@@ -4094,8 +4094,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Map<String, String> stringUtilReplaceValues)
 		throws Exception {
 
-		_languageKeyResolver.expand(serviceContext.getCompanyId(), jsonObject);
-
 		SiteNavigationMenu siteNavigationMenu =
 			_siteNavigationMenuLocalService.
 				fetchSiteNavigationMenuByExternalReferenceCode(

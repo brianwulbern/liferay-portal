@@ -603,7 +603,7 @@ test.describe('Profiles - Data Masks tab', () => {
 
 			await profilesPage.deselectAllButton.click();
 
-			await expect(profilesPage.selectionStatus).toHaveText(
+			await expect(profilesPage.dialog.getByRole('status')).toHaveText(
 				'Nothing Selected'
 			);
 			await expect(

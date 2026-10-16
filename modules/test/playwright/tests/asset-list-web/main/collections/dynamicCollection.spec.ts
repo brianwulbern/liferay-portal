@@ -235,15 +235,9 @@ testWithEnhancedFiltering.describe(
 						await collectionsPage.openCollection(collectionName);
 
 						// A column on a field of the item type is saved as JSON
-						// carrying the objectDefinitionExternalReferenceCode
-						// and propertyName.
+						// carrying the propertyName, classNameId, classTypeId.
 
-						const orderByColumn1 = await getOrderByColumn(1);
-
-						expect(orderByColumn1).toContain(
-							'"objectDefinitionExternalReferenceCode":"L_CMS_BASIC_WEB_CONTENT"'
-						);
-						expect(orderByColumn1).toContain(
+						expect(await getOrderByColumn(1)).toContain(
 							'"propertyName":"title"'
 						);
 						expect(await getOrderByColumn(2)).toBe('createDate');
@@ -332,12 +326,7 @@ testWithEnhancedFiltering.describe(
 
 						await collectionsPage.openCollection(collectionName);
 
-						const filters = await getFilters();
-
-						expect(filters).toHaveLength(2);
-						expect(
-							filters[0].objectDefinitionExternalReferenceCode
-						).toBe('L_CMS_BASIC_WEB_CONTENT');
+						expect(await getFilters()).toHaveLength(2);
 					}
 				);
 
@@ -362,10 +351,8 @@ testWithEnhancedFiltering.describe(
 						const filters = await getFilters();
 
 						expect(filters).toHaveLength(1);
-						expect(
-							filters[0].objectDefinitionExternalReferenceCode
-						).toBeUndefined();
 						expect(filters[0].propertyName).toBe('userName');
+						expect(filters[0].classNameId).toBeUndefined();
 					}
 				);
 
@@ -391,10 +378,8 @@ testWithEnhancedFiltering.describe(
 						const filters = await getFilters();
 
 						expect(filters).toHaveLength(1);
-						expect(
-							filters[0].objectDefinitionExternalReferenceCode
-						).toBeUndefined();
 						expect(filters[0].propertyName).toBe('userName');
+						expect(filters[0].classNameId).toBeUndefined();
 					}
 				);
 			}

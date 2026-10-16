@@ -3,36 +3,22 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {FrameLocator, Locator, Page, expect} from '@playwright/test';
-
-import {PageEditorPage} from '../layout-content-page-editor-web/PageEditorPage';
+import {Locator, Page} from '@playwright/test';
 
 export class FormWidgetPage {
-	readonly closeConfigurationModalButton: Locator;
 	readonly configurationDropdownButton: Locator;
-	readonly configurationFrame: FrameLocator;
-	readonly displayingFormName: Locator;
 	readonly dropdownButton: Locator;
 	readonly formLabelLink: Locator;
 	readonly formWidgetContainer: Locator;
-	readonly javascriptLinks: Locator;
 	readonly nextButton: Locator;
 	readonly page: Page;
-	readonly pageEditorPage: PageEditorPage;
 	readonly previousButton: Locator;
 	readonly saveButton: Locator;
 
 	constructor(page: Page) {
-		this.closeConfigurationModalButton = page
-			.locator('.modal')
-			.getByLabel('Close', {exact: true});
 		this.configurationDropdownButton = page.getByRole('menuitem', {
 			name: 'Configuration',
 		});
-		this.configurationFrame = page.frameLocator('#modalIframe');
-		this.displayingFormName = this.configurationFrame.locator(
-			'.displaying-form-instance-id'
-		);
 		this.dropdownButton = page
 			.locator('#wrapper')
 			.getByRole('button', {name: 'Options'});
@@ -42,55 +28,37 @@ export class FormWidgetPage {
 		this.formWidgetContainer = page.locator(
 			'.lfr-layout-structure-item-com-liferay-dynamic-data-mapping-form-web-portlet-ddmformportlet'
 		);
-		this.javascriptLinks = this.configurationFrame.locator(
-			'a[href^="javascript:"]'
-		);
 		this.nextButton = page.getByRole('button', {
 			exact: true,
 			name: 'Next',
 		});
-		this.page = page;
-		this.pageEditorPage = new PageEditorPage(page);
 		this.previousButton = page.getByRole('button', {
 			exact: true,
 			name: 'Previous',
 		});
-		this.saveButton = this.configurationFrame.getByText('Save');
-	}
-
-	async closeConfiguration() {
-		await this.closeConfigurationModalButton.click();
+		this.page = page;
+		this.saveButton = page.frameLocator('#modalIframe').getByText('Save');
 	}
 
 	getFormLink(formName: string) {
-		return this.configurationFrame.getByRole('link', {name: formName});
-	}
-
-	async openConfiguration() {
-		const widgetId = await this.pageEditorPage.getFragmentId('Form');
-
-		await this.pageEditorPage.goToWidgetConfiguration(widgetId);
-	}
-
-	async saveConfiguration() {
-		await this.saveButton.click();
-	}
-
-	async selectForm(formName: string) {
-		await this.getFormLink(formName).click();
-
-		await expect(this.displayingFormName).toHaveText(
-			`${formName} (Modified)`
-		);
+		return this.page
+			.frameLocator('#modalIframe')
+			.getByRole('link', {name: formName});
 	}
 
 	async setFormWidgetConfiguration(formName: string) {
-		await this.openConfiguration();
+		await this.formWidgetContainer.click();
+		await this.dropdownButton.hover();
+		await this.dropdownButton.click();
 
-		await this.selectForm(formName);
+		await this.configurationDropdownButton.first().click();
 
-		await this.saveConfiguration();
+		const formLink = this.getFormLink(formName);
 
-		await this.closeConfiguration();
+		await formLink.click();
+
+		await this.saveButton.click();
+
+		await this.page.keyboard.press('Escape');
 	}
 }

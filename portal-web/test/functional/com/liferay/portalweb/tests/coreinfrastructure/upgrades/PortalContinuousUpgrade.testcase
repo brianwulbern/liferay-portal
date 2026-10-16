@@ -126,20 +126,20 @@ definition {
 		property database.types = "mysql,postgresql";
 		property liferay.online.properties = "true";
 
-		User.firstLoginUI(
+		User.firstLoginPG(
 			password = PropsUtil.get("default.admin.password"),
-			specificURL = "http://localhost:8080",
-			userEmailAddress = "test@liferay.com");
+			userEmailAddress = "test@liferay.com",
+			virtualHostsURL = "http://localhost:8080");
 
 		HeadlessPortalInstanceAPI.addPortalInstance(
 			domain = "www.able.com",
 			portalInstanceId = "www.able.com",
 			virtualHost = "www.able.com");
 
-		User.firstLoginUI(
+		User.firstLoginPG(
 			password = PropsUtil.get("default.admin.password"),
-			specificURL = "http://www.able.com:8080",
-			userEmailAddress = "test@www.able.com");
+			userEmailAddress = "test@www.able.com",
+			virtualHostsURL = "http://www.able.com:8080");
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",

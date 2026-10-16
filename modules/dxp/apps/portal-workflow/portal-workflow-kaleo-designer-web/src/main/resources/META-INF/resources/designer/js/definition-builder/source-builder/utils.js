@@ -42,10 +42,7 @@ export function parseAssignments(node) {
 		}
 		else if (itemKeys.includes('role-id')) {
 			assignments.assignmentType = ['roleId'];
-			assignments.roleExternalReferenceCode =
-				item['role-external-reference-code']?.[0];
 			assignments.roleId = parseInt(item['role-id'], 10);
-			assignments.roleType = item['role-type']?.[0];
 		}
 		else if (itemKeys.includes('role-type')) {
 			assignments.assignmentType = ['roleType'];
@@ -106,7 +103,7 @@ export function parseReassignments(node) {
 				item['resource-actions'][0]['resource-action'];
 		}
 		else if (item['roles']) {
-			if (item['roles'][0]['role']?.['name']) {
+			if (item['roles'][0]['role']?.['role-type']) {
 				assignments.assignmentType = ['roleType'];
 
 				assignments.autoCreate = [];
@@ -127,13 +124,10 @@ export function parseReassignments(node) {
 			}
 			else {
 				assignments.assignmentType = ['roleId'];
-				assignments.roleExternalReferenceCode =
-					item['roles'][0]['role']?.['role-external-reference-code'];
 				assignments.roleId = parseInt(
 					item['roles'][0]['role']?.['role-id'],
 					10
 				);
-				assignments.roleType = item['roles'][0]['role']?.['role-type'];
 			}
 		}
 		else if (item['scripted-assignment']) {
@@ -357,10 +351,7 @@ export function parseNotifications(node) {
 
 		const roles = item['recipients']?.[0]?.['roles'];
 
-		if (
-			(item['role-name'] || roles?.['name']) &&
-			(item['role-type'] || roles?.['role-type'])
-		) {
+		if (item['role-type'] || roles?.['role-type']) {
 			const autoCreate = item['auto-create'] || roles?.['auto-create'];
 			const roleName = item['role-name'] || roles?.['name'];
 			const roleType = item['role-type'] || roles?.['role-type'];
@@ -390,31 +381,22 @@ export function parseNotifications(node) {
 				(item['recipients'][0]?.['roles']?.['role'] ||
 					item['recipients'][0]?.['roles']?.['role-id']))
 		) {
-			const roleExternalReferenceCode =
-				item['role-external-reference-code']?.[0] ||
-				roles?.['role-external-reference-code']?.[0];
 			const roleId = item['role-id']
 				? item['role-id'][0]
 				: item['recipients'][0]['roles']['role'] ||
 					item['recipients'][0]['roles']['role-id'];
-			const roleType =
-				item['role-type']?.[0] || roles?.['role-type']?.[0];
 
 			if (receptionType) {
 				notifications.recipients[index].push({
 					assignmentType: ['roleId'],
 					receptionType: [receptionType],
-					roleExternalReferenceCode,
 					roleId,
-					roleType,
 				});
 			}
 			else {
 				notifications.recipients[index].push({
 					assignmentType: ['roleId'],
-					roleExternalReferenceCode,
 					roleId,
-					roleType,
 				});
 			}
 		}

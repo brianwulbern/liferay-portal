@@ -10,7 +10,7 @@ import ClayIcon from '@clayui/icon';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import useTypeProperties from '../../hooks/useTypeProperties';
-import {getFilterPropertyKey} from '../CollectionFilterBuilder/types';
+import {getPropertyKey} from '../CollectionFilterBuilder/types';
 
 import type {
 	FilterProperty,
@@ -23,7 +23,8 @@ const DEFAULT_ORDER_BY_COLUMN_2 = 'title';
 type OrderByType = 'ASC' | 'DESC';
 
 interface OrderBySelection {
-	objectDefinitionExternalReferenceCode?: string;
+	classNameId?: number;
+	classTypeId?: number;
 	propertyName: string;
 }
 
@@ -34,12 +35,13 @@ function isGroup(
 }
 
 function isTypeSpecificProperty(value: OrderBySelection): boolean {
-	return value.objectDefinitionExternalReferenceCode !== undefined;
+	return value.classNameId !== undefined && value.classTypeId !== undefined;
 }
 
 function resetOrderByColumn(defaultPropertyName: string): OrderBySelection {
 	return {
-		objectDefinitionExternalReferenceCode: undefined,
+		classNameId: undefined,
+		classTypeId: undefined,
 		propertyName: defaultPropertyName,
 	};
 }
@@ -65,10 +67,10 @@ function parseInitialOrderByColumn(
 		try {
 			const parsed = JSON.parse(value);
 
-			if (parsed?.objectDefinitionExternalReferenceCode) {
+			if (parsed && typeof parsed === 'object') {
 				return {
-					objectDefinitionExternalReferenceCode:
-						parsed.objectDefinitionExternalReferenceCode,
+					classNameId: parsed.classNameId,
+					classTypeId: parsed.classTypeId,
 					propertyName: parsed.propertyName,
 				};
 			}
@@ -80,11 +82,7 @@ function parseInitialOrderByColumn(
 		}
 	}
 
-	if (!value || value.startsWith('{')) {
-		return resetOrderByColumn(defaultPropertyName);
-	}
-
-	return resetOrderByColumn(value);
+	return resetOrderByColumn(value || defaultPropertyName);
 }
 
 interface OrderByFieldProps {
@@ -111,8 +109,9 @@ function OrderByField({
 	typeValue,
 }: OrderByFieldProps) {
 	const ascending = typeValue === 'ASC';
-	const selectedKey = getFilterPropertyKey(
-		columnValue.objectDefinitionExternalReferenceCode,
+	const selectedKey = getPropertyKey(
+		columnValue.classNameId,
+		columnValue.classTypeId,
 		columnValue.propertyName
 	);
 
@@ -141,8 +140,9 @@ function OrderByField({
 							>
 								{(option) => (
 									<Option
-										key={getFilterPropertyKey(
-											option.objectDefinitionExternalReferenceCode,
+										key={getPropertyKey(
+											option.classNameId,
+											option.classTypeId,
 											option.name
 										)}
 									>
@@ -152,8 +152,9 @@ function OrderByField({
 							</DropDown.Group>
 						) : (
 							<Option
-								key={getFilterPropertyKey(
-									item.objectDefinitionExternalReferenceCode,
+								key={getPropertyKey(
+									item.classNameId,
+									item.classTypeId,
 									item.name
 								)}
 							>
@@ -305,14 +306,12 @@ export default function CollectionOrdering({
 
 		properties
 			.flatMap((group) => group.items ?? [])
-			.forEach(({name, objectDefinitionExternalReferenceCode}) => {
-				map.set(
-					getFilterPropertyKey(
-						objectDefinitionExternalReferenceCode,
-						name
-					),
-					{objectDefinitionExternalReferenceCode, propertyName: name}
-				);
+			.forEach(({classNameId, classTypeId, name}) => {
+				map.set(getPropertyKey(classNameId, classTypeId, name), {
+					classNameId,
+					classTypeId,
+					propertyName: name,
+				});
 			});
 
 		return map;

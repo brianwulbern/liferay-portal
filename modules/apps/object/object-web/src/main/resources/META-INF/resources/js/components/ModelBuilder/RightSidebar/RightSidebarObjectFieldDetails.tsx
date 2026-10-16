@@ -42,11 +42,9 @@ export function RightSidebarObjectFieldDetails() {
 			forbiddenChars,
 			forbiddenLastChars,
 			forbiddenNames,
-			googleMapsAPIKey,
 			hasDepotEntry,
 			isRootDescendantNode,
 			learnResourceContext,
-			mapProviderKey,
 			metadataObjectFieldNames,
 			selectedObjectDefinitionNode,
 			selectedObjectField,
@@ -218,13 +216,11 @@ export function RightSidebarObjectFieldDetails() {
 							decimalSeparator={decimalSeparator}
 							errors={errors}
 							filterOperators={filterOperators}
-							googleMapsAPIKey={googleMapsAPIKey}
 							handleChange={handleChange}
 							hasDepotEntry={hasDepotEntry}
 							isDefaultStorageType={isDefaultStorageType}
 							isRootDescendantNode={isRootDescendantNode}
 							learnResources={learnResourceContext}
-							mapProviderKey={mapProviderKey}
 							metadataObjectFieldNames={metadataObjectFieldNames}
 							modelBuilder
 							objectDefinition={objectDefinitionNodeData}

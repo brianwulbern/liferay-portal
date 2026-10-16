@@ -44,7 +44,6 @@ export function TranslationOptionsContainer({
 			values.businessType === 'Decimal' ||
 			values.businessType === 'EmailAddress' ||
 			values.businessType === 'Integer' ||
-			values.businessType === 'Location' ||
 			values.businessType === 'LongInteger' ||
 			values.businessType === 'LongText' ||
 			values.businessType === 'MultiselectPicklist' ||

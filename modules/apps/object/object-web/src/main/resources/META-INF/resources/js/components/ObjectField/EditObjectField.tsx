@@ -29,12 +29,10 @@ export interface EditObjectFieldProps {
 	forbiddenChars: string[];
 	forbiddenLastChars: string[];
 	forbiddenNames: string[];
-	googleMapsAPIKey?: string;
 	hasDepotEntry?: boolean;
 	isDefaultStorageType: boolean;
 	isRootDescendantNode: boolean;
 	learnResources: ILearnResourceContext;
-	mapProviderKey?: string;
 	metadataObjectFieldNames: string[];
 	objectDefinitionExternalReferenceCode: string;
 	objectFieldId: number;
@@ -71,12 +69,10 @@ export default function EditObjectField({
 	forbiddenChars,
 	forbiddenLastChars,
 	forbiddenNames,
-	googleMapsAPIKey,
 	hasDepotEntry,
 	isDefaultStorageType,
 	isRootDescendantNode,
 	learnResources,
-	mapProviderKey,
 	metadataObjectFieldNames,
 	objectDefinitionExternalReferenceCode,
 	objectFieldId,
@@ -159,13 +155,11 @@ export default function EditObjectField({
 				decimalSeparator={decimalSeparator}
 				errors={errors}
 				filterOperators={filterOperators}
-				googleMapsAPIKey={googleMapsAPIKey}
 				handleChange={handleChange}
 				hasDepotEntry={hasDepotEntry}
 				isDefaultStorageType={isDefaultStorageType}
 				isRootDescendantNode={isRootDescendantNode}
 				learnResources={learnResources}
-				mapProviderKey={mapProviderKey}
 				metadataObjectFieldNames={metadataObjectFieldNames}
 				objectDefinition={objectDefinition}
 				objectFieldId={objectFieldId}

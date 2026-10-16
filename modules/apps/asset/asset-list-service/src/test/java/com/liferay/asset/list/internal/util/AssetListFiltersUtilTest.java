@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
@@ -80,12 +81,14 @@ public class AssetListFiltersUtilTest {
 	public static void tearDownClass() {
 		_objectDefinitionLocalServiceUtilMockedStatic.close();
 		_objectFieldLocalServiceUtilMockedStatic.close();
+		_portalUtilMockedStatic.close();
 	}
 
 	@Before
 	public void setUp() {
 		_objectDefinitionLocalServiceUtilMockedStatic.reset();
 		_objectFieldLocalServiceUtilMockedStatic.reset();
+		_portalUtilMockedStatic.reset();
 
 		_setUpLocalizationUtil();
 	}
@@ -1322,8 +1325,9 @@ public class AssetListFiltersUtilTest {
 		String operatorName, String propertyName, JSONArray valueJSONArray) {
 
 		return JSONUtil.put(
-			"objectDefinitionExternalReferenceCode",
-			_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE
+			"classNameId", _CLASS_NAME_ID
+		).put(
+			"classTypeId", _CLASS_TYPE_ID
 		).put(
 			"operatorName", operatorName
 		).put(
@@ -1337,8 +1341,9 @@ public class AssetListFiltersUtilTest {
 		String operatorName, String propertyName, String value) {
 
 		return JSONUtil.put(
-			"objectDefinitionExternalReferenceCode",
-			_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE
+			"classNameId", _CLASS_NAME_ID
+		).put(
+			"classTypeId", _CLASS_TYPE_ID
 		).put(
 			"operatorName", operatorName
 		).put(
@@ -1421,7 +1426,7 @@ public class AssetListFiltersUtilTest {
 		Mockito.when(
 			objectDefinition.getObjectDefinitionId()
 		).thenReturn(
-			_OBJECT_DEFINITION_ID
+			_CLASS_TYPE_ID
 		);
 
 		ObjectField objectField = Mockito.mock(ObjectField.class);
@@ -1447,17 +1452,23 @@ public class AssetListFiltersUtilTest {
 		_objectDefinitionLocalServiceUtilMockedStatic.when(
 			() ->
 				ObjectDefinitionLocalServiceUtil.
-					fetchObjectDefinitionByExternalReferenceCode(
-						_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE, _COMPANY_ID)
+					fetchObjectDefinitionByClassName(
+						_COMPANY_ID, "com.liferay.test.Class" + _CLASS_NAME_ID)
 		).thenReturn(
 			objectDefinition
 		);
 
 		_objectFieldLocalServiceUtilMockedStatic.when(
 			() -> ObjectFieldLocalServiceUtil.fetchObjectField(
-				_OBJECT_DEFINITION_ID, fieldName)
+				_CLASS_TYPE_ID, fieldName)
 		).thenReturn(
 			objectField
+		);
+
+		_portalUtilMockedStatic.when(
+			() -> PortalUtil.fetchClassName(_CLASS_NAME_ID)
+		).thenReturn(
+			"com.liferay.test.Class" + _CLASS_NAME_ID
 		);
 
 		return objectField;
@@ -1481,16 +1492,14 @@ public class AssetListFiltersUtilTest {
 		);
 	}
 
+	private static final long _CLASS_NAME_ID = RandomTestUtil.randomLong();
+
+	private static final long _CLASS_TYPE_ID = RandomTestUtil.randomLong();
+
 	private static final long _COMPANY_ID = RandomTestUtil.randomLong();
 
 	private static final String _NESTED_TEXT_FIELD =
 		"nestedFieldArray.value_text";
-
-	private static final String _OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE =
-		RandomTestUtil.randomString();
-
-	private static final long _OBJECT_DEFINITION_ID =
-		RandomTestUtil.randomLong();
 
 	private static final MockedStatic<ObjectDefinitionLocalServiceUtil>
 		_objectDefinitionLocalServiceUtilMockedStatic = Mockito.mockStatic(
@@ -1498,5 +1507,7 @@ public class AssetListFiltersUtilTest {
 	private static final MockedStatic<ObjectFieldLocalServiceUtil>
 		_objectFieldLocalServiceUtilMockedStatic = Mockito.mockStatic(
 			ObjectFieldLocalServiceUtil.class);
+	private static final MockedStatic<PortalUtil> _portalUtilMockedStatic =
+		Mockito.mockStatic(PortalUtil.class);
 
 }

@@ -13,7 +13,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.hits.TotalHitsRelation;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 import com.liferay.portal.search.web.internal.search.results.configuration.SearchResultsPortletInstanceConfiguration;
 import com.liferay.portal.search.web.internal.util.DisplayContextHelperUtil;
@@ -114,14 +113,6 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 		return _showPagination;
 	}
 
-	public boolean isTotalHitsExact() {
-		if (_totalHitsRelation == TotalHitsRelation.EQ) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public void setDocuments(List<Document> documents) {
 		_documents = documents;
 	}
@@ -164,10 +155,6 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 		_totalHits = totalHits;
 	}
 
-	public void setTotalHitsRelation(TotalHitsRelation totalHitsRelation) {
-		_totalHitsRelation = totalHitsRelation;
-	}
-
 	public List<SearchResultSummaryDisplayContext>
 		translateSearchResultSummaryDisplayContexts(List<Document> documents) {
 
@@ -190,6 +177,5 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 	private boolean _showPagination;
 	private final ThemeDisplay _themeDisplay;
 	private int _totalHits;
-	private TotalHitsRelation _totalHitsRelation;
 
 }

@@ -110,10 +110,6 @@ export class ProfilesPage extends FDSTablePage {
 		return this.masksRows.filter({hasText: name});
 	}
 
-	get selectionStatus(): Locator {
-		return this.dialog.getByRole('status').filter({hasText: 'Selected'});
-	}
-
 	toolCheckbox(name: string): Locator {
 		return this.toolTreeItem(name).getByRole('checkbox');
 	}

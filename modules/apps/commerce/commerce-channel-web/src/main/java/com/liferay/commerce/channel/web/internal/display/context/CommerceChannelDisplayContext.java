@@ -32,7 +32,6 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.tax.configuration.CommerceShippingTaxConfiguration;
-import com.liferay.commerce.util.CommerceChannelConfigurationUtil;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.item.selector.ItemSelector;
@@ -551,13 +550,6 @@ public class CommerceChannelDisplayContext
 
 		return commerceOrderCheckoutConfiguration.
 			checkoutRequestedDeliveryDateEnabled();
-	}
-
-	public boolean isGuestBrowsingEnabled() throws PortalException {
-		CommerceChannel commerceChannel = getCommerceChannel();
-
-		return CommerceChannelConfigurationUtil.isGuestBrowsingEnabled(
-			commerceChannel.getGroupId());
 	}
 
 	public boolean isGuestCheckoutEnabled() throws PortalException {

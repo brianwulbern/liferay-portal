@@ -43,6 +43,9 @@ public class GetTypePropertiesMVCResourceCommand
 		long[] classNameIds = GetterUtil.getLongValues(
 			StringUtil.split(
 				ParamUtil.getString(resourceRequest, "classNameIds")));
+		long[] classTypeIds = GetterUtil.getLongValues(
+			StringUtil.split(
+				ParamUtil.getString(resourceRequest, "classTypeIds")));
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -50,7 +53,7 @@ public class GetTypePropertiesMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			AssetListTypePropertiesUtil.getTypePropertiesJSONArray(
-				classNameIds, themeDisplay.getCompanyId(),
+				classNameIds, classTypeIds, themeDisplay.getCompanyId(),
 				themeDisplay.getLocale()));
 	}
 

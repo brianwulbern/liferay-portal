@@ -13,6 +13,7 @@ import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
@@ -24,17 +25,21 @@ import java.util.Locale;
 public class AssetListObjectFieldUtil {
 
 	public static ObjectField fetchObjectField(
-		long companyId, String name,
-		String objectDefinitionExternalReferenceCode) {
+		long classNameId, long companyId, String name) {
 
-		if (Validator.isNull(objectDefinitionExternalReferenceCode)) {
+		if (classNameId <= 0) {
+			return null;
+		}
+
+		String className = PortalUtil.fetchClassName(classNameId);
+
+		if (Validator.isNull(className)) {
 			return null;
 		}
 
 		ObjectDefinition objectDefinition =
-			ObjectDefinitionLocalServiceUtil.
-				fetchObjectDefinitionByExternalReferenceCode(
-					objectDefinitionExternalReferenceCode, companyId);
+			ObjectDefinitionLocalServiceUtil.fetchObjectDefinitionByClassName(
+				companyId, className);
 
 		if (objectDefinition == null) {
 			return null;

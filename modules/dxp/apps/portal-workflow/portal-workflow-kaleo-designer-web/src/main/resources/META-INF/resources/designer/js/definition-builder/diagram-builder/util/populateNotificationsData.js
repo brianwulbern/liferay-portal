@@ -7,7 +7,7 @@ import {isNode} from 'react-flow-renderer';
 
 import {
 	retrieveAccountRoles,
-	retrieveRole,
+	retrieveRoleById,
 	retrieveRoles,
 	retrieveUsersBy,
 } from '../../util/fetchUtil';
@@ -30,10 +30,7 @@ const populateNotificationsData = (
 					}
 
 					if (recipient?.assignmentType?.[0] === 'roleId') {
-						retrieveRole(
-							recipient.roleExternalReferenceCode,
-							recipient.roleId
-						)
+						retrieveRoleById(recipient.roleId)
 							.then((response) => response.json())
 							.then((response) => {
 								initialElements[
@@ -162,10 +159,7 @@ const populateNotificationsData = (
 					}
 
 					if (recipient?.assignmentType?.[0] === 'roleId') {
-						retrieveRole(
-							recipient.roleExternalReferenceCode,
-							recipient.roleId
-						)
+						retrieveRoleById(recipient.roleId)
 							.then((response) => response.json())
 							.then((response) => {
 								if (

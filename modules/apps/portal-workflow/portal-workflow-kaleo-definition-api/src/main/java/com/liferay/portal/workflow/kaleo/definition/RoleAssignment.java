@@ -19,7 +19,6 @@ public class RoleAssignment extends Assignment {
 
 		_roleId = roleId;
 
-		_roleExternalReferenceCode = null;
 		_roleName = null;
 		_roleType = null;
 	}
@@ -30,20 +29,6 @@ public class RoleAssignment extends Assignment {
 		_roleId = roleId;
 		_roleName = roleName;
 		_roleType = roleType;
-
-		_roleExternalReferenceCode = null;
-	}
-
-	public RoleAssignment(
-		String roleExternalReferenceCode, long roleId, String roleName,
-		String roleType) {
-
-		super(AssignmentType.ROLE);
-
-		_roleExternalReferenceCode = roleExternalReferenceCode;
-		_roleId = roleId;
-		_roleName = roleName;
-		_roleType = roleType;
 	}
 
 	public RoleAssignment(String roleName, String roleType) {
@@ -51,8 +36,6 @@ public class RoleAssignment extends Assignment {
 
 		_roleName = roleName;
 		_roleType = roleType;
-
-		_roleExternalReferenceCode = null;
 	}
 
 	@Override
@@ -76,10 +59,6 @@ public class RoleAssignment extends Assignment {
 		return true;
 	}
 
-	public String getRoleExternalReferenceCode() {
-		return _roleExternalReferenceCode;
-	}
-
 	public long getRoleId() {
 		return _roleId;
 	}
@@ -94,9 +73,8 @@ public class RoleAssignment extends Assignment {
 
 	@Override
 	public int hashCode() {
-		int hash = HashUtil.hash(0, _roleExternalReferenceCode);
+		int hash = HashUtil.hash(0, _roleId);
 
-		hash = HashUtil.hash(hash, _roleId);
 		hash = HashUtil.hash(hash, _roleName);
 
 		return HashUtil.hash(hash, _roleType);
@@ -111,7 +89,6 @@ public class RoleAssignment extends Assignment {
 	}
 
 	private boolean _autoCreate;
-	private final String _roleExternalReferenceCode;
 	private long _roleId;
 	private final String _roleName;
 	private final String _roleType;

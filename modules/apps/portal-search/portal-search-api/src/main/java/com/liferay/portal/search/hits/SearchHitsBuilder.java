@@ -27,9 +27,7 @@ public class SearchHitsBuilder {
 	}
 
 	public SearchHits build() {
-		return new SearchHits(
-			_maxScore, _searchHits, _searchTime, _totalHits,
-			_totalHitsRelation);
+		return new SearchHits(_maxScore, _searchHits, _searchTime, _totalHits);
 	}
 
 	public SearchHitsBuilder maxScore(float maxScore) {
@@ -50,18 +48,9 @@ public class SearchHitsBuilder {
 		return this;
 	}
 
-	public SearchHitsBuilder totalHitsRelation(
-		TotalHitsRelation totalHitsRelation) {
-
-		_totalHitsRelation = totalHitsRelation;
-
-		return this;
-	}
-
 	private float _maxScore;
 	private final List<SearchHit> _searchHits = new ArrayList<>();
 	private long _searchTime;
 	private long _totalHits;
-	private TotalHitsRelation _totalHitsRelation = TotalHitsRelation.EQ;
 
 }

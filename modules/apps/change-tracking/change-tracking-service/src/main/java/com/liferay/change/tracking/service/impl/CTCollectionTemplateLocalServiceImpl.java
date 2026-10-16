@@ -123,11 +123,6 @@ public class CTCollectionTemplateLocalServiceImpl
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			ctCollectionTemplate.getCtCollectionTemplateId());
 
-		_jsonStorageEntryLocalService.deleteJSONStorageEntries(
-			_classNameLocalService.getClassNameId(
-				CTCollectionTemplate.class.getName()),
-			ctCollectionTemplate.getCtCollectionTemplateId());
-
 		return ctCollectionTemplate;
 	}
 

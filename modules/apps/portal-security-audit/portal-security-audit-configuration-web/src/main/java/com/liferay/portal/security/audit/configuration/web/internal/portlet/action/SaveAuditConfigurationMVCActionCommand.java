@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.audit.configuration.AuditConfiguration;
 import com.liferay.portal.security.audit.configuration.web.internal.util.AuditConfigurationOverrideUtil;
 import com.liferay.portal.security.audit.router.configuration.FileSystemAuditMessageProcessorConfiguration;
+import com.liferay.portal.security.audit.router.configuration.PersistentAuditMessageProcessorConfiguration;
 
 import jakarta.portlet.ActionRequest;
 import jakarta.portlet.ActionResponse;
@@ -110,6 +111,22 @@ public class SaveAuditConfigurationMVCActionCommand
 					FileSystemAuditMessageProcessorConfiguration.class,
 					fileSystemAuditMessageProcessorConfigurationProperties);
 			}
+
+			Dictionary<String, Object>
+				persistentAuditMessageProcessorConfigurationProperties =
+					_getPersistentAuditMessageProcessorConfigurationProperties(
+						actionRequest,
+						_configurationProvider.getSystemConfiguration(
+							PersistentAuditMessageProcessorConfiguration.
+								class));
+
+			if (!persistentAuditMessageProcessorConfigurationProperties.
+					isEmpty()) {
+
+				_configurationProvider.saveSystemConfiguration(
+					PersistentAuditMessageProcessorConfiguration.class,
+					persistentAuditMessageProcessorConfigurationProperties);
+			}
 		}
 		else {
 			long companyId = themeDisplay.getCompanyId();
@@ -121,22 +138,22 @@ public class SaveAuditConfigurationMVCActionCommand
 					permissionChecker);
 			}
 
-			AuditConfiguration auditConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					AuditConfiguration.class, companyId);
+			if (!AuditConfigurationOverrideUtil.isOverridden(
+					AuditConfiguration.class, "enabled")) {
 
-			_configurationProvider.saveCompanyConfiguration(
-				AuditConfiguration.class, companyId,
-				HashMapDictionaryBuilder.<String, Object>put(
-					"pseudonymizationEnabled",
-					ParamUtil.getBoolean(
-						actionRequest, "pseudonymizationEnabled",
-						auditConfiguration.pseudonymizationEnabled())
-				).build());
+				AuditConfiguration auditConfiguration =
+					_configurationProvider.getCompanyConfiguration(
+						AuditConfiguration.class, companyId);
 
-			_routePseudonymizationChangeAuditMessage(
-				actionRequest, auditConfiguration.pseudonymizationEnabled(),
-				themeDisplay);
+				_configurationProvider.saveCompanyConfiguration(
+					AuditConfiguration.class, companyId,
+					_getAuditConfigurationProperties(
+						actionRequest, auditConfiguration));
+
+				_routePseudonymizationChangeAuditMessage(
+					actionRequest, auditConfiguration.pseudonymizationEnabled(),
+					themeDisplay);
+			}
 
 			Dictionary<String, Object>
 				fileSystemAuditMessageProcessorConfigurationProperties =
@@ -153,6 +170,23 @@ public class SaveAuditConfigurationMVCActionCommand
 					FileSystemAuditMessageProcessorConfiguration.class,
 					companyId,
 					fileSystemAuditMessageProcessorConfigurationProperties);
+			}
+
+			Dictionary<String, Object>
+				persistentAuditMessageProcessorConfigurationProperties =
+					_getPersistentAuditMessageProcessorConfigurationProperties(
+						actionRequest,
+						_configurationProvider.getCompanyConfiguration(
+							PersistentAuditMessageProcessorConfiguration.class,
+							companyId));
+
+			if (!persistentAuditMessageProcessorConfigurationProperties.
+					isEmpty()) {
+
+				_configurationProvider.saveCompanyConfiguration(
+					PersistentAuditMessageProcessorConfiguration.class,
+					companyId,
+					persistentAuditMessageProcessorConfigurationProperties);
 			}
 		}
 
@@ -239,6 +273,52 @@ public class SaveAuditConfigurationMVCActionCommand
 					"fileSystemAuditMessageProcessorOutputFormat",
 					fileSystemAuditMessageProcessorConfiguration.
 						outputFormat()));
+		}
+
+		return properties;
+	}
+
+	private Dictionary<String, Object>
+		_getPersistentAuditMessageProcessorConfigurationProperties(
+			ActionRequest actionRequest,
+			PersistentAuditMessageProcessorConfiguration
+				persistentAuditMessageProcessorConfiguration) {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		if (!AuditConfigurationOverrideUtil.isOverridden(
+				PersistentAuditMessageProcessorConfiguration.class,
+				"bufferSize")) {
+
+			properties.put(
+				"bufferSize",
+				ParamUtil.getInteger(
+					actionRequest, "persistentAuditMessageProcessorBufferSize",
+					persistentAuditMessageProcessorConfiguration.bufferSize()));
+		}
+
+		if (!AuditConfigurationOverrideUtil.isOverridden(
+				PersistentAuditMessageProcessorConfiguration.class,
+				"enabled")) {
+
+			properties.put(
+				"enabled",
+				ParamUtil.getBoolean(
+					actionRequest, "persistentAuditMessageProcessorEnabled",
+					persistentAuditMessageProcessorConfiguration.enabled()));
+		}
+
+		if (!AuditConfigurationOverrideUtil.isOverridden(
+				PersistentAuditMessageProcessorConfiguration.class,
+				"flushInterval")) {
+
+			properties.put(
+				"flushInterval",
+				ParamUtil.getLong(
+					actionRequest,
+					"persistentAuditMessageProcessorFlushInterval",
+					persistentAuditMessageProcessorConfiguration.
+						flushInterval()));
 		}
 
 		return properties;

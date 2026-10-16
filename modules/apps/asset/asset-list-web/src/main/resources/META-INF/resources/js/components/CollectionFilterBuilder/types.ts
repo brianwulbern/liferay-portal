@@ -22,9 +22,10 @@ export interface PropertyOption {
 }
 
 export interface FilterProperty {
+	classNameId?: number;
+	classTypeId?: number;
 	label: string;
 	name: string;
-	objectDefinitionExternalReferenceCode?: string;
 	options?: PropertyOption[];
 	sortable?: boolean;
 	type?: PropertyType;
@@ -41,8 +42,9 @@ export interface FilterOperator {
 }
 
 export interface FilterCondition {
+	classNameId?: number;
+	classTypeId?: number;
 	id: string;
-	objectDefinitionExternalReferenceCode?: string;
 	operatorName?: string;
 	propertyName?: string;
 	quantifier?: string;
@@ -57,9 +59,10 @@ export function getCombinationKey(
 	return `${propertyKey}|${operatorName ?? ''}|${quantifier ?? ''}`;
 }
 
-export function getFilterPropertyKey(
-	objectDefinitionExternalReferenceCode: string | undefined,
+export function getPropertyKey(
+	classNameId: number | undefined,
+	classTypeId: number | undefined,
 	name: string | undefined
 ): string {
-	return `${objectDefinitionExternalReferenceCode ?? ''}|${name ?? ''}`;
+	return `${classNameId ?? ''}|${classTypeId ?? ''}|${name ?? ''}`;
 }

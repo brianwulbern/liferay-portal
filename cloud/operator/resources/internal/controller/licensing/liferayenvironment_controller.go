@@ -1,6 +1,6 @@
-// +kubebuilder:rbac:groups=licensing.liferay.com,resources=liferayenvironments,verbs=get;list;watch
+// +kubebuilder:rbac:groups=licensing.liferay.com,resources=liferayenvironments,verbs=get;list;patch;update;watch
 // +kubebuilder:rbac:groups=licensing.liferay.com,resources=liferayenvironments/finalizers,verbs=update
-// +kubebuilder:rbac:groups=licensing.liferay.com,resources=liferayenvironments/status,verbs=get;update
+// +kubebuilder:rbac:groups=licensing.liferay.com,resources=liferayenvironments/status,verbs=get;patch;update
 package licensing
 
 import (
@@ -69,11 +69,10 @@ const (
 )
 
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
-// +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;update;watch
-// +kubebuilder:rbac:groups="",resources=secrets,verbs=create;get;list;update;watch
+// +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;patch;update;watch
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=create;get;list;patch;update;watch
 // +kubebuilder:rbac:groups=apiextensions.k8s.io,resources=customresourcedefinitions,verbs=get;list;watch
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;update;watch
-// +kubebuilder:rbac:groups=apps,resources=statefulsets,verbs=get;list;update;watch
+// +kubebuilder:rbac:groups=apps,resources=statefulsets,verbs=get;list;patch;update;watch
 // +kubebuilder:rbac:groups=autoscaling,resources=horizontalpodautoscalers,verbs=get;list;patch;watch
 // +kubebuilder:rbac:groups=keda.sh,resources=scaledobjects,verbs=get;list;patch;watch
 func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) Reconcile(
@@ -696,11 +695,13 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 
 	liferayEnvironment.Status.ReplicaCeiling = &replicaCeiling
 
-	workloadKind := liferayEnvironment.Spec.WorkloadRef.EffectiveKind()
+	statefulSet := &appsv1.StatefulSet{}
 
-	workload, getError := liferayEnvironmentReconciler.getWorkload(
-		context, liferayEnvironment,
-	)
+	getError := liferayEnvironmentReconciler.Get(
+		context, types.NamespacedName{
+			Name:      liferayEnvironment.Spec.WorkloadRef.Name,
+			Namespace: liferayEnvironment.Namespace,
+		}, statefulSet)
 
 	if errors.IsNotFound(getError) {
 		logger.V(1).Info(
@@ -714,8 +715,8 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 			&liferayEnvironment.Status.Conditions,
 			metav1.Condition{
 				Message: fmt.Sprintf(
-					"Workload %s %q does not exist.",
-					workloadKind, liferayEnvironment.Spec.WorkloadRef.Name,
+					"Workload StatefulSet %q does not exist.",
+					liferayEnvironment.Spec.WorkloadRef.Name,
 				),
 				Reason: "WorkloadNotFound",
 				Status: metav1.ConditionUnknown,
@@ -730,13 +731,9 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 		return 0, getError
 	}
 
-	liveReplicas := getReplicas(workload)
+	desiredReplicas := resolveDesiredReplicas(liferayEnvironment, statefulSet)
 
-	desiredReplicas := resolveDesiredReplicas(liferayEnvironment, liveReplicas)
-
-	annotations := workload.GetAnnotations()
-
-	markedScaledToZero := annotations[annotationScaledToZero] == "true"
+	markedScaledToZero := statefulSet.Annotations[annotationScaledToZero] == "true"
 
 	if markedScaledToZero && replicaCeiling > 0 && liferayEnvironment.Spec.Autoscaling != nil {
 		desiredReplicas = max(desiredReplicas, liferayEnvironment.Spec.Autoscaling.MinReplicas)
@@ -745,9 +742,10 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 	effectiveReplicas := min(desiredReplicas, replicaCeiling)
 
 	markScaledToZero := liferayEnvironment.Spec.Autoscaling != nil && replicaCeiling == 0 &&
-		(markedScaledToZero || liveReplicas == nil || *liveReplicas > 0)
+		(markedScaledToZero || statefulSet.Spec.Replicas == nil || *statefulSet.Spec.Replicas > 0)
 
-	replicasChanged := liveReplicas == nil || *liveReplicas != effectiveReplicas
+	replicasChanged := statefulSet.Spec.Replicas == nil ||
+		*statefulSet.Spec.Replicas != effectiveReplicas
 
 	if ceilingChanged || replicasChanged {
 		if error := liferayEnvironmentReconciler.Status().Update(context, liferayEnvironment); error != nil {
@@ -756,27 +754,27 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 	}
 
 	if replicasChanged || markScaledToZero != markedScaledToZero {
-		setReplicas(&effectiveReplicas, workload)
+		liveReplicas := statefulSet.Spec.Replicas
+
+		statefulSet.Spec.Replicas = &effectiveReplicas
 
 		if markScaledToZero {
-			if annotations == nil {
-				annotations = map[string]string{}
+			if statefulSet.Annotations == nil {
+				statefulSet.Annotations = map[string]string{}
 			}
 
-			annotations[annotationScaledToZero] = "true"
+			statefulSet.Annotations[annotationScaledToZero] = "true"
 		} else {
-			delete(annotations, annotationScaledToZero)
+			delete(statefulSet.Annotations, annotationScaledToZero)
 		}
 
-		workload.SetAnnotations(annotations)
-
 		if error := liferayEnvironmentReconciler.Update(
-			context, workload, client.FieldOwner(fieldOwner),
+			context, statefulSet, client.FieldOwner(fieldOwner),
 		); error != nil {
 			logger.Error(
 				error, "Unable to enforce the licensed replica ceiling",
 				"effectiveReplicas", effectiveReplicas,
-				"workload", workload.GetName(),
+				"workload", statefulSet.Name,
 			)
 
 			liferayEnvironment.Status.EffectiveReplicas = liveReplicas
@@ -785,8 +783,8 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 				&liferayEnvironment.Status.Conditions,
 				metav1.Condition{
 					Message: fmt.Sprintf(
-						"Unable to scale %s %q to %d replicas: %s.",
-						workloadKind, workload.GetName(), effectiveReplicas, error,
+						"Unable to scale StatefulSet %q to %d replicas: %s.",
+						statefulSet.Name, effectiveReplicas, error,
 					),
 					Reason: "WorkloadUpdateRejected",
 					Status: metav1.ConditionFalse,
@@ -806,7 +804,7 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 			"desiredReplicas", desiredReplicas,
 			"effectiveReplicas", effectiveReplicas,
 			"replicaCeiling", replicaCeiling,
-			"workload", workload.GetName(),
+			"workload", statefulSet.Name,
 		)
 	}
 
@@ -818,15 +816,15 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) enforceReplica
 		logger.Error(
 			error, "Unable to enforce the licensed autoscaling ceiling",
 			"replicaCeiling", replicaCeiling,
-			"workload", workload.GetName(),
+			"workload", statefulSet.Name,
 		)
 
 		meta.SetStatusCondition(
 			&liferayEnvironment.Status.Conditions,
 			metav1.Condition{
 				Message: fmt.Sprintf(
-					"Unable to cap the autoscaler of %s %q to %d replicas: %s.",
-					workloadKind, workload.GetName(), replicaCeiling, error,
+					"Unable to cap the autoscaler of StatefulSet %q to %d replicas: %s.",
+					statefulSet.Name, replicaCeiling, error,
 				),
 				Reason: "AutoscalerUpdateRejected",
 				Status: metav1.ConditionFalse,
@@ -1324,47 +1322,6 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) finishWithBack
 	)
 }
 
-func getPodTemplate(workload client.Object) *corev1.PodTemplateSpec {
-	if deployment, ok := workload.(*appsv1.Deployment); ok {
-		return &deployment.Spec.Template
-	}
-
-	if statefulSet, ok := workload.(*appsv1.StatefulSet); ok {
-		return &statefulSet.Spec.Template
-	}
-
-	return nil
-}
-
-func getReplicas(workload client.Object) *int32 {
-	if deployment, ok := workload.(*appsv1.Deployment); ok {
-		return deployment.Spec.Replicas
-	}
-
-	if statefulSet, ok := workload.(*appsv1.StatefulSet); ok {
-		return statefulSet.Spec.Replicas
-	}
-
-	return nil
-}
-
-func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) getWorkload(
-	context context.Context,
-	liferayEnvironment *licensingv1alpha1.LiferayEnvironment,
-) (client.Object, error) {
-	workload := liferayEnvironment.Spec.WorkloadRef.NewObject()
-
-	if error := liferayEnvironmentReconciler.Get(
-		context, types.NamespacedName{
-			Name:      liferayEnvironment.Spec.WorkloadRef.Name,
-			Namespace: liferayEnvironment.Namespace,
-		}, workload); error != nil {
-		return nil, error
-	}
-
-	return workload, nil
-}
-
 func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) handleOnlineActivation(
 	context context.Context,
 	environmentID string,
@@ -1705,23 +1662,19 @@ func readScaledObjectSpec(
 		)
 	}
 
-	if scaledObjectSpec.ScaleTargetRef.Kind == "" {
-		scaledObjectSpec.ScaleTargetRef.Kind = string(licensingv1alpha1.WorkloadKindDeployment)
-	}
-
 	return scaledObjectSpec, nil
 }
 
 func resolveDesiredReplicas(
 	liferayEnvironment *licensingv1alpha1.LiferayEnvironment,
-	workloadReplicas *int32,
+	statefulSet *appsv1.StatefulSet,
 ) int32 {
 	if liferayEnvironment.Spec.DesiredReplicas != nil {
 		return *liferayEnvironment.Spec.DesiredReplicas
 	}
 
-	if workloadReplicas != nil {
-		return *workloadReplicas
+	if statefulSet.Spec.Replicas != nil {
+		return *statefulSet.Spec.Replicas
 	}
 
 	return 1
@@ -1737,11 +1690,13 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) resolveDxpVers
 
 	logger := logf.FromContext(context)
 
-	workload, error := liferayEnvironmentReconciler.getWorkload(
-		context, liferayEnvironment,
-	)
+	statefulSet := &appsv1.StatefulSet{}
 
-	if error != nil {
+	if error := liferayEnvironmentReconciler.Get(
+		context, types.NamespacedName{
+			Name:      liferayEnvironment.Spec.WorkloadRef.Name,
+			Namespace: liferayEnvironment.Namespace,
+		}, statefulSet); error != nil {
 		logger.V(1).Info(
 			"Unable to read the workload to determine the DXP version",
 			"workload", liferayEnvironment.Spec.WorkloadRef.Name,
@@ -1750,7 +1705,7 @@ func (liferayEnvironmentReconciler *LiferayEnvironmentReconciler) resolveDxpVers
 		return ""
 	}
 
-	for _, container := range getPodTemplate(workload).Spec.Containers {
+	for _, container := range statefulSet.Spec.Template.Spec.Containers {
 		dxpVersion := extractLiferayImageTag(container.Image)
 
 		if dxpVersion != "" {
@@ -1784,18 +1739,7 @@ func scalesWorkload(
 	liferayEnvironment *licensingv1alpha1.LiferayEnvironment,
 	name string,
 ) bool {
-	return kind == string(liferayEnvironment.Spec.WorkloadRef.EffectiveKind()) &&
-		name == liferayEnvironment.Spec.WorkloadRef.Name
-}
-
-func setReplicas(replicas *int32, workload client.Object) {
-	if deployment, ok := workload.(*appsv1.Deployment); ok {
-		deployment.Spec.Replicas = replicas
-	}
-
-	if statefulSet, ok := workload.(*appsv1.StatefulSet); ok {
-		statefulSet.Spec.Replicas = replicas
-	}
+	return kind == "StatefulSet" && name == liferayEnvironment.Spec.WorkloadRef.Name
 }
 
 type LiferayEnvironmentReconciler struct {

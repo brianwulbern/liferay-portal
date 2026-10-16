@@ -100,7 +100,7 @@
 			String successMessage = (String)SessionMessages.get(renderRequest, "requestProcessed");
 			%>
 
-			<c:if test="<%= Validator.isNotNull(successMessage) %>">
+			<c:if test='<%= Validator.isNotNull(successMessage) && !successMessage.equals("request_processed") %>'>
 				<div class="alert alert-success">
 					<%= HtmlUtil.escape(successMessage) %>
 				</div>

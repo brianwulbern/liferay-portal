@@ -18,12 +18,6 @@ public interface WorkflowModelParser {
 
 	public Definition parse(InputStream inputStream) throws WorkflowException;
 
-	public default Definition parse(long companyId, InputStream inputStream)
-		throws WorkflowException {
-
-		throw new UnsupportedOperationException();
-	}
-
 	public default Definition parse(String content) throws WorkflowException {
 		return parse(new UnsyncByteArrayInputStream(content.getBytes()));
 	}

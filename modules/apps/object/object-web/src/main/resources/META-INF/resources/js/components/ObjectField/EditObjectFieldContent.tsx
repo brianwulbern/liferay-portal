@@ -51,13 +51,11 @@ export function EditObjectFieldContent({
 	decimalSeparator,
 	errors,
 	filterOperators,
-	googleMapsAPIKey,
 	handleChange,
 	hasDepotEntry,
 	isDefaultStorageType,
 	isRootDescendantNode,
 	learnResources,
-	mapProviderKey,
 	metadataObjectFieldNames,
 	modelBuilder = false,
 	objectDefinition,
@@ -223,11 +221,9 @@ export function EditObjectFieldContent({
 									defaultValueSidebarElements
 								}
 								errors={errors}
-								googleMapsAPIKey={googleMapsAPIKey}
 								isDefaultStorageType={isDefaultStorageType}
 								isRootDescendantNode={isRootDescendantNode}
 								learnResources={learnResources}
-								mapProviderKey={mapProviderKey}
 								modelBuilder={modelBuilder}
 								onSubmit={onSubmit}
 								readOnlySidebarElements={

@@ -191,28 +191,11 @@ function appendXMLAssignments(
 
 			const xmlRole = XMLUtil.createObj('role');
 
-			buffer.push(xmlRole.open);
-
-			const roleExternalReferenceCode =
-				dataAssignments.roleExternalReferenceCode;
-
-			if (roleExternalReferenceCode) {
-				buffer.push(
-					createTagWithEscapedContent(
-						'roleExternalReferenceCode',
-						roleExternalReferenceCode
-					)
-				);
-			}
-
-			const roleType = dataAssignments.roleType;
-
-			if (roleType) {
-				buffer.push(createTagWithEscapedContent('roleType', roleType));
-			}
+			const roleId = dataAssignments.roleId;
 
 			buffer.push(
-				createTagWithEscapedContent('roleId', dataAssignments.roleId),
+				xmlRole.open,
+				createTagWithEscapedContent('roleId', roleId),
 				xmlRole.close
 			);
 

@@ -57,13 +57,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "object-model-builder"));
 			).put(
 				"forbiddenNames", PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST)
 			).put(
-				"googleMapsAPIKey", objectDefinitionsFieldsDisplayContext.getGoogleMapsAPIKey()
-			).put(
 				"hasDepotEntry", objectDefinitionsFieldsDisplayContext.hasDepotEntry()
 			).put(
 				"learnResourceContext", LearnMessageUtil.getReactDataJSONObject(new String[] {"frontend-js-components-web", "object-web"})
-			).put(
-				"mapProviderKey", objectDefinitionsFieldsDisplayContext.getMapProviderKey()
 			).put(
 				"metadataObjectFieldNames", ObjectFieldUtil.getMetadataObjectFieldNamesJSONArray()
 			).put(
