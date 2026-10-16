@@ -140,7 +140,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -193,7 +192,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -4446,18 +4444,8 @@ public class BundleSiteInitializerTest {
 
 		String typeSettings = siteNavigationMenuItem1.getTypeSettings();
 
+		Assert.assertTrue(typeSettings.contains("Test Layout"));
 		Assert.assertTrue(typeSettings.contains("useCustomName"));
-
-		UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.fastLoad(
-			typeSettings
-		).build();
-
-		Assert.assertEquals(
-			LanguageUtil.get(LocaleUtil.US, "layout"),
-			unicodeProperties.getProperty("name_en_US"));
-		Assert.assertEquals(
-			LanguageUtil.get(LocaleUtil.SPAIN, "layout"),
-			unicodeProperties.getProperty("name_es_ES"));
 
 		SiteNavigationMenuItem siteNavigationMenuItem2 =
 			siteNavigationMenuItems.get(1);

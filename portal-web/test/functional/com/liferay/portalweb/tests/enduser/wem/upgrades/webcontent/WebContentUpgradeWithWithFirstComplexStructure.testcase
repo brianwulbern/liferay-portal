@@ -282,10 +282,6 @@ definition {
 
 		Button.clickSaveAsDraft();
 
-		Alert.viewSuccessMessage();
-
-		Alert.closeMessage(messageType = "SUCCESS");
-
 		WebContent.publishExistingWCArticleWithPermissions();
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");

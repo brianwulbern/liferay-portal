@@ -78,12 +78,6 @@ describe('Check the return for all object field business types)', () => {
 		);
 	});
 
-	it('returns location language key', () => {
-		expect(getObjectFieldBusinessTypeLabel('Location')).toStrictEqual(
-			'location'
-		);
-	});
-
 	it('returns long text language key', () => {
 		expect(getObjectFieldBusinessTypeLabel('LongText')).toStrictEqual(
 			'long-text'

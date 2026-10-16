@@ -658,114 +658,101 @@ func TestEnforceReplicaCeiling(t *testing.T) {
 	}
 
 	for name, testCase := range testCases {
-		for _, workloadKind := range workloadKinds {
-			t.Run(fmt.Sprintf("%s for a %s", name, workloadKind), func(t *testing.T) {
-				liferayEnvironment := &licensingv1alpha1.LiferayEnvironment{
+		t.Run(name, func(t *testing.T) {
+			liferayEnvironment := &licensingv1alpha1.LiferayEnvironment{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dev",
+					Namespace: "liferay-dev",
+				},
+				Spec: licensingv1alpha1.LiferayEnvironmentSpec{
+					Autoscaling:     testCase.autoscaling,
+					DesiredReplicas: testCase.desiredReplicas,
+					WorkloadRef: licensingv1alpha1.WorkloadRef{
+						Name: "dev-liferay",
+					},
+				},
+			}
+
+			objects := []client.Object{liferayEnvironment}
+
+			if testCase.workloadExists {
+				objects = append(objects, &appsv1.StatefulSet{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "dev",
+						Name:      "dev-liferay",
 						Namespace: "liferay-dev",
 					},
-					Spec: licensingv1alpha1.LiferayEnvironmentSpec{
-						Autoscaling:     testCase.autoscaling,
-						DesiredReplicas: testCase.desiredReplicas,
-						WorkloadRef: licensingv1alpha1.WorkloadRef{
-							Kind: workloadKind,
-							Name: "dev-liferay",
-						},
+					Spec: appsv1.StatefulSetSpec{
+						Replicas: testCase.workloadReplicas,
 					},
-				}
+				})
+			}
 
-				objects := []client.Object{liferayEnvironment}
+			liferayEnvironmentReconciler := &LiferayEnvironmentReconciler{
+				Client: newFakeClient(t, objects...),
+			}
 
-				if testCase.workloadExists {
-					objects = append(
-						objects,
-						newDevelopmentWorkload(testCase.workloadReplicas, workloadKind),
-					)
-				}
+			if _, error := liferayEnvironmentReconciler.enforceReplicaCeiling(
+				context.Background(), liferayEnvironment, testCase.replicaCeiling,
+			); error != nil {
+				t.Fatalf("Unexpected error from enforceReplicaCeiling: %v", error)
+			}
 
-				liferayEnvironmentReconciler := &LiferayEnvironmentReconciler{
-					Client: newFakeClient(t, objects...),
-				}
+			assertReplicasEqual(
+				liferayEnvironment.Status.EffectiveReplicas,
+				testCase.expectedEffective,
+				"status.effectiveReplicas",
+				t,
+			)
 
-				if _, error := liferayEnvironmentReconciler.enforceReplicaCeiling(
-					context.Background(), liferayEnvironment, testCase.replicaCeiling,
-				); error != nil {
-					t.Fatalf("Unexpected error from enforceReplicaCeiling: %v", error)
-				}
+			assertReplicasEqual(
+				liferayEnvironment.Status.ReplicaCeiling,
+				&testCase.replicaCeiling,
+				"status.replicaCeiling",
+				t,
+			)
 
-				assertReplicasEqual(
-					liferayEnvironment.Status.EffectiveReplicas,
-					testCase.expectedEffective,
-					"status.effectiveReplicas",
-					t,
+			condition := meta.FindStatusCondition(
+				liferayEnvironment.Status.Conditions, conditionReplicasCountValid,
+			)
+
+			if condition == nil {
+				t.Fatalf("Expected a %s condition, got none", conditionReplicasCountValid)
+			}
+
+			if condition.Status != testCase.expectedCondition {
+				t.Errorf(
+					"Condition status = %q, want %q",
+					condition.Status, testCase.expectedCondition,
 				)
+			}
 
-				assertReplicasEqual(
-					liferayEnvironment.Status.ReplicaCeiling,
-					&testCase.replicaCeiling,
-					"status.replicaCeiling",
-					t,
+			if condition.Reason != testCase.expectedReason {
+				t.Errorf(
+					"Condition reason = %q, want %q",
+					condition.Reason, testCase.expectedReason,
 				)
+			}
 
-				condition := meta.FindStatusCondition(
-					liferayEnvironment.Status.Conditions, conditionReplicasCountValid,
+			if condition.Reason == "ExceedsLicensedMaximum" &&
+				!strings.Contains(condition.Message, "replica ceiling") {
+
+				t.Errorf(
+					"Condition message = %q, want it to name the replica ceiling",
+					condition.Message,
 				)
+			}
 
-				if condition == nil {
-					t.Fatalf("Expected a %s condition, got none", conditionReplicasCountValid)
-				}
+			if !testCase.workloadExists {
+				return
+			}
 
-				if condition.Status != testCase.expectedCondition {
-					t.Errorf(
-						"Condition status = %q, want %q",
-						condition.Status, testCase.expectedCondition,
-					)
-				}
+			statefulSet := getStatefulSet(liferayEnvironmentReconciler, t)
 
-				if condition.Reason != testCase.expectedReason {
-					t.Errorf(
-						"Condition reason = %q, want %q",
-						condition.Reason, testCase.expectedReason,
-					)
-				}
-
-				if condition.Reason == "ExceedsLicensedMaximum" &&
-					!strings.Contains(condition.Message, "replica ceiling") {
-
-					t.Errorf(
-						"Condition message = %q, want it to name the replica ceiling",
-						condition.Message,
-					)
-				}
-
-				if condition.Reason == "WorkloadNotFound" &&
-					!strings.Contains(condition.Message, string(workloadKind)) {
-
-					t.Errorf(
-						"Condition message = %q, want it to name the %s",
-						condition.Message, workloadKind,
-					)
-				}
-
-				if !testCase.workloadExists {
-					return
-				}
-
-				workload, error := liferayEnvironmentReconciler.getWorkload(
-					context.Background(), liferayEnvironment,
-				)
-
-				if error != nil {
-					t.Fatalf("Unable to read the workload: %v", error)
-				}
-
-				assertReplicasEqual(
-					getReplicas(workload), testCase.expectedReplicas,
-					"workload.spec.replicas", t,
-				)
-			})
-		}
+			assertReplicasEqual(
+				statefulSet.Spec.Replicas, testCase.expectedReplicas,
+				"statefulSet.spec.replicas", t,
+			)
+		})
 	}
 }
 
@@ -1230,10 +1217,6 @@ func TestEnforceReplicaCeilingPersistsRefusalWhenWorkloadUpdateRejected(t *testi
 }
 
 func TestEnqueueScaleTargetEnvironments(t *testing.T) {
-	deploymentHorizontalPodAutoscaler := newHorizontalPodAutoscaler(10, 1, "dev-liferay")
-
-	deploymentHorizontalPodAutoscaler.Spec.ScaleTargetRef.Kind = "Deployment"
-
 	deploymentScaledObject := newScaledObject(10, 1, "dev-liferay")
 
 	unstructured.RemoveNestedField(
@@ -1243,25 +1226,10 @@ func TestEnqueueScaleTargetEnvironments(t *testing.T) {
 	testCases := map[string]struct {
 		autoscaler     client.Object
 		expectEnqueued bool
-		workloadKind   licensingv1alpha1.WorkloadKind
 	}{
-		"horizontal pod autoscaler scaling a deployment of the same name": {
-			autoscaler:     deploymentHorizontalPodAutoscaler,
-			expectEnqueued: false,
-		},
-		"horizontal pod autoscaler scaling a stateful set of the same name": {
-			autoscaler:     newHorizontalPodAutoscaler(10, 1, "dev-liferay"),
-			expectEnqueued: false,
-			workloadKind:   licensingv1alpha1.WorkloadKindDeployment,
-		},
 		"horizontal pod autoscaler scaling another workload": {
 			autoscaler:     newHorizontalPodAutoscaler(10, 1, "other-workload"),
 			expectEnqueued: false,
-		},
-		"horizontal pod autoscaler scaling the deployment workload": {
-			autoscaler:     deploymentHorizontalPodAutoscaler,
-			expectEnqueued: true,
-			workloadKind:   licensingv1alpha1.WorkloadKindDeployment,
 		},
 		"horizontal pod autoscaler scaling the workload": {
 			autoscaler:     newHorizontalPodAutoscaler(10, 1, "dev-liferay"),
@@ -1274,11 +1242,6 @@ func TestEnqueueScaleTargetEnvironments(t *testing.T) {
 		"scaled object scaling another workload": {
 			autoscaler:     newScaledObject(10, 1, "other-workload"),
 			expectEnqueued: false,
-		},
-		"scaled object scaling the deployment workload by the default kind": {
-			autoscaler:     deploymentScaledObject,
-			expectEnqueued: true,
-			workloadKind:   licensingv1alpha1.WorkloadKindDeployment,
 		},
 		"scaled object scaling the workload": {
 			autoscaler:     newScaledObject(10, 1, "dev-liferay"),
@@ -1298,7 +1261,6 @@ func TestEnqueueScaleTargetEnvironments(t *testing.T) {
 						},
 						Spec: licensingv1alpha1.LiferayEnvironmentSpec{
 							WorkloadRef: licensingv1alpha1.WorkloadRef{
-								Kind: testCase.workloadKind,
 								Name: "dev-liferay",
 							},
 						},
@@ -3455,78 +3417,16 @@ func TestResolveDesiredReplicas(t *testing.T) {
 				},
 			}
 
+			statefulSet := &appsv1.StatefulSet{
+				Spec: appsv1.StatefulSetSpec{
+					Replicas: testCase.workloadReplicas,
+				},
+			}
+
 			if actual := resolveDesiredReplicas(
-				liferayEnvironment, testCase.workloadReplicas,
+				liferayEnvironment, statefulSet,
 			); actual != testCase.expected {
 				t.Errorf("Unexpected resolveDesiredReplicas result: got %d, want %d", actual, testCase.expected)
-			}
-		})
-	}
-}
-
-func TestResolveDxpVersion(t *testing.T) {
-	testCases := map[string]struct {
-		dxpVersion   string
-		expected     string
-		image        string
-		workloadKind licensingv1alpha1.WorkloadKind
-	}{
-		"detects the tag of a deployment": {
-			expected:     "2026.q1.0-lts",
-			image:        "liferay/dxp:2026.q1.0-lts",
-			workloadKind: licensingv1alpha1.WorkloadKindDeployment,
-		},
-		"detects the tag of a stateful set": {
-			expected:     "2026.q1.0-lts",
-			image:        "liferay/dxp:2026.q1.0-lts",
-			workloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-		},
-		"ignores a mirror under another repository name": {
-			expected:     "",
-			image:        "registry.example.com/mirror/portal:2026.q1.0-lts",
-			workloadKind: licensingv1alpha1.WorkloadKindDeployment,
-		},
-		"prefers the declared version": {
-			dxpVersion:   "2025.q4.0",
-			expected:     "2025.q4.0",
-			image:        "liferay/dxp:2026.q1.0-lts",
-			workloadKind: licensingv1alpha1.WorkloadKindDeployment,
-		},
-	}
-
-	for name, testCase := range testCases {
-		t.Run(name, func(t *testing.T) {
-			liferayEnvironment := &licensingv1alpha1.LiferayEnvironment{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "dev",
-					Namespace: "liferay-dev",
-				},
-				Spec: licensingv1alpha1.LiferayEnvironmentSpec{
-					DxpVersion: testCase.dxpVersion,
-					WorkloadRef: licensingv1alpha1.WorkloadRef{
-						Kind: testCase.workloadKind,
-						Name: "dev-liferay",
-					},
-				},
-			}
-
-			workload := newDevelopmentWorkload(nil, testCase.workloadKind)
-
-			getPodTemplate(workload).Spec.Containers = []corev1.Container{
-				{
-					Image: testCase.image,
-					Name:  "liferay",
-				},
-			}
-
-			liferayEnvironmentReconciler := &LiferayEnvironmentReconciler{
-				Client: newFakeClient(t, liferayEnvironment, workload),
-			}
-
-			if actual := liferayEnvironmentReconciler.resolveDxpVersion(
-				context.Background(), liferayEnvironment,
-			); actual != testCase.expected {
-				t.Errorf("resolveDxpVersion = %q, want %q", actual, testCase.expected)
 			}
 		})
 	}
@@ -3596,11 +3496,8 @@ func TestSetupWithManagerWatchesScaledObjects(t *testing.T) {
 				t.Fatalf("Unable to create the namespace: %v", error)
 			}
 
-			statefulSet := newWorkload(
-				"liferay-dev", licensingv1alpha1.WorkloadKindStatefulSet,
-			)
-
-			setReplicas(pointerInt32(1), statefulSet)
+			statefulSet := newWorkload("liferay-dev")
+			statefulSet.Spec.Replicas = pointerInt32(1)
 
 			if error := setUpClient.Create(context.Background(), statefulSet); error != nil {
 				t.Fatalf("Unable to create the workload: %v", error)
@@ -4036,22 +3933,6 @@ func installScaledObjectCustomResourceDefinition(setUpClient client.Client, t *t
 	)
 }
 
-func newDevelopmentWorkload(
-	replicas *int32,
-	workloadKind licensingv1alpha1.WorkloadKind,
-) client.Object {
-	workloadRef := licensingv1alpha1.WorkloadRef{Kind: workloadKind}
-
-	workload := workloadRef.NewObject()
-
-	workload.SetName("dev-liferay")
-	workload.SetNamespace("liferay-dev")
-
-	setReplicas(replicas, workload)
-
-	return workload
-}
-
 func newFakeClient(t *testing.T, objects ...client.Object) client.Client {
 	t.Helper()
 
@@ -4365,9 +4246,4 @@ type stubProvisioning struct {
 	entitlements   *provisioning.Entitlements
 	manifestCalled bool
 	manifestError  error
-}
-
-var workloadKinds = []licensingv1alpha1.WorkloadKind{
-	licensingv1alpha1.WorkloadKindDeployment,
-	licensingv1alpha1.WorkloadKindStatefulSet,
 }

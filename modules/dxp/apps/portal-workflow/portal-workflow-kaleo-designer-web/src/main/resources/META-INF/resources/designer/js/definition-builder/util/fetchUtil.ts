@@ -66,20 +66,7 @@ export function retrieveDefinitionRequest(
 	});
 }
 
-export function retrieveRole(
-	roleExternalReferenceCode: string,
-	roleId: number
-) {
-	if (roleExternalReferenceCode) {
-		return fetch(
-			`${window.location.origin}${contextUrl}${userBaseURL}/roles/by-external-reference-code/${encodeURIComponent(roleExternalReferenceCode)}`,
-			{
-				headers: HEADERS,
-				method: 'GET',
-			}
-		);
-	}
-
+export function retrieveRoleById(roleId: number) {
 	return fetch(
 		`${window.location.origin}${contextUrl}${userBaseURL}/roles/${roleId}`,
 		{

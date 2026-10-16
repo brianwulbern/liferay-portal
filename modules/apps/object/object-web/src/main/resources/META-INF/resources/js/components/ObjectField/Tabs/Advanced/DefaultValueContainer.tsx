@@ -30,7 +30,6 @@ import {removeFieldSettings} from '../../../../utils/fieldSettings';
 import BooleanDefaultValueSelect from '../../DefaultValueFields/BooleanDefaultValueSelect';
 import DateDefaultValueInput from '../../DefaultValueFields/DateDefaultValueInput';
 import ListTypeDefaultValueSelect from '../../DefaultValueFields/ListTypeDefaultValueSelect';
-import LocationDefaultValueInput from '../../DefaultValueFields/LocationDefaultValueInput';
 import NumericDefaultValueInput from '../../DefaultValueFields/NumericDefaultValueInput';
 import RichTextDefaultValue from '../../DefaultValueFields/RichTextDefaultValue';
 import TextDefaultValueInput from '../../DefaultValueFields/TextDefaultValueInput';
@@ -41,9 +40,7 @@ interface DefaultValueContainerProps {
 	decimalSeparator: string;
 	defaultValueSidebarElements: SidebarCategory[];
 	errors: ObjectFieldErrors;
-	googleMapsAPIKey?: string;
 	learnResources: ILearnResourceContext;
-	mapProviderKey?: string;
 	modelBuilder?: boolean;
 	onSubmit?: (values?: Partial<ObjectField>) => void;
 	setValues: (value: Partial<ObjectField>) => void;
@@ -57,10 +54,8 @@ export interface InputAsValueFieldComponentProps {
 	decimalSeparator?: string;
 	defaultValue?: ObjectFieldSettingValue;
 	error?: string;
-	googleMapsAPIKey?: string;
 	id?: string;
 	label: string;
-	mapProviderKey?: string;
 	onSubmit?: (values?: Partial<ObjectField>) => void;
 	placeholder?: string;
 	required?: boolean;
@@ -79,7 +74,6 @@ const InputAsValueFieldComponents: Partial<InputAsValueFieldComponents> = {
 	Decimal: NumericDefaultValueInput,
 	EmailAddress: TextDefaultValueInput,
 	Integer: NumericDefaultValueInput,
-	Location: LocationDefaultValueInput,
 	LongInteger: NumericDefaultValueInput,
 	LongText: TextDefaultValueInput,
 	PhoneNumber: TextDefaultValueInput,
@@ -95,9 +89,7 @@ export function DefaultValueContainer({
 	decimalSeparator,
 	defaultValueSidebarElements,
 	errors,
-	googleMapsAPIKey,
 	learnResources,
-	mapProviderKey,
 	modelBuilder = false,
 	onSubmit,
 	setValues,
@@ -170,7 +162,7 @@ export function DefaultValueContainer({
 					modelBuilder,
 			})}
 		>
-			{!values.state && values.businessType !== 'Location' && (
+			{!values.state && (
 				<ClayAlert displayType="info" title="Info">
 					{Liferay.Language.get(
 						'enter-a-value-or-use-expressions-to-set-default-values'
@@ -207,8 +199,7 @@ export function DefaultValueContainer({
 
 			{defaultValueSidebarElements &&
 				defaultValueToggleEnabled &&
-				!values.state &&
-				values.businessType !== 'Location' && (
+				!values.state && (
 					<ClayButton.Group>
 						<ClayButton
 							className={classNames({
@@ -270,14 +261,12 @@ export function DefaultValueContainer({
 							defaultValueType === 'inputAsValue' && defaultValue
 						}
 						error={errors.defaultValue}
-						googleMapsAPIKey={googleMapsAPIKey}
 						id="default_value_container_input"
 						label={
 							!values.state
 								? Liferay.Language.get('default-value')
 								: Liferay.Language.get('input-as-value')
 						}
-						mapProviderKey={mapProviderKey}
 						onSubmit={onSubmit}
 						required
 						setValues={setValues}

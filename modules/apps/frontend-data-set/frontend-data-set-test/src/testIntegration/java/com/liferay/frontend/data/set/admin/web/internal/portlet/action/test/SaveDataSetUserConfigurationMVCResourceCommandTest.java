@@ -129,8 +129,6 @@ public class SaveDataSetUserConfigurationMVCResourceCommandTest {
 
 		_objectEntryLocalService.deleteObjectEntry(
 			_dataSetSnapshotObjectEntry.getObjectEntryId());
-
-		FrontendDataSetTestUtil.tearDown();
 	}
 
 	@Test

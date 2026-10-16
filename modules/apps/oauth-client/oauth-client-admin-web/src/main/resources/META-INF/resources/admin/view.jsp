@@ -15,8 +15,6 @@ String navigation = ParamUtil.getString(request, "navigation", "oauth-clients");
 	navigationItems='<%=
 		new JSPNavigationItemList(pageContext) {
 			{
-				PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
-
 				add(
 					navigationItem -> {
 						navigationItem.setActive(navigation.equals("oauth-clients"));
@@ -67,25 +65,6 @@ String navigation = ParamUtil.getString(request, "navigation", "oauth-clients");
 
 						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "oauth-client-pr-local-metadata"));
 					});
-
-				if (permissionChecker.isCompanyAdmin()) {
-					add(
-						navigationItem -> {
-							navigationItem.setActive(navigation.equals("oauth-client-company-configuration"));
-
-							PortletURL portletURL = PortletURLBuilder.createRenderURL(
-								renderResponse
-							).setMVCRenderCommandName(
-								"/oauth_client_admin/view_oauth_client_company_configuration"
-							).setNavigation(
-								"oauth-client-company-configuration"
-							).buildPortletURL();
-
-							navigationItem.setHref(portletURL.toString());
-
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "configuration"));
-						});
-				}
 			}
 		}
 	%>'
@@ -100,8 +79,5 @@ String navigation = ParamUtil.getString(request, "navigation", "oauth-clients");
 	</c:when>
 	<c:when test='<%= navigation.equals("oauth-client-pr-local-metadata") %>'>
 		<liferay-util:include page="/admin/view_oauth_client_pr_local_metadata.jsp" servletContext="<%= application %>" />
-	</c:when>
-	<c:when test='<%= permissionChecker.isCompanyAdmin() && navigation.equals("oauth-client-company-configuration") %>'>
-		<liferay-util:include page="/admin/view_oauth_client_company_configuration.jsp" servletContext="<%= application %>" />
 	</c:when>
 </c:choose>

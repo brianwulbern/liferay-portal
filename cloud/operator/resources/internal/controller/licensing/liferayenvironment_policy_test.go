@@ -44,117 +44,74 @@ func TestAdmissionPolicyDeniesOverLimitReplicas(t *testing.T) {
 	config := startPolicyEnvironment(t)
 
 	testCases := map[string]struct {
-		labelNamespace       bool
-		licensedWorkloadKind licensingv1alpha1.WorkloadKind
-		maxClusterNodes      *int32
-		namespaceName        string
-		replicaCeiling       *int32
-		scaleSubresource     bool
-		shouldDeny           bool
-		workloadKind         licensingv1alpha1.WorkloadKind
+		labelNamespace   bool
+		maxClusterNodes  *int32
+		namespaceName    string
+		replicaCeiling   *int32
+		scaleSubresource bool
+		shouldDeny       bool
 	}{
-		"a licensed deployment allows a stateful set of the same name": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindDeployment,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-other-kind",
-			replicaCeiling:       pointerInt32(1),
-			shouldDeny:           false,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
-		},
-		"a licensed deployment denies an over limit scale": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindDeployment,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-deployment-scale",
-			replicaCeiling:       pointerInt32(1),
-			scaleSubresource:     true,
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindDeployment,
-		},
-		"a licensed deployment denies an over limit write": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindDeployment,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-deployment",
-			replicaCeiling:       pointerInt32(1),
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindDeployment,
-		},
 		"a licensed environment denies an over limit scale": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-scale",
-			replicaCeiling:       pointerInt32(1),
-			scaleSubresource:     true,
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:   true,
+			maxClusterNodes:  pointerInt32(1),
+			namespaceName:    "liferay-scale",
+			replicaCeiling:   pointerInt32(1),
+			scaleSubresource: true,
+			shouldDeny:       true,
 		},
 		"a licensed environment denies an over limit write": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-licensed",
-			replicaCeiling:       pointerInt32(1),
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:  true,
+			maxClusterNodes: pointerInt32(1),
+			namespaceName:   "liferay-licensed",
+			replicaCeiling:  pointerInt32(1),
+			shouldDeny:      true,
 		},
 		"a licensed maximum without a replica ceiling denies an over limit write": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-fallback",
-			replicaCeiling:       nil,
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:  true,
+			maxClusterNodes: pointerInt32(1),
+			namespaceName:   "liferay-fallback",
+			replicaCeiling:  nil,
+			shouldDeny:      true,
 		},
 		"a replica ceiling below the licensed maximum denies an over limit write": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      pointerInt32(3),
-			namespaceName:        "liferay-ceiling",
-			replicaCeiling:       pointerInt32(1),
-			shouldDeny:           true,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:  true,
+			maxClusterNodes: pointerInt32(3),
+			namespaceName:   "liferay-ceiling",
+			replicaCeiling:  pointerInt32(1),
+			shouldDeny:      true,
 		},
 		"any namespace the policy does not gate allows any write": {
-			labelNamespace:       false,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      pointerInt32(1),
-			namespaceName:        "liferay-any",
-			replicaCeiling:       pointerInt32(1),
-			shouldDeny:           false,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:  false,
+			maxClusterNodes: pointerInt32(1),
+			namespaceName:   "liferay-any",
+			replicaCeiling:  pointerInt32(1),
+			shouldDeny:      false,
 		},
 		"any namespace without a ceiling allows any write": {
-			labelNamespace:       true,
-			licensedWorkloadKind: licensingv1alpha1.WorkloadKindStatefulSet,
-			maxClusterNodes:      nil,
-			namespaceName:        "liferay-unlicensed",
-			replicaCeiling:       nil,
-			shouldDeny:           false,
-			workloadKind:         licensingv1alpha1.WorkloadKindStatefulSet,
+			labelNamespace:  true,
+			maxClusterNodes: nil,
+			namespaceName:   "liferay-unlicensed",
+			replicaCeiling:  nil,
+			shouldDeny:      false,
 		},
 	}
 
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
 			writeClient := newPolicyFixture(
-				config, testCase.labelNamespace, testCase.licensedWorkloadKind,
-				testCase.maxClusterNodes, testCase.namespaceName,
-				testCase.replicaCeiling, t, testCase.workloadKind,
+				config, testCase.labelNamespace, testCase.maxClusterNodes,
+				testCase.namespaceName, testCase.replicaCeiling, t,
 			)
 
 			error := attemptOverLimitWrite(
 				testCase.namespaceName, testCase.scaleSubresource, t,
-				testCase.workloadKind, writeClient,
+				writeClient,
 			)
 
 			if testCase.shouldDeny && !errors.IsForbidden(error) {
 				error = awaitForbidden(
 					testCase.namespaceName, testCase.scaleSubresource, t,
-					testCase.workloadKind, writeClient,
+					writeClient,
 				)
 			}
 
@@ -184,22 +141,14 @@ func TestReconcileWithAdmissionPolicy(t *testing.T) {
 	testCases := map[string]struct {
 		impersonateOperator bool
 		namespaceName       string
-		workloadKind        licensingv1alpha1.WorkloadKind
 	}{
 		"the exempt operator restores the ceiling": {
 			impersonateOperator: true,
 			namespaceName:       "liferay-exempt",
-			workloadKind:        licensingv1alpha1.WorkloadKindStatefulSet,
 		},
 		"the operator the policy validates restores the ceiling": {
 			impersonateOperator: false,
 			namespaceName:       "liferay-validated",
-			workloadKind:        licensingv1alpha1.WorkloadKindStatefulSet,
-		},
-		"the operator the policy validates restores the ceiling of a deployment": {
-			impersonateOperator: false,
-			namespaceName:       "liferay-validated-deployment",
-			workloadKind:        licensingv1alpha1.WorkloadKindDeployment,
 		},
 	}
 
@@ -207,7 +156,6 @@ func TestReconcileWithAdmissionPolicy(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			liferayEnvironmentReconciler := newPolicyReconciler(
 				config, testCase.impersonateOperator, testCase.namespaceName, t,
-				testCase.workloadKind,
 			)
 
 			_, error := liferayEnvironmentReconciler.Reconcile(
@@ -256,16 +204,21 @@ func TestReconcileWithAdmissionPolicy(t *testing.T) {
 				"status.replicaCeiling", t,
 			)
 
-			workload, error := liferayEnvironmentReconciler.getWorkload(
-				context.Background(), &liferayEnvironment,
-			)
+			var statefulSet appsv1.StatefulSet
 
-			if error != nil {
+			if error := liferayEnvironmentReconciler.Get(
+				context.Background(),
+				types.NamespacedName{
+					Name:      "dev-liferay",
+					Namespace: testCase.namespaceName,
+				},
+				&statefulSet,
+			); error != nil {
 				t.Fatalf("Unable to read the workload: %v", error)
 			}
 
 			assertReplicasEqual(
-				getReplicas(workload), pointerInt32(3), "Replicas", t,
+				statefulSet.Spec.Replicas, pointerInt32(3), "Replicas", t,
 			)
 		})
 	}
@@ -276,9 +229,7 @@ func TestReconcileWithAdmissionPolicyHoldsProvisioningGracePeriodCeiling(t *test
 
 	namespaceName := "liferay-grace-period"
 
-	liferayEnvironmentReconciler := newPolicyReconciler(
-		config, true, namespaceName, t, licensingv1alpha1.WorkloadKindStatefulSet,
-	)
+	liferayEnvironmentReconciler := newPolicyReconciler(config, true, namespaceName, t)
 
 	liferayEnvironmentReconciler.Provisioning = &stubProvisioning{
 		manifestError: fmt.Errorf("provisioning: connection refused"),
@@ -340,7 +291,7 @@ func TestReconcileWithAdmissionPolicyHoldsProvisioningGracePeriodCeiling(t *test
 	}
 
 	if error := awaitForbidden(
-		namespaceName, true, t, licensingv1alpha1.WorkloadKindStatefulSet, writeClient,
+		namespaceName, true, t, writeClient,
 	); !errors.IsForbidden(error) {
 		t.Errorf(
 			"Scale error = %v, want the grace period ceiling to refuse an autoscaler scaling back up to the licensed maximum",
@@ -351,28 +302,26 @@ func TestReconcileWithAdmissionPolicyHoldsProvisioningGracePeriodCeiling(t *test
 
 func attemptOverLimitWrite(
 	namespaceName string, scaleSubresource bool, t *testing.T,
-	workloadKind licensingv1alpha1.WorkloadKind, writeClient client.Client,
+	writeClient client.Client,
 ) error {
 	t.Helper()
 
-	workloadRef := licensingv1alpha1.WorkloadRef{Kind: workloadKind}
-
-	workload := workloadRef.NewObject()
+	var statefulSet appsv1.StatefulSet
 
 	if error := writeClient.Get(
 		context.Background(),
 		types.NamespacedName{Name: "dev-liferay", Namespace: namespaceName},
-		workload,
+		&statefulSet,
 	); error != nil {
 		t.Fatalf("Unable to read the workload: %v", error)
 	}
 
-	return writeOverLimitReplicas(scaleSubresource, workload, writeClient)
+	return writeOverLimitReplicas(scaleSubresource, &statefulSet, writeClient)
 }
 
 func awaitForbidden(
 	namespaceName string, scaleSubresource bool, t *testing.T,
-	workloadKind licensingv1alpha1.WorkloadKind, writeClient client.Client,
+	writeClient client.Client,
 ) error {
 	t.Helper()
 
@@ -380,14 +329,14 @@ func awaitForbidden(
 
 	for {
 		error := attemptOverLimitWrite(
-			namespaceName, scaleSubresource, t, workloadKind, writeClient,
+			namespaceName, scaleSubresource, t, writeClient,
 		)
 
 		if errors.IsForbidden(error) || time.Now().After(deadline) {
 			return error
 		}
 
-		resetReplicas(namespaceName, t, workloadKind, writeClient)
+		resetReplicas(namespaceName, t, writeClient)
 
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -397,14 +346,11 @@ func awaitPolicyEnforcement(config *rest.Config, t *testing.T) {
 	t.Helper()
 
 	writeClient := newPolicyFixture(
-		config, true, licensingv1alpha1.WorkloadKindStatefulSet, pointerInt32(1),
-		policyProbeNamespace, pointerInt32(1), t,
-		licensingv1alpha1.WorkloadKindStatefulSet,
+		config, true, pointerInt32(1), policyProbeNamespace, pointerInt32(1), t,
 	)
 
 	if error := awaitForbidden(
-		policyProbeNamespace, false, t,
-		licensingv1alpha1.WorkloadKindStatefulSet, writeClient,
+		policyProbeNamespace, false, t, writeClient,
 	); !errors.IsForbidden(error) {
 		t.Fatalf(
 			"The admission policy admitted an over limit write for %v, so it is installed but inert and no assertion below would be meaningful: %v\n%s",
@@ -434,7 +380,7 @@ func describePolicyState(config *rest.Config, t *testing.T) string {
 
 		if error := describeClient.Get(
 			context.Background(),
-			types.NamespacedName{Name: "liferay-dxp-operator-workload-scale"},
+			types.NamespacedName{Name: "liferay-dxp-operator-statefulset-scale"},
 			&object,
 		); error != nil {
 			fmt.Fprintf(report, "%s: unreadable: %v\n", kind, error)
@@ -581,10 +527,8 @@ func installAdmissionPolicy(config *rest.Config, t *testing.T) {
 }
 
 func newPolicyFixture(
-	config *rest.Config, labelNamespace bool,
-	licensedWorkloadKind licensingv1alpha1.WorkloadKind, maxClusterNodes *int32,
+	config *rest.Config, labelNamespace bool, maxClusterNodes *int32,
 	namespaceName string, replicaCeiling *int32, t *testing.T,
-	workloadKind licensingv1alpha1.WorkloadKind,
 ) client.Client {
 	t.Helper()
 
@@ -624,7 +568,6 @@ func newPolicyFixture(
 			},
 			DesiredReplicas: pointerInt32(3),
 			WorkloadRef: licensingv1alpha1.WorkloadRef{
-				Kind: licensedWorkloadKind,
 				Name: "dev-liferay",
 			},
 		},
@@ -670,7 +613,7 @@ func newPolicyFixture(
 	}
 
 	if error := setUpClient.Create(
-		context.Background(), newWorkload(namespaceName, workloadKind),
+		context.Background(), newWorkload(namespaceName),
 	); error != nil {
 		t.Fatalf("Unable to create the workload: %v", error)
 	}
@@ -680,7 +623,7 @@ func newPolicyFixture(
 
 func newPolicyReconciler(
 	config *rest.Config, impersonateOperator bool, namespaceName string,
-	t *testing.T, workloadKind licensingv1alpha1.WorkloadKind,
+	t *testing.T,
 ) *LiferayEnvironmentReconciler {
 	t.Helper()
 
@@ -715,7 +658,6 @@ func newPolicyReconciler(
 			},
 			DesiredReplicas: pointerInt32(3),
 			WorkloadRef: licensingv1alpha1.WorkloadRef{
-				Kind: workloadKind,
 				Name: "dev-liferay",
 			},
 		},
@@ -738,7 +680,7 @@ func newPolicyReconciler(
 	}
 
 	if error := setUpClient.Create(
-		context.Background(), newWorkload(namespaceName, workloadKind),
+		context.Background(), newWorkload(namespaceName),
 	); error != nil {
 		t.Fatalf("Unable to create the workload: %v", error)
 	}
@@ -784,71 +726,51 @@ func newPolicyReconciler(
 	}
 }
 
-func newWorkload(
-	namespaceName string, workloadKind licensingv1alpha1.WorkloadKind,
-) client.Object {
+func newWorkload(namespaceName string) *appsv1.StatefulSet {
 	labels := map[string]string{"app": "dev-liferay"}
 
-	objectMeta := metav1.ObjectMeta{
-		Name:      "dev-liferay",
-		Namespace: namespaceName,
-	}
-
-	podTemplate := corev1.PodTemplateSpec{
-		ObjectMeta: metav1.ObjectMeta{Labels: labels},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Image: "registry.k8s.io/pause:3.9",
-					Name:  "liferay",
-				},
-			},
-		},
-	}
-
-	if workloadKind == licensingv1alpha1.WorkloadKindDeployment {
-		return &appsv1.Deployment{
-			ObjectMeta: objectMeta,
-			Spec: appsv1.DeploymentSpec{
-				Replicas: pointerInt32(0),
-				Selector: &metav1.LabelSelector{MatchLabels: labels},
-				Template: podTemplate,
-			},
-		}
-	}
-
 	return &appsv1.StatefulSet{
-		ObjectMeta: objectMeta,
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "dev-liferay",
+			Namespace: namespaceName,
+		},
 		Spec: appsv1.StatefulSetSpec{
 			Replicas:    pointerInt32(0),
 			Selector:    &metav1.LabelSelector{MatchLabels: labels},
 			ServiceName: "dev-liferay",
-			Template:    podTemplate,
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{Labels: labels},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Image: "registry.k8s.io/pause:3.9",
+							Name:  "liferay",
+						},
+					},
+				},
+			},
 		},
 	}
 }
 
 func resetReplicas(
-	namespaceName string, t *testing.T,
-	workloadKind licensingv1alpha1.WorkloadKind, writeClient client.Client,
+	namespaceName string, t *testing.T, writeClient client.Client,
 ) {
 	t.Helper()
 
-	workloadRef := licensingv1alpha1.WorkloadRef{Kind: workloadKind}
-
-	workload := workloadRef.NewObject()
+	var statefulSet appsv1.StatefulSet
 
 	if error := writeClient.Get(
 		context.Background(),
 		types.NamespacedName{Name: "dev-liferay", Namespace: namespaceName},
-		workload,
+		&statefulSet,
 	); error != nil {
 		return
 	}
 
-	setReplicas(pointerInt32(0), workload)
+	statefulSet.Spec.Replicas = pointerInt32(0)
 
-	writeClient.Update(context.Background(), workload)
+	writeClient.Update(context.Background(), &statefulSet)
 }
 
 func startPolicyEnvironment(t *testing.T) *rest.Config {
@@ -892,16 +814,17 @@ func startPolicyEnvironment(t *testing.T) *rest.Config {
 }
 
 func writeOverLimitReplicas(
-	scaleSubresource bool, workload client.Object, writeClient client.Client,
+	scaleSubresource bool, statefulSet *appsv1.StatefulSet,
+	writeClient client.Client,
 ) error {
 	if scaleSubresource {
 		return writeClient.SubResource("scale").Update(
-			context.Background(), workload,
+			context.Background(), statefulSet,
 			client.WithSubResourceBody(
 				&autoscalingv1.Scale{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      workload.GetName(),
-						Namespace: workload.GetNamespace(),
+						Name:      statefulSet.Name,
+						Namespace: statefulSet.Namespace,
 					},
 					Spec: autoscalingv1.ScaleSpec{Replicas: 3},
 				},
@@ -909,7 +832,7 @@ func writeOverLimitReplicas(
 		)
 	}
 
-	setReplicas(pointerInt32(3), workload)
+	statefulSet.Spec.Replicas = pointerInt32(3)
 
-	return writeClient.Update(context.Background(), workload)
+	return writeClient.Update(context.Background(), statefulSet)
 }

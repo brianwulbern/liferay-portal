@@ -113,9 +113,7 @@ const ActionTypeNotification = ({
 				...prevSections[actionSectionsIndex],
 				recipients: {
 					assignmentType: ['roleId'],
-					roleExternalReferenceCode: role.externalReferenceCode,
 					roleId: role.id,
-					roleType: role.roleType,
 					sectionsData: {
 						id: role.id,
 						name: role.name,

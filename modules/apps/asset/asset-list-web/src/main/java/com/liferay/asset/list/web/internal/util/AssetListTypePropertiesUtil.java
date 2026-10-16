@@ -32,7 +32,8 @@ import java.util.Locale;
 public class AssetListTypePropertiesUtil {
 
 	public static JSONArray getTypePropertiesJSONArray(
-		long[] classNameIds, long companyId, Locale locale) {
+		long[] classNameIds, long[] classTypeIds, long companyId,
+		Locale locale) {
 
 		JSONArray jsonArray = JSONUtil.put(
 			JSONUtil.put(
@@ -41,9 +42,15 @@ public class AssetListTypePropertiesUtil {
 				"label", LanguageUtil.get(locale, "common-fields")
 			));
 
-		for (long classNameId : classNameIds) {
+		for (int i = 0; i < classNameIds.length; i++) {
+			long classTypeId = 0;
+
+			if (i < classTypeIds.length) {
+				classTypeId = classTypeIds[i];
+			}
+
 			ObjectDefinition objectDefinition = _fetchObjectDefinition(
-				classNameId, companyId);
+				classNameIds[i], companyId);
 
 			if (objectDefinition == null) {
 				continue;
@@ -56,7 +63,7 @@ public class AssetListTypePropertiesUtil {
 				JSONUtil.put(
 					"items",
 					_getItemsJSONArray(
-						locale, objectDefinition.getExternalReferenceCode(),
+						classNameIds[i], classTypeId, locale,
 						objectFieldBag.getNestedIndexedObjectFields())
 				).put(
 					"label", objectDefinition.getLabel(locale, true)
@@ -126,7 +133,7 @@ public class AssetListTypePropertiesUtil {
 	}
 
 	private static JSONArray _getItemsJSONArray(
-		Locale locale, String objectDefinitionExternalReferenceCode,
+		long classNameId, long classTypeId, Locale locale,
 		List<ObjectField> objectFields) {
 
 		return JSONUtil.toJSONArray(
@@ -139,23 +146,23 @@ public class AssetListTypePropertiesUtil {
 				}
 
 				return _getPropertyJSONObject(
-					locale, objectDefinitionExternalReferenceCode, objectField,
-					type);
+					classNameId, classTypeId, locale, objectField, type);
 			},
 			_log);
 	}
 
 	private static JSONObject _getPropertyJSONObject(
-		Locale locale, String objectDefinitionExternalReferenceCode,
+		long classNameId, long classTypeId, Locale locale,
 		ObjectField objectField, String type) {
 
 		return JSONUtil.put(
+			"classNameId", classNameId
+		).put(
+			"classTypeId", classTypeId
+		).put(
 			"label", objectField.getLabel(locale, true)
 		).put(
 			"name", objectField.getName()
-		).put(
-			"objectDefinitionExternalReferenceCode",
-			objectDefinitionExternalReferenceCode
 		).put(
 			"options",
 			() -> {

@@ -37,7 +37,6 @@ import java.io.Serializable;
 
 import java.util.Arrays;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -79,11 +78,6 @@ public class DataSetSnapshotSharingEntryInterpreterTest {
 		Assert.assertNotNull(_objectDefinition);
 
 		_toUser = UserTestUtil.addUser();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		FrontendDataSetTestUtil.tearDown();
 	}
 
 	@Test

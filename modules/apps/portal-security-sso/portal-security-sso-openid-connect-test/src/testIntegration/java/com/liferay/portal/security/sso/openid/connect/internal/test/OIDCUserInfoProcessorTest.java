@@ -21,14 +21,12 @@ import com.liferay.expando.kernel.model.ExpandoValue;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.expando.kernel.service.ExpandoValueLocalService;
-import com.liferay.oauth.client.persistence.configuration.OAuthClientCompanyConfiguration;
 import com.liferay.oauth.client.persistence.constants.OAuthClientEntryConstants;
 import com.liferay.oauth.client.persistence.model.OAuthClientEntry;
 import com.liferay.oauth.client.persistence.service.OAuthClientEntryLocalService;
 import com.liferay.oauth.client.test.util.OpenIdConnectProviderHttpServer;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -142,14 +140,6 @@ public class OIDCUserInfoProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_companyConfigurationTemporarySwapper =
-			new CompanyConfigurationTemporarySwapper(
-				TestPropsValues.getCompanyId(),
-				OAuthClientCompanyConfiguration.class.getName(),
-				HashMapDictionaryBuilder.<String, Object>put(
-					"authServerLocalNetworkAccessEnabled", true
-				).build());
-
 		_openIdConnectProviderHttpServer =
 			new OpenIdConnectProviderHttpServer();
 
@@ -203,10 +193,6 @@ public class OIDCUserInfoProcessorTest {
 	@After
 	public void tearDown() throws Exception {
 		ConfigurationTestUtil.deleteConfiguration(_pid);
-
-		if (_companyConfigurationTemporarySwapper != null) {
-			_companyConfigurationTemporarySwapper.close();
-		}
 
 		if (_openIdConnectProviderHttpServer != null) {
 			_openIdConnectProviderHttpServer.close();
@@ -626,9 +612,6 @@ public class OIDCUserInfoProcessorTest {
 
 	@Inject
 	private ClassNameLocalService _classNameLocalService;
-
-	private CompanyConfigurationTemporarySwapper
-		_companyConfigurationTemporarySwapper;
 
 	@Inject
 	private CompanyLocalService _companyLocalService;

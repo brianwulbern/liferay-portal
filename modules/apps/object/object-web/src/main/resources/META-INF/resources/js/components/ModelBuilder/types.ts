@@ -243,14 +243,12 @@ export type TState = {
 	forbiddenChars: string[];
 	forbiddenLastChars: string[];
 	forbiddenNames: string[];
-	googleMapsAPIKey?: string;
 	hasDepotEntry?: boolean;
 	hasUnsavedObjectFolderItemPositions: boolean;
 	isLoadingObjectFolder: boolean;
 	isRootDescendantNode: boolean;
 	learnResourceContext: ILearnResourceContext;
 	leftSidebarItems: LeftSidebarItem[];
-	mapProviderKey?: string;
 	metadataObjectFieldNames: string[];
 	modelBuilderModals: ModelBuilderModals;
 	movedObjectDefinitionId?: number;

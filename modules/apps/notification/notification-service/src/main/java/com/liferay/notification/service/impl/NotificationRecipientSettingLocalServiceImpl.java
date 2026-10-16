@@ -21,7 +21,6 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -143,6 +142,15 @@ public class NotificationRecipientSettingLocalServiceImpl
 			missingUserScreenNames, notificationTemplate, user);
 
 		return notificationRecipientSettings;
+	}
+
+	@Override
+	public List<NotificationRecipientSetting>
+		createNotificationRecipientSettings(
+			long notificationRecipientId, Object[] recipients, User user) {
+
+		return createNotificationRecipientSettings(
+			notificationRecipientId, null, recipients, user);
 	}
 
 	@Override
@@ -272,16 +280,6 @@ public class NotificationRecipientSettingLocalServiceImpl
 		List<NotificationRecipientSetting> notificationRecipientSettings,
 		Map<String, Object> recipientMap, User user) {
 
-		if (!FeatureFlagManagerUtil.isEnabled(
-				user.getCompanyId(), "LPD-49854")) {
-
-			_addNotificationRecipientSetting(
-				entry.getKey(), notificationRecipientId,
-				notificationRecipientSettings, user, entry.getValue());
-
-			return;
-		}
-
 		String value = GetterUtil.getString(entry.getValue());
 
 		if (Objects.equals(
@@ -357,10 +355,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 		String externalReferenceCode, String name, String typeLabel,
 		User user) {
 
-		if (Validator.isNotNull(externalReferenceCode) &&
-			FeatureFlagManagerUtil.isEnabled(
-				user.getCompanyId(), "LPD-49854")) {
-
+		if (Validator.isNotNull(externalReferenceCode)) {
 			try {
 				return _roleService.getOrAddEmptyRole(
 					externalReferenceCode, _getRoleClassName(typeLabel), 0,
@@ -422,10 +417,7 @@ public class NotificationRecipientSettingLocalServiceImpl
 	private UserGroup _getUserGroup(
 		String externalReferenceCode, String name, User user) {
 
-		if (Validator.isNotNull(externalReferenceCode) &&
-			FeatureFlagManagerUtil.isEnabled(
-				user.getCompanyId(), "LPD-49854")) {
-
+		if (Validator.isNotNull(externalReferenceCode)) {
 			try {
 				return _userGroupService.getOrAddEmptyUserGroup(
 					externalReferenceCode, name);

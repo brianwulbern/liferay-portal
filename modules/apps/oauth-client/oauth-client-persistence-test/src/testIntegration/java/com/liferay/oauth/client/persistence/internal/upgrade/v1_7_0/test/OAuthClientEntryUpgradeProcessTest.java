@@ -6,12 +6,10 @@
 package com.liferay.oauth.client.persistence.internal.upgrade.v1_7_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.oauth.client.persistence.configuration.OAuthClientCompanyConfiguration;
 import com.liferay.oauth.client.persistence.constants.OAuthClientEntryConstants;
 import com.liferay.oauth.client.persistence.model.OAuthClientEntry;
 import com.liferay.oauth.client.persistence.service.OAuthClientEntryLocalService;
 import com.liferay.oauth.client.test.util.OpenIdConnectProviderHttpServer;
-import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBInspector;
@@ -22,7 +20,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -54,15 +51,7 @@ public class OAuthClientEntryUpgradeProcessTest {
 
 		OAuthClientEntry oAuthClientEntry = null;
 
-		try (CompanyConfigurationTemporarySwapper
-				companyConfigurationTemporarySwapper =
-					new CompanyConfigurationTemporarySwapper(
-						TestPropsValues.getCompanyId(),
-						OAuthClientCompanyConfiguration.class.getName(),
-						HashMapDictionaryBuilder.<String, Object>put(
-							"authServerLocalNetworkAccessEnabled", true
-						).build());
-			OpenIdConnectProviderHttpServer openIdConnectProviderHttpServer =
+		try (OpenIdConnectProviderHttpServer openIdConnectProviderHttpServer =
 				new OpenIdConnectProviderHttpServer()) {
 
 			oAuthClientEntry =

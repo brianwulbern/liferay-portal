@@ -78,7 +78,7 @@ test('Search finds a Documents and Media image, absent from Blog Images', async 
 
 	await searchForSingleResult(iframe, fileName);
 
-	await expect(iframe.getByText(fileName, {exact: true})).toBeVisible();
+	await expect(iframe.getByTitle(fileName)).toBeVisible();
 });
 
 test('Search finds a Blog Images upload, absent from Documents and Media', async ({
@@ -107,9 +107,7 @@ test('Search finds a Blog Images upload, absent from Documents and Media', async
 
 	await iframe.getByRole('link', {name: 'Documents and Media'}).click();
 
-	await expect(
-		iframe.getByText('sample_image.png', {exact: true})
-	).toBeHidden();
+	await expect(iframe.getByTitle('sample_image.png')).toBeHidden();
 
 	// Searching under Blog Images finds the upload
 
@@ -117,7 +115,5 @@ test('Search finds a Blog Images upload, absent from Documents and Media', async
 
 	await searchForSingleResult(iframe, 'sample_image.png');
 
-	await expect(
-		iframe.getByText('sample_image.png', {exact: true})
-	).toBeVisible();
+	await expect(iframe.getByTitle('sample_image.png')).toBeVisible();
 });

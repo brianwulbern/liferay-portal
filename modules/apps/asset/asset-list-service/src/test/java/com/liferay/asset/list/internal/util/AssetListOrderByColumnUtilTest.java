@@ -14,6 +14,7 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.AfterClass;
@@ -49,12 +50,14 @@ public class AssetListOrderByColumnUtilTest {
 	public static void tearDownClass() {
 		_objectDefinitionLocalServiceUtilMockedStatic.close();
 		_objectFieldLocalServiceUtilMockedStatic.close();
+		_portalUtilMockedStatic.close();
 	}
 
 	@Before
 	public void setUp() {
 		_objectDefinitionLocalServiceUtilMockedStatic.reset();
 		_objectFieldLocalServiceUtilMockedStatic.reset();
+		_portalUtilMockedStatic.reset();
 	}
 
 	@Test
@@ -114,8 +117,9 @@ public class AssetListOrderByColumnUtilTest {
 
 	private String _buildOrderByColumn(String propertyName) {
 		return JSONUtil.put(
-			"objectDefinitionExternalReferenceCode",
-			_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE
+			"classNameId", _CLASS_NAME_ID
+		).put(
+			"classTypeId", _CLASS_TYPE_ID
 		).put(
 			"propertyName", propertyName
 		).toString();
@@ -142,35 +146,39 @@ public class AssetListOrderByColumnUtilTest {
 		Mockito.when(
 			objectDefinition.getObjectDefinitionId()
 		).thenReturn(
-			_OBJECT_DEFINITION_ID
+			_CLASS_TYPE_ID
 		);
 
 		_objectDefinitionLocalServiceUtilMockedStatic.when(
 			() ->
 				ObjectDefinitionLocalServiceUtil.
-					fetchObjectDefinitionByExternalReferenceCode(
-						_OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE, _COMPANY_ID)
+					fetchObjectDefinitionByClassName(
+						_COMPANY_ID, "com.liferay.test.Class" + _CLASS_NAME_ID)
 		).thenReturn(
 			objectDefinition
 		);
 
 		_objectFieldLocalServiceUtilMockedStatic.when(
 			() -> ObjectFieldLocalServiceUtil.fetchObjectField(
-				_OBJECT_DEFINITION_ID, name)
+				_CLASS_TYPE_ID, name)
 		).thenReturn(
 			objectField
+		);
+
+		_portalUtilMockedStatic.when(
+			() -> PortalUtil.getClassName(_CLASS_NAME_ID)
+		).thenReturn(
+			"com.liferay.test.Class" + _CLASS_NAME_ID
 		);
 
 		return objectField;
 	}
 
+	private static final long _CLASS_NAME_ID = RandomTestUtil.randomLong();
+
+	private static final long _CLASS_TYPE_ID = RandomTestUtil.randomLong();
+
 	private static final long _COMPANY_ID = RandomTestUtil.randomLong();
-
-	private static final String _OBJECT_DEFINITION_EXTERNAL_REFERENCE_CODE =
-		RandomTestUtil.randomString();
-
-	private static final long _OBJECT_DEFINITION_ID =
-		RandomTestUtil.randomLong();
 
 	private static final MockedStatic<ObjectDefinitionLocalServiceUtil>
 		_objectDefinitionLocalServiceUtilMockedStatic = Mockito.mockStatic(
@@ -178,5 +186,7 @@ public class AssetListOrderByColumnUtilTest {
 	private static final MockedStatic<ObjectFieldLocalServiceUtil>
 		_objectFieldLocalServiceUtilMockedStatic = Mockito.mockStatic(
 			ObjectFieldLocalServiceUtil.class);
+	private static final MockedStatic<PortalUtil> _portalUtilMockedStatic =
+		Mockito.mockStatic(PortalUtil.class);
 
 }

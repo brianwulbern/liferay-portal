@@ -250,6 +250,10 @@ public interface AnalyticsAssociationLocalService
 		long companyId, Date modifiedDate, String associationClassName,
 		int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AnalyticsAssociation> getAnalyticsAssociations(
+		long companyId, String associationClassName, int start, int end);
+
 	/**
 	 * Returns the number of analytics associations.
 	 *
@@ -261,6 +265,10 @@ public interface AnalyticsAssociationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAnalyticsAssociationsCount(
 		long companyId, Date modifiedDate, String associationClassName);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAnalyticsAssociationsCount(
+		long companyId, String associationClassName);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
@@ -310,4 +318,4 @@ public interface AnalyticsAssociationLocalService
 		throws E;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:1280798746
+// LIFERAY-SERVICE-BUILDER-HASH:-588855454

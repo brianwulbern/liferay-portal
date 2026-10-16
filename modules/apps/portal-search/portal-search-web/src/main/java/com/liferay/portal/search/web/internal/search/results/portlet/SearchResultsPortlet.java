@@ -255,8 +255,6 @@ public class SearchResultsPortlet extends MVCPortlet {
 			searchResultsPortletPreferences.isShowPagination());
 		searchResultsPortletDisplayContext.setTotalHits(
 			searchResponse.getTotalHits());
-		searchResultsPortletDisplayContext.setTotalHitsRelation(
-			searchResponse.getTotalHitsRelation());
 
 		return searchResultsPortletDisplayContext;
 	}

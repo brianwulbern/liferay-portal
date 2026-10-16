@@ -18,7 +18,6 @@ import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalSegmentTest
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightSegmentTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.SegmentTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
-import com.liferay.jenkins.results.parser.testray.TestrayContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -850,7 +849,6 @@ public abstract class BaseJob implements Job {
 		return sb.toString();
 	}
 
-	@Override
 	public String getTestSuiteName() {
 		if (this instanceof TestSuiteJob) {
 			TestSuiteJob testSuiteJob = (TestSuiteJob)this;
@@ -859,11 +857,6 @@ public abstract class BaseJob implements Job {
 		}
 
 		return null;
-	}
-
-	@Override
-	public TestrayContext getTestrayContext() {
-		return _testrayContext;
 	}
 
 	@Override
@@ -1072,11 +1065,6 @@ public abstract class BaseJob implements Job {
 	@Override
 	public boolean isValidationRequired() {
 		return false;
-	}
-
-	@Override
-	public void setTestrayContext(TestrayContext testrayContext) {
-		_testrayContext = testrayContext;
 	}
 
 	protected BaseJob(BuildProfile buildProfile, String jobName) {
@@ -1740,6 +1728,5 @@ public abstract class BaseJob implements Job {
 	private JobHistory _jobHistory;
 	private final String _jobName;
 	private Boolean _testAnalyticsCloud;
-	private TestrayContext _testrayContext;
 
 }

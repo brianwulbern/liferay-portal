@@ -86,11 +86,9 @@ public class ClassNameLocalServiceImpl
 	public ClassName fetchByClassNameId(long classNameId) {
 		ClassName className = ClassNamePool.fetchByClassNameId(classNameId);
 
-		if (className != null) {
-			return className;
+		if (className == null) {
+			className = classNamePersistence.fetchByPrimaryKey(classNameId);
 		}
-
-		className = classNamePersistence.fetchByPrimaryKey(classNameId);
 
 		ClassNamePool.add(className);
 
@@ -105,11 +103,9 @@ public class ClassNameLocalServiceImpl
 
 		ClassName className = ClassNamePool.fetchByValue(value);
 
-		if (className != null) {
-			return className;
+		if (className == null) {
+			className = classNamePersistence.fetchByValue(value);
 		}
-
-		className = classNamePersistence.fetchByValue(value);
 
 		if (className == null) {
 			return _nullClassName;

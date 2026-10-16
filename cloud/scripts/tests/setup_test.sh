@@ -12,16 +12,11 @@ function main {
 
 	scripts_dir=$(cd "$(dirname "${0}")/.." && pwd)
 
-	_run_test "${scripts_dir}/setup_aws.sh" _test_aborts_with_config_missing_account_id
-	_run_test "${scripts_dir}/setup_aws.sh" _test_aborts_with_tfstate_missing_bucket_name
-
-	for script in "${scripts_dir}/setup_aws.sh" "${scripts_dir}/setup_azure.sh"
+	for script in "${scripts_dir}/setup_aws.sh" "${scripts_dir}/setup_gcp.sh"
 	do
-		_run_test "${script}" _test_aborts_with_config_missing_required_key
+		_run_test "${script}" _test_aborts_with_config_missing_variables_object
+		_run_test "${script}" _test_aborts_with_old_terraform_version
 	done
-
-	_run_test "${scripts_dir}/setup_gcp.sh" _test_aborts_with_config_missing_variables_object
-	_run_test "${scripts_dir}/setup_gcp.sh" _test_aborts_with_old_terraform_version
 
 	for script in "${scripts_dir}/setup_aws.sh" "${scripts_dir}/setup_azure.sh" "${scripts_dir}/setup_gcp.sh"
 	do
@@ -162,44 +157,6 @@ function _run_test {
 	fi
 }
 
-function _test_aborts_with_config_missing_account_id {
-	local config_json
-	local exit_code
-	local output
-	local result
-
-	config_json=$(jq --null-input '{deployment_name: "liferay-test", region: "us-east-1"}')
-	result=$(_run_setup_test "${1}" "${config_json}")
-	exit_code=$(echo "${result}" | head -n 1)
-	output=$(echo "${result}" | tail -n +2)
-
-	if [ ${exit_code} -ne 0 ] && [[ ${output} == *'must contain a key named "account_id"'* ]]
-	then
-		return 0
-	fi
-
-	return 1
-}
-
-function _test_aborts_with_config_missing_required_key {
-	local config_json
-	local exit_code
-	local output
-	local result
-
-	config_json=$(jq --null-input '{account_id: "111111111111", deployment_name: "liferay-test", subscription_id: "subscription", tenant_id: "tenant"}')
-	result=$(_run_setup_test "${1}" "${config_json}")
-	exit_code=$(echo "${result}" | head -n 1)
-	output=$(echo "${result}" | tail -n +2)
-
-	if [ ${exit_code} -ne 0 ] && [[ ${output} == *'must contain a key named "region"'* ]]
-	then
-		return 0
-	fi
-
-	return 1
-}
-
 function _test_aborts_with_config_missing_variables_object {
 	local config_json
 	local exit_code
@@ -302,25 +259,6 @@ function _test_aborts_with_old_terraform_version {
 	output=$(echo "${result}" | tail -n +2)
 
 	if [ ${exit_code} -ne 0 ] && [[ ${output} == *"is older than"* ]]
-	then
-		return 0
-	fi
-
-	return 1
-}
-
-function _test_aborts_with_tfstate_missing_bucket_name {
-	local config_json
-	local exit_code
-	local output
-	local result
-
-	config_json=$(jq --null-input '{account_id: "111111111111", deployment_name: "liferay-test", region: "us-east-1", tfstate: {}}')
-	result=$(_run_setup_test "${1}" "${config_json}")
-	exit_code=$(echo "${result}" | head -n 1)
-	output=$(echo "${result}" | tail -n +2)
-
-	if [ ${exit_code} -ne 0 ] && [[ ${output} == *'must contain a key named "tfstate.bucket_name"'* ]]
 	then
 		return 0
 	fi

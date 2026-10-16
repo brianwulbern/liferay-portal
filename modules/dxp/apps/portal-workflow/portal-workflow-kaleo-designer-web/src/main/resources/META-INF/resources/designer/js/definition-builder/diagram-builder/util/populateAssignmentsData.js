@@ -5,7 +5,7 @@
 
 import {
 	retrieveAccountRoles,
-	retrieveRole,
+	retrieveRoleById,
 	retrieveRoles,
 	retrieveUsersBy,
 } from '../../util/fetchUtil';
@@ -79,10 +79,7 @@ const populateAssignmentsData = (
 		const assignmentType = getAssignmentType(taskNode.data.assignments);
 
 		if (assignmentType === 'roleId') {
-			retrieveRole(
-				taskNode.data.assignments.roleExternalReferenceCode,
-				taskNode.data.assignments.roleId
-			)
+			retrieveRoleById(taskNode.data.assignments.roleId)
 				.then((response) => response.json())
 				.then((response) => {
 					taskNode.data.assignments.sectionsData = {

@@ -67,7 +67,6 @@ export class CommerceAdminChannelDetailsPage {
 		tableName: string,
 		text: string
 	) => Promise<Locator>;
-	readonly guestBrowsingToggle: Locator;
 	readonly guestCheckoutToggle: Locator;
 	readonly isActive: Locator;
 	readonly linkSupplierSelect: Locator;
@@ -236,7 +235,6 @@ export class CommerceAdminChannelDetailsPage {
 		this.generalCommerceAdminChannelTableLink = async (name: string) => {
 			return page.getByRole('link', {exact: true, name});
 		};
-		this.guestBrowsingToggle = page.getByLabel('Guest Browsing');
 		this.guestCheckoutToggle = page.getByLabel('Guest Checkout');
 		this.closeSidePanelFrame = async (
 			isNestedFrame: boolean,

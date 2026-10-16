@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -287,13 +286,6 @@ public class EditCommerceChannelMVCActionCommand
 
 		for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
 			modifiableSettings.setValue(entry.getKey(), entry.getValue());
-		}
-
-		if (!GetterUtil.getBoolean(
-				parameterMap.get("guestBrowsingEnabled"), true)) {
-
-			modifiableSettings.setValue(
-				"guestCheckoutEnabled", Boolean.FALSE.toString());
 		}
 
 		modifiableSettings.store();

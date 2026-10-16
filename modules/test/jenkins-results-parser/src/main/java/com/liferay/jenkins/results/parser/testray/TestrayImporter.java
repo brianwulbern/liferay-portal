@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -361,6 +362,33 @@ public class TestrayImporter {
 			propertyElement.addAttribute("name", propertyName);
 			propertyElement.addAttribute("value", propertyValue);
 		}
+	}
+
+	private String _getEnhancedBatchName(
+		AxisTestClassGroup axisTestClassGroup) {
+
+		if (!(axisTestClassGroup instanceof FunctionalAxisTestClassGroup)) {
+			return axisTestClassGroup.getBatchName();
+		}
+
+		String batchName = axisTestClassGroup.getBatchName();
+
+		FunctionalAxisTestClassGroup functionalAxisTestClassGroup =
+			(FunctionalAxisTestClassGroup)axisTestClassGroup;
+
+		Properties poshiProperties =
+			functionalAxisTestClassGroup.getPoshiProperties();
+
+		String browserChromeVersion = poshiProperties.getProperty(
+			"browser.chrome.version");
+
+		if ((browserChromeVersion != null) &&
+			browserChromeVersion.equals("139.0")) {
+
+			batchName += "-chrome139";
+		}
+
+		return batchName;
 	}
 
 	private Element _getJenkinsBuildDescriptionCodeElement(
@@ -710,9 +738,14 @@ public class TestrayImporter {
 		AxisTestClassGroup axisTestClassGroup,
 		TestrayCaseResult topLevelTestrayCaseResult) {
 
-		TestrayRun testrayRun = axisTestClassGroup.getTestrayRun();
+		Job job = axisTestClassGroup.getJob();
 
-		TestrayBuild testrayBuild = testrayRun.getTestrayBuild();
+		TestrayBuild testrayBuild = _testrayContext.getTestrayBuild(
+			axisTestClassGroup.getTestBaseDir());
+
+		TestrayRun testrayRun = TestrayFactory.newTestrayRun(
+			testrayBuild, _getEnhancedBatchName(axisTestClassGroup),
+			_topLevelBuildReport.getTestSuiteName(), job.getJobProperties());
 
 		long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
 

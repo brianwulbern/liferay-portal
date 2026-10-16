@@ -89,7 +89,6 @@ type ObjectFieldBusinessTypeName =
 	| 'Encrypted'
 	| 'Formula'
 	| 'Integer'
-	| 'Location'
 	| 'LongInteger'
 	| 'LongText'
 	| 'MultiselectPicklist'

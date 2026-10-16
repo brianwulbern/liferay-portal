@@ -73,7 +73,6 @@ import com.liferay.source.formatter.util.DebugUtil;
 import com.liferay.source.formatter.util.FileUtil;
 import com.liferay.source.formatter.util.JIRAUtil;
 import com.liferay.source.formatter.util.SourceFormatterUtil;
-import com.liferay.source.formatter.util.ThrowableUtil;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
@@ -303,38 +302,19 @@ public class SourceFormatter {
 
 			sourceFormatter.format();
 		}
-		catch (Throwable throwable) {
-			UnsupportedClassVersionError unsupportedClassVersionError =
-				ThrowableUtil.getNestedThrowable(
-					throwable, UnsupportedClassVersionError.class);
-
-			if (unsupportedClassVersionError != null) {
-				System.err.println(
-					StringBundler.concat(
-						"Unable to run Source Formatter under Java ",
-						System.getProperty("java.specification.version"),
-						"\nIt loads classes compiled for a newer Java ",
-						"version. Set JAVA_HOME to a newer JDK and run ",
-						"again.\nThis is a toolchain failure, not a ",
-						"formatting violation\n",
-						unsupportedClassVersionError));
-
-				System.exit(2);
-			}
-
-			if (throwable instanceof GitException) {
-				System.out.println(throwable.getMessage());
+		catch (Exception exception) {
+			if (exception instanceof GitException) {
+				System.out.println(exception.getMessage());
 			}
 			else {
 				CheckstyleException checkstyleException =
-					ThrowableUtil.getNestedThrowable(
-						throwable, CheckstyleException.class);
+					_getNestedCheckstyleException(exception);
 
 				if (checkstyleException != null) {
 					checkstyleException.printStackTrace();
 				}
 				else {
-					throwable.printStackTrace();
+					exception.printStackTrace();
 				}
 			}
 
@@ -511,6 +491,24 @@ public class SourceFormatter {
 
 	public List<SourceMismatchException> getSourceMismatchExceptions() {
 		return _sourceMismatchExceptions;
+	}
+
+	private static CheckstyleException _getNestedCheckstyleException(
+		Exception exception) {
+
+		Throwable throwable = exception;
+
+		while (true) {
+			if (throwable == null) {
+				return null;
+			}
+
+			if (throwable instanceof CheckstyleException) {
+				return (CheckstyleException)throwable;
+			}
+
+			throwable = throwable.getCause();
+		}
 	}
 
 	private Set<String> _addDependentFileName(

@@ -5,15 +5,11 @@
 
 package com.liferay.jenkins.results.parser.monitor;
 
-import com.liferay.jenkins.results.parser.Dom4JUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.dom4j.Document;
-import org.dom4j.Node;
 
 /**
  * @author Brittney Nguyen
@@ -41,8 +37,8 @@ public abstract class BaseMonitor implements Monitor {
 	protected int getAttemptTimeoutMillis(int maxRetries) {
 		long timeoutMillis = _getTimeoutMillis();
 
-		return (int)((timeoutMillis - (timeoutMillis / 10)) /
-			(getReadsCount() * (maxRetries + 1)));
+		return (int)
+			((timeoutMillis - (timeoutMillis / 10)) / (2 * (maxRetries + 1)));
 	}
 
 	protected boolean getBooleanValue(
@@ -61,36 +57,6 @@ public abstract class BaseMonitor implements Monitor {
 		}
 
 		return Boolean.parseBoolean(value);
-	}
-
-	protected CronSchedule getCronSchedule(String jobName, String masterName)
-		throws Exception {
-
-		if (_cronScheduleLoaded) {
-			return _cronSchedule;
-		}
-
-		MasterResourceReader masterResourceReader =
-			MasterResourceReader.getInstance(masterName);
-
-		Document document = masterResourceReader.getJobConfigDocument(
-			jobName,
-			getAttemptTimeoutMillis(MasterResourceReader.RETRIES_SIZE_MAX));
-
-		Node specNode = Dom4JUtil.getNodeByXPath(
-			document, "//hudson.triggers.TimerTrigger/spec");
-
-		if (specNode != null) {
-			String spec = specNode.getText();
-
-			if (!JenkinsResultsParserUtil.isNullOrEmpty(spec)) {
-				_cronSchedule = new CronSchedule(spec);
-			}
-		}
-
-		_cronScheduleLoaded = true;
-
-		return _cronSchedule;
 	}
 
 	protected String getInvalidValueMessage(
@@ -129,25 +95,6 @@ public abstract class BaseMonitor implements Monitor {
 		return longValue;
 	}
 
-	protected long getOverdueDeadlineTimestamp(
-		CronSchedule cronSchedule, long currentTimeMillis,
-		long overdueGraceSeconds) {
-
-		long toleranceSeconds =
-			overdueGraceSeconds + cronSchedule.getHashSpanSeconds();
-
-		return cronSchedule.getPreviousFireTimestamp(
-			currentTimeMillis - (toleranceSeconds * 1000));
-	}
-
-	protected long getOverdueGraceSeconds(
-		CronSchedule cronSchedule, long currentTimeMillis,
-		Map<String, String> thresholds) {
-
-		return getOverdueGraceSeconds(
-			cronSchedule.getPeriodSeconds(currentTimeMillis), thresholds);
-	}
-
 	protected long getOverdueGraceSeconds(
 		long cadenceSeconds, Map<String, String> thresholds) {
 
@@ -155,10 +102,6 @@ public abstract class BaseMonitor implements Monitor {
 			"threshold",
 			Math.max(_SECONDS_OVERDUE_GRACE_MINIMUM, cadenceSeconds / 4),
 			"overdue.grace", thresholds);
-	}
-
-	protected int getReadsCount() {
-		return 2;
 	}
 
 	protected String getRequiredParameter(
@@ -225,8 +168,6 @@ public abstract class BaseMonitor implements Monitor {
 	private static final Pattern _userInfoPattern = Pattern.compile(
 		"(//|[^/?#]*://)?[^/?#]*@.*");
 
-	private CronSchedule _cronSchedule;
-	private boolean _cronScheduleLoaded;
 	private final MonitorConfig _monitorConfig;
 
 }

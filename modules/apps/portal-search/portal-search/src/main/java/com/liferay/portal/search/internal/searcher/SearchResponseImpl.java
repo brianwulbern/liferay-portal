@@ -17,7 +17,6 @@ import com.liferay.portal.search.groupby.GroupByResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilder;
-import com.liferay.portal.search.hits.TotalHitsRelation;
 import com.liferay.portal.search.internal.legacy.searcher.FacetContextImpl;
 import com.liferay.portal.search.searcher.FacetContext;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -154,15 +153,6 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 		}
 
 		return _hits.getLength();
-	}
-
-	@Override
-	public TotalHitsRelation getTotalHitsRelation() {
-		if (_searchHits == null) {
-			return TotalHitsRelation.EQ;
-		}
-
-		return _searchHits.getTotalHitsRelation();
 	}
 
 	public void setAggregationResultsMap(

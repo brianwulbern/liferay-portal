@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.security.audit.configuration.AuditConfiguration;
 import com.liferay.portal.security.audit.configuration.web.internal.display.context.AuditConfigurationDisplayContext;
 import com.liferay.portal.security.audit.router.configuration.FileSystemAuditMessageProcessorConfiguration;
+import com.liferay.portal.security.audit.router.configuration.PersistentAuditMessageProcessorConfiguration;
 import com.liferay.portal.settings.configuration.admin.display.PortalSettingsConfigurationScreenContributor;
 import com.liferay.portal.settings.configuration.admin.display.PortalSettingsConfigurationScreenFactory;
 
@@ -120,7 +121,8 @@ public class AuditPortalSettingsConfigurationScreenWrapper
 					_getConfiguration(AuditConfiguration.class),
 					_getConfiguration(
 						FileSystemAuditMessageProcessorConfiguration.class),
-					ExtendedObjectClassDefinition.Scope.SYSTEM.equals(_scope)));
+					_getConfiguration(
+						PersistentAuditMessageProcessorConfiguration.class)));
 		}
 
 		private <T> T _getConfiguration(Class<T> clazz) {

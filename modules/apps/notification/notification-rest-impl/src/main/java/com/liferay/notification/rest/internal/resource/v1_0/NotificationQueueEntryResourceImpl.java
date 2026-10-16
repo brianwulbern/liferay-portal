@@ -156,8 +156,7 @@ public class NotificationQueueEntryResourceImpl
 		notificationContext.setNotificationRecipientSettings(
 			_notificationRecipientSettingLocalService.
 				createNotificationRecipientSettings(
-					0L, null, notificationQueueEntry.getRecipients(),
-					contextUser));
+					0L, notificationQueueEntry.getRecipients(), contextUser));
 
 		notificationContext.setType(NotificationConstants.TYPE_EMAIL);
 

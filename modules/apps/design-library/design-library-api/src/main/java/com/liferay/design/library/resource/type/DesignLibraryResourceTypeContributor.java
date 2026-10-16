@@ -35,10 +35,6 @@ public interface DesignLibraryResourceTypeContributor {
 		return Collections.emptyList();
 	}
 
-	public default String getCreationItemsGroupLabel(Locale locale) {
-		return getLabel(locale);
-	}
-
 	public String getDefaultActionId();
 
 	public String getEntryClassName();

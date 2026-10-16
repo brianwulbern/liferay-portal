@@ -5,8 +5,10 @@
 
 package com.liferay.portal.cluster.multiple.internal.jgroups;
 
+import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -34,7 +36,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 
@@ -321,7 +322,8 @@ public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 	private InetAddress _bindInetAddress;
 	private NetworkInterface _bindNetworkInterface;
 	private final ConcurrentMap<ClassLoader, ClassLoader> _classLoaders =
-		new ConcurrentHashMap<>();
+		new ConcurrentReferenceKeyHashMap<>(
+			FinalizeManager.WEAK_REFERENCE_FACTORY);
 	private volatile ClusterExecutorConfiguration _clusterExecutorConfiguration;
 
 	private static class SymEncryptProtocolStackConfigurator
