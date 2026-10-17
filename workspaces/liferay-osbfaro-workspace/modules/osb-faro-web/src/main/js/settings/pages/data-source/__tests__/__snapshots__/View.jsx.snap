@@ -6,7 +6,7 @@ exports[`View should render a CSV data-source page 1`] = `
     class="settings-root"
   >
     <nav
-      class="align-items-center bg-white sticky-top toolbar-root mb-4 tbar component-tbar"
+      class="align-items-center bg-white sticky-top toolbar-root base-edit-page-toolbar mb-4 tbar component-tbar"
     >
       <ul
         class="align-items-center mx-3 tbar-nav"
@@ -46,8 +46,13 @@ exports[`View should render a CSV data-source page 1`] = `
           </div>
         </li>
         <li
-          class="tbar-item tbar-item-expand"
-        />
+          class="ml-auto tbar-item"
+        >
+          <ul
+            class="base-edit-page-toolbar-actions tbar-nav"
+            data-testid="toolbar-actions"
+          />
+        </li>
       </ul>
     </nav>
     <div
@@ -486,7 +491,7 @@ exports[`View should render a Liferay data-source page 1`] = `
     class="settings-root"
   >
     <nav
-      class="align-items-center bg-white sticky-top toolbar-root mb-4 tbar component-tbar"
+      class="align-items-center bg-white sticky-top toolbar-root base-edit-page-toolbar mb-4 tbar component-tbar"
     >
       <ul
         class="align-items-center mx-3 tbar-nav"
@@ -526,8 +531,13 @@ exports[`View should render a Liferay data-source page 1`] = `
           </div>
         </li>
         <li
-          class="tbar-item tbar-item-expand"
-        />
+          class="ml-auto tbar-item"
+        >
+          <ul
+            class="base-edit-page-toolbar-actions tbar-nav"
+            data-testid="toolbar-actions"
+          />
+        </li>
       </ul>
     </nav>
     <div
@@ -771,7 +781,7 @@ exports[`View should render a Liferay data-source page 1`] = `
               class="mb-5"
             >
               <span
-                class="label mb-2 label-success"
+                class="label mb-2 label-inverse-success"
               >
                 <span
                   class="label-item label-item-expand"
@@ -1017,7 +1027,7 @@ exports[`View should render a Liferay data-source page 1`] = `
                       class="justify-content-center autofit-col"
                     >
                       <span
-                        class="label label-secondary"
+                        class="label label-inverse-secondary"
                       >
                         <span
                           class="label-item label-item-expand"
@@ -1073,7 +1083,7 @@ exports[`View should render a Liferay data-source page 1`] = `
                       class="justify-content-center autofit-col"
                     >
                       <span
-                        class="label label-secondary"
+                        class="label label-inverse-secondary"
                       >
                         <span
                           class="label-item label-item-expand"
@@ -1129,7 +1139,7 @@ exports[`View should render a Liferay data-source page 1`] = `
                       class="justify-content-center autofit-col"
                     >
                       <span
-                        class="label label-secondary"
+                        class="label label-inverse-secondary"
                       >
                         <span
                           class="label-item label-item-expand"
@@ -1391,7 +1401,7 @@ exports[`View should render a Salesforce data-source page 1`] = `
     class="settings-root"
   >
     <nav
-      class="align-items-center bg-white sticky-top toolbar-root mb-4 tbar component-tbar"
+      class="align-items-center bg-white sticky-top toolbar-root base-edit-page-toolbar mb-4 tbar component-tbar"
     >
       <ul
         class="align-items-center mx-3 tbar-nav"
@@ -1431,8 +1441,13 @@ exports[`View should render a Salesforce data-source page 1`] = `
           </div>
         </li>
         <li
-          class="tbar-item tbar-item-expand"
-        />
+          class="ml-auto tbar-item"
+        >
+          <ul
+            class="base-edit-page-toolbar-actions tbar-nav"
+            data-testid="toolbar-actions"
+          />
+        </li>
       </ul>
     </nav>
     <div
@@ -1676,7 +1691,7 @@ exports[`View should render a Salesforce data-source page 1`] = `
               class="mb-5"
             >
               <span
-                class="label mb-2 label-success"
+                class="label mb-2 label-inverse-success"
               >
                 <span
                   class="label-item label-item-expand"

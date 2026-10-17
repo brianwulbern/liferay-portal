@@ -12,7 +12,7 @@ exports[`View should render 1`] = `
         class="settings-root"
       >
         <nav
-          class="align-items-center bg-white sticky-top toolbar-root mb-4 tbar component-tbar"
+          class="align-items-center bg-white sticky-top toolbar-root base-edit-page-toolbar mb-4 tbar component-tbar"
         >
           <ul
             class="align-items-center mx-3 tbar-nav"
@@ -52,8 +52,13 @@ exports[`View should render 1`] = `
               </div>
             </li>
             <li
-              class="tbar-item tbar-item-expand"
-            />
+              class="ml-auto tbar-item"
+            >
+              <ul
+                class="base-edit-page-toolbar-actions tbar-nav"
+                data-testid="toolbar-actions"
+              />
+            </li>
           </ul>
         </nav>
         <div
@@ -402,15 +407,15 @@ exports[`View should render 1`] = `
                                 123
                               </td>
                               <td>
-                                <div
-                                  class="label label-root status label-success label-lg label-uppercase"
+                                <span
+                                  class="label status label-lg label-inverse-success"
                                 >
                                   <span
-                                    class="label-item"
+                                    class="label-item label-item-expand"
                                   >
                                     Completed
                                   </span>
-                                </div>
+                                </span>
                               </td>
                             </tr>
                           </tbody>
