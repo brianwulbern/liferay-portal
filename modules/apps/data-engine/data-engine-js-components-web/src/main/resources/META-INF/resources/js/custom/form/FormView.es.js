@@ -274,6 +274,10 @@ const usePublicAPI = ({apiRef, containerRef, unstable_onEventRef}) => {
 	} = useFormState();
 	const dispatch = useForm();
 
+	const pagesRef = useRef(pages);
+
+	pagesRef.current = pages;
+
 	const validate = useCallback(
 		() =>
 			dispatch(
@@ -407,6 +411,7 @@ const usePublicAPI = ({apiRef, containerRef, unstable_onEventRef}) => {
 				pageLanguageUpdate({
 					ddmStructureLayoutId,
 					defaultLanguageId: nextDefaultLanguageId,
+					getPages: () => pagesRef.current,
 					nextEditingLanguageId,
 					pages,
 					portletNamespace,

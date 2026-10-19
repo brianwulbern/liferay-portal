@@ -57,6 +57,7 @@ const getFieldProperties = (instanceId, pages) => {
 export default function pageLanguageUpdate({
 	ddmStructureLayoutId,
 	defaultLanguageId,
+	getPages,
 	nextEditingLanguageId,
 	pages,
 	portletNamespace,
@@ -97,6 +98,22 @@ export default function pageLanguageUpdate({
 		)
 			.then((response) => response.json())
 			.then((response) => {
+				if (getPages && getPages() !== pages) {
+					pageLanguageUpdate({
+						ddmStructureLayoutId,
+						defaultLanguageId,
+						getPages,
+						nextEditingLanguageId,
+						pages: getPages(),
+						portletNamespace,
+						preserveValue,
+						prevEditingLanguageId,
+						readOnly,
+					})(dispatch);
+
+					return;
+				}
+
 				const visitor = new PagesVisitor(response.pages);
 				const newPages = visitor.mapFields(
 					(field) => {
