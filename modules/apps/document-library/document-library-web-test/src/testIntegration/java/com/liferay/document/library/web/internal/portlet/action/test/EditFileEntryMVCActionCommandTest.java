@@ -354,8 +354,8 @@ public class EditFileEntryMVCActionCommandTest {
 						})
 				).put(
 					StringBundler.concat(
-						ddmStructure.getStructureId(), "_ddm$$", fieldName,
-						"$", RandomTestUtil.randomString(), "$0$$",
+						ddmStructure.getStructureId(), "_ddm$$", fieldName, "$",
+						RandomTestUtil.randomString(), "$0$$",
 						LocaleUtil.toLanguageId(LocaleUtil.US)),
 					new String[] {value}
 				).put(
@@ -376,8 +376,7 @@ public class EditFileEntryMVCActionCommandTest {
 			FileVersion fileVersion = fileEntry.getFileVersion();
 
 			Map<String, DDMFormValues> ddmFormValuesMap =
-				dlFileEntry.getDDMFormValuesMap(
-					fileVersion.getFileVersionId());
+				dlFileEntry.getDDMFormValuesMap(fileVersion.getFileVersionId());
 
 			DDMFormValues ddmFormValues = ddmFormValuesMap.get(
 				ddmStructure.getStructureKey());
