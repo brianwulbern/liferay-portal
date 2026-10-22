@@ -11,9 +11,12 @@ import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortle
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessorRegistryUtil;
 import com.liferay.layout.importer.PortletPreferencesPortletConfigurationImporter;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
@@ -106,6 +109,21 @@ public class PortletPreferencesPortletConfigurationImporterImpl
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
 				portletId, portletPreferencesXML);
 		}
+
+		PortletLayoutListener portletLayoutListener =
+			portlet.getPortletLayoutListenerInstance();
+
+		if (portletLayoutListener == null) {
+			return;
+		}
+
+		try {
+			portletLayoutListener.onSetup(portletId, layout.getPlid());
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to fire portlet layout listener event", exception);
+		}
 	}
 
 	private void _processImportPortletPreferences(
@@ -134,6 +152,9 @@ public class PortletPreferencesPortletConfigurationImporterImpl
 			ReflectionUtil.throwException(portletDataException);
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletPreferencesPortletConfigurationImporterImpl.class);
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
