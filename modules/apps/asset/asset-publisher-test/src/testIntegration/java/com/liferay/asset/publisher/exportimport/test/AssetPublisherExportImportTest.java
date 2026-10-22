@@ -49,7 +49,10 @@ import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.exporter.PortletPreferencesPortletConfigurationExporter;
 import com.liferay.layout.importer.PortletPreferencesPortletConfigurationImporter;
+import com.liferay.layout.model.LayoutClassedModelUsage;
+import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
@@ -858,6 +861,57 @@ public class AssetPublisherExportImportTest extends BaseExportImportTestCase {
 			TestPropsValues.getUserId(), layout);
 
 		testExportImportAssetEntries(layoutGroup);
+	}
+
+	@Test
+	@TestInfo("LPD-97248")
+	public void testExportImportManualAssetEntryLayoutClassedModelUsage()
+		throws Exception {
+
+		StagingLocalServiceUtil.enableLocalStaging(
+			TestPropsValues.getUserId(), group, false, false,
+			new ServiceContext());
+
+		group = _groupLocalService.getGroup(group.getGroupId());
+
+		Group stagingGroup = group.getStagingGroup();
+
+		Layout stagingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+			layout.getUuid(), stagingGroup.getGroupId(),
+			layout.isPrivateLayout());
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			stagingGroup.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		_publishLayouts(stagingGroup);
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			JournalArticle.class.getName(),
+			journalArticle.getResourcePrimKey());
+
+		LayoutTestUtil.addPortletToLayout(
+			stagingLayout, AssetPublisherPortletKeys.ASSET_PUBLISHER,
+			HashMapBuilder.put(
+				"assetEntryXml",
+				new String[] {
+					AssetPublisherTestUtil.getAssetEntryXml(assetEntry)
+				}
+			).put(
+				"selectionStyle", new String[] {"manual"}
+			).build());
+
+		_publishLayouts(stagingGroup);
+
+		AssetEntry liveAssetEntry = _assetEntryLocalService.getEntry(
+			group.getGroupId(), assetEntry.getClassUuid());
+
+		List<Long> plids = TransformUtil.transform(
+			_layoutClassedModelUsageLocalService.getLayoutClassedModelUsages(
+				liveAssetEntry.getClassNameId(), liveAssetEntry.getClassPK()),
+			LayoutClassedModelUsage::getPlid);
+
+		Assert.assertTrue(plids.toString(), plids.contains(layout.getPlid()));
 	}
 
 	@Test
@@ -1950,6 +2004,10 @@ public class AssetPublisherExportImportTest extends BaseExportImportTestCase {
 
 	@Inject
 	private JournalFolderLocalService _journalFolderLocalService;
+
+	@Inject
+	private LayoutClassedModelUsageLocalService
+		_layoutClassedModelUsageLocalService;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;
