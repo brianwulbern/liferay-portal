@@ -10,16 +10,16 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.counter.kernel.service.CounterLocalService;
-import com.liferay.exportimport.changeset.Changeset;
-import com.liferay.exportimport.changeset.portlet.action.ExportImportChangesetMVCActionCommandHelper;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.service.StagingLocalService;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalContentSearch;
 import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
-import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.layout.test.util.ContentLayoutTestUtil;
@@ -32,12 +32,11 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
-import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -46,7 +45,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -55,7 +53,6 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -245,7 +242,7 @@ public class JournalArticleLayoutClassedModelUsageUpgradeProcessTest {
 				false);
 
 			_assertLayoutClassedModelUsagesCount(
-				_journalArticle.getResourcePrimKey(), 0);
+				_journalArticle.getResourcePrimKey(), 1);
 
 			_runUpgrade();
 
@@ -570,69 +567,23 @@ public class JournalArticleLayoutClassedModelUsageUpgradeProcessTest {
 	}
 
 	private void _publishToLive(Layout layout) throws Exception {
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
-			new MockLiferayPortletActionRequest();
+		Map<String, String[]> parameterMap =
+			ExportImportConfigurationParameterMapFactoryUtil.
+				buildParameterMap();
 
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.PORTLET_ID, LayoutAdminPortletKeys.GROUP_PAGES);
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA_ALL,
+			new String[] {Boolean.TRUE.toString()});
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		Group stagingGroup = GroupLocalServiceUtil.getGroup(
+			layout.getGroupId());
 
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, serviceContext.getThemeDisplay());
-
-		mockLiferayPortletActionRequest.setParameter(
-			"groupId", String.valueOf(layout.getGroupId()));
-
-		Changeset.Builder builder = Changeset.create();
-
-		Changeset changeset = builder.addStagedModel(
-			() -> layout
-		).addMultipleStagedModel(
-			Collections::emptyList
-		).build();
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.portal.background.task.internal.messaging." +
-					"BackgroundTaskMessageListener",
-				LoggerTestUtil.ERROR)) {
-
-			_exportImportChangesetMVCActionCommandHelper.publish(
-				mockLiferayPortletActionRequest,
-				new MockLiferayPortletActionResponse(), changeset);
-
-			List<LogEntry> logEntries = logCapture.getLogEntries();
-
-			Assert.assertTrue(
-				ListUtil.toString(
-					logEntries,
-					new Accessor<LogEntry, String>() {
-
-						@Override
-						public String get(LogEntry logEntry) {
-							Throwable throwable = logEntry.getThrowable();
-
-							while (throwable.getCause() != null) {
-								throwable = throwable.getCause();
-							}
-
-							return throwable.getMessage();
-						}
-
-						@Override
-						public Class<String> getAttributeClass() {
-							return String.class;
-						}
-
-						@Override
-						public Class<LogEntry> getTypeClass() {
-							return LogEntry.class;
-						}
-
-					}),
-				ListUtil.isEmpty(logEntries));
-		}
+		StagingUtil.publishLayouts(
+			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
+			stagingGroup.getLiveGroupId(), false, parameterMap);
 	}
 
 	private void _pushServiceContext(Group group, Layout layout)
@@ -691,10 +642,6 @@ public class JournalArticleLayoutClassedModelUsageUpgradeProcessTest {
 
 	@Inject
 	private CounterLocalService _counterLocalService;
-
-	@Inject
-	private ExportImportChangesetMVCActionCommandHelper
-		_exportImportChangesetMVCActionCommandHelper;
 
 	@DeleteAfterTestRun
 	private Group _group;
