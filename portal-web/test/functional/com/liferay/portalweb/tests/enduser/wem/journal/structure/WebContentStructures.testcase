@@ -858,14 +858,15 @@ definition {
 				groupName = "Test Site Name",
 				layoutName = "Test Content Page");
 
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Link To A Page Of This Site",
+				type = "link_to_layout");
 
-			PagesAdmin.addPage(
-				linkPageName = "Test Content Page",
-				pageName = "Test Link To A Page Of This Site",
-				sitePageType = "Link to a Page of This Site");
-
-			Alert.viewSuccessMessageText(successMessage = "The page was updated successfully.");
+			JSONLayout.updateTypeSettings(
+				groupName = "Test Site Name",
+				layoutName = "Test Link To A Page Of This Site",
+				linkToLayoutName = "Test Content Page");
 		}
 
 		task ("Add a structure with Link to Page field") {
