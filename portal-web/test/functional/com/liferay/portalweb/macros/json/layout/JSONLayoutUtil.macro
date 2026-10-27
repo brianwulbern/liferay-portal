@@ -366,6 +366,21 @@ definition {
 	}
 
 	@summary = "Default summary"
+	macro _linkToLayoutId(linkToLayoutId = null) {
+		if (!(isSet(linkToLayoutId))) {
+			fail("linkToLayoutId not set.");
+		}
+
+		if (!(isSet(typeSettings))) {
+			fail("typeSettings not set.");
+		}
+
+		var typeSettings = StringUtil.add(${typeSettings}, "linkToLayoutId=${linkToLayoutId}", "");
+
+		return ${typeSettings};
+	}
+
+	@summary = "Default summary"
 	macro _updateLayoutTemplateId(layoutTemplate = null) {
 		if (!(isSet(layoutTemplate))) {
 			fail("layoutTemplate not set.");

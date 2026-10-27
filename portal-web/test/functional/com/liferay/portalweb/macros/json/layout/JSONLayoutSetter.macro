@@ -106,7 +106,7 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro setTypeSettings(remoteAppEntryId = null, widgetName = null, groupId = null, column = null, embeddedLayoutURL = null, layoutTemplate = null, privateLayout = null, layoutName = null) {
+	macro setTypeSettings(remoteAppEntryId = null, widgetName = null, groupId = null, column = null, embeddedLayoutURL = null, layoutTemplate = null, privateLayout = null, layoutName = null, linkToLayoutName = null) {
 		Variables.assertDefined(parameterList = "${groupId},${layoutName},${privateLayout}");
 
 		var typeSettings = JSONLayoutAPI._getTypeSettingsByName(
@@ -123,6 +123,17 @@ definition {
 		if (isSet(layoutTemplate)) {
 			var typeSettings = JSONLayoutUtil._updateLayoutTemplateId(
 				layoutTemplate = ${layoutTemplate},
+				typeSettings = ${typeSettings});
+		}
+
+		if (isSet(linkToLayoutName)) {
+			var linkToLayoutId = JSONLayoutSetter.setLayoutId(
+				groupId = ${groupId},
+				layoutName = ${linkToLayoutName},
+				privateLayout = ${privateLayout});
+
+			var typeSettings = JSONLayoutUtil._linkToLayoutId(
+				linkToLayoutId = ${linkToLayoutId},
 				typeSettings = ${typeSettings});
 		}
 
