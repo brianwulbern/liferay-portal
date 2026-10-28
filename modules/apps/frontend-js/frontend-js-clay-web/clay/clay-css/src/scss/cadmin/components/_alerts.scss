@@ -117,6 +117,10 @@
 	}
 
 	@include clay-css($cadmin-alert-notifications-fixed);
+
+	> * {
+		pointer-events: auto;
+	}
 }
 
 // Alert List

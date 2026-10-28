@@ -113,6 +113,10 @@
 	}
 
 	@include clay-css($alert-notifications-fixed);
+
+	> * {
+		pointer-events: auto;
+	}
 }
 
 // Alert List
