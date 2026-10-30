@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.comparator.UserIdComparator;
 
 import java.util.Calendar;
 import java.util.List;
@@ -346,7 +347,7 @@ public class UserTestUtil {
 			companyId, RoleConstants.ADMINISTRATOR);
 
 		List<User> users = UserLocalServiceUtil.getRoleUsers(
-			role.getRoleId(), 0, 1);
+			role.getRoleId(), 0, 1, UserIdComparator.getInstance(true));
 
 		if (!users.isEmpty()) {
 			return users.get(0);
