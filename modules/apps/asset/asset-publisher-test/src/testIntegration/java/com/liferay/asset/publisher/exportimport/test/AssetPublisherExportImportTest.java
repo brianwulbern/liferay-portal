@@ -1270,6 +1270,49 @@ public class AssetPublisherExportImportTest extends BaseExportImportTestCase {
 		Assert.assertEquals(null, portletPreferences.getValue("scopeId", null));
 	}
 
+	@Test
+	@TestInfo("LPD-110540")
+	public void testImportNumericClassNameIdsWithRemoteStaging()
+		throws Exception {
+
+		String portletId = LayoutTestUtil.addPortletToLayout(
+			TestPropsValues.getUserId(), layout, getPortletId(), "column-1",
+			new HashMap<>());
+
+		importedLayout = LayoutTestUtil.addTypePortletLayout(importedGroup);
+
+		String journalArticleClassNameId = String.valueOf(
+			_portal.getClassNameId(JournalArticle.class));
+
+		ExportImportThreadLocal.setPortletStagingInProcess(true);
+
+		try {
+			_portletPreferencesPortletConfigurationImporter.
+				importPortletConfiguration(
+					importedLayout.getPlid(), portletId,
+					HashMapBuilder.<String, Object>put(
+						"anyAssetType",
+						Collections.singletonList(journalArticleClassNameId)
+					).put(
+						"classNameIds",
+						Collections.singletonList(journalArticleClassNameId)
+					).build());
+		}
+		finally {
+			ExportImportThreadLocal.setPortletStagingInProcess(false);
+		}
+
+		PortletPreferences importedPortletPreferences =
+			LayoutTestUtil.getPortletPreferences(importedLayout, portletId);
+
+		Assert.assertEquals(
+			journalArticleClassNameId,
+			importedPortletPreferences.getValue("anyAssetType", null));
+		Assert.assertArrayEquals(
+			new String[] {journalArticleClassNameId},
+			importedPortletPreferences.getValues("classNameIds", null));
+	}
+
 	@Ignore
 	@Test
 	public void testLayoutScopeId() throws Exception {
