@@ -27,6 +27,10 @@ definition {
 
 		Alert.viewSuccessMessage();
 
+		if (isSet(sitePageType) || isSet(inheritChanges) || isSet(openGraph)) {
+			Alert.closeMessage(messageType = "SUCCESS");
+		}
+
 		if (${sitePageType} == "Embedded") {
 			PagesAdmin._addPageTypeEmbedded(pageTypeURL = ${pageTypeURL});
 		}
