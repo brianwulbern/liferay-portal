@@ -185,6 +185,39 @@ public class PageTemplateResourceTest extends BasePageTemplateResourceTestCase {
 					RandomTestUtil.randomString())));
 	}
 
+	@Test
+	@TestInfo("LPD-TBD")
+	public void testEnableLocalStagingWithCompanyGroupWidgetPageTemplate()
+		throws Exception {
+
+		_withCompanyGroupWidgetPageTemplate(
+			(group, widgetPageTemplate) -> {
+				_postSitePageTemplate(
+					widgetPageTemplate, group.getExternalReferenceCode());
+
+				try {
+					_stagingLocalService.enableLocalStaging(
+						TestPropsValues.getUserId(), group, false, false,
+						ServiceContextTestUtil.getServiceContext(
+							group, TestPropsValues.getUserId()));
+
+					Group stagingGroup = group.getStagingGroup();
+
+					Assert.assertNotNull(
+						_layoutPageTemplateEntryLocalService.
+							fetchLayoutPageTemplateEntryByExternalReferenceCode(
+								widgetPageTemplate.getExternalReferenceCode(),
+								stagingGroup.getGroupId()));
+				}
+				finally {
+					_stagingLocalService.disableStaging(
+						group,
+						ServiceContextTestUtil.getServiceContext(
+							group, TestPropsValues.getUserId()));
+				}
+			});
+	}
+
 	@Override
 	@Test
 	@TestInfo("LPD-44414")
