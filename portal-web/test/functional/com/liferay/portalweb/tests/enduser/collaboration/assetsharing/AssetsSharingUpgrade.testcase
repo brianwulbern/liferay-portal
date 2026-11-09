@@ -29,7 +29,7 @@ definition {
 
 		ValidateAssetSharingUpgrade.viewSharedDocument(dmDocumentTitle = "DM Document Title 1");
 
-		ValidateAssetSharingUpgrade.viewSharedBlog();
+		ValidateAssetSharingUpgrade.viewSharedBlog(openFromSharedContent = "true");
 
 		ValidateAssetSharingUpgrade.revokeAndUpdateSharedEntry(
 			blogsEntryTitleUpdate = "Blogs Entry Title Can Update",

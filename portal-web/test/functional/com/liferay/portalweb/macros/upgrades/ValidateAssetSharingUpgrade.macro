@@ -81,7 +81,7 @@ definition {
 	}
 
 	@summary = "Default summary"
-	macro viewSharedBlog() {
+	macro viewSharedBlog(openFromSharedContent = null) {
 		User.logoutPG();
 
 		User.loginUserPG(
@@ -97,6 +97,13 @@ definition {
 			contentTitle = "Blogs Entry Title",
 			openNotification = "true",
 			ownerName = "Test Test");
+
+		if (${openFromSharedContent} == "true") {
+			AssertClick(
+				key_contentTitle = "Blogs Entry Title",
+				locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
+				value1 = "Blogs Entry Title");
+		}
 
 		BlogsEntry.viewSharedAsset(
 			contentSharingPermission = "View",
