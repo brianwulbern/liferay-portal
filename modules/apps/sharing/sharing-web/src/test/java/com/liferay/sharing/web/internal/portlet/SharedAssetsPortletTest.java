@@ -37,18 +37,15 @@ public class SharedAssetsPortletTest {
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			new MockLiferayPortletRenderRequest();
 
-		mockLiferayPortletRenderRequest.setParameter(
-			"mvcRenderCommandName", "/shared_assets/view_sharing_entry");
-
 		MockLiferayPortletRenderResponse mockLiferayPortletRenderResponse =
 			new MockLiferayPortletRenderResponse();
-
-		ViewSharedAssetsDisplayContext viewSharedAssetsDisplayContext =
-			Mockito.mock(ViewSharedAssetsDisplayContext.class);
 
 		ViewSharedAssetsDisplayContextFactory
 			viewSharedAssetsDisplayContextFactory = Mockito.mock(
 				ViewSharedAssetsDisplayContextFactory.class);
+
+		ViewSharedAssetsDisplayContext viewSharedAssetsDisplayContext =
+			Mockito.mock(ViewSharedAssetsDisplayContext.class);
 
 		Mockito.when(
 			viewSharedAssetsDisplayContextFactory.
