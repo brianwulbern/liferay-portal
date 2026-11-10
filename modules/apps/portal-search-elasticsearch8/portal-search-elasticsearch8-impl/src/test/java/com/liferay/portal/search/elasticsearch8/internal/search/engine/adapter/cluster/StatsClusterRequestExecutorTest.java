@@ -19,6 +19,7 @@ import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonParser;
 
 import java.io.StringReader;
@@ -80,6 +81,9 @@ public class StatsClusterRequestExecutorTest {
 	public void testClusterRequestExecutionWithoutOpenFileDescriptors()
 		throws Exception {
 
+		ElasticsearchClientResolver elasticsearchClientResolver = Mockito.mock(
+			ElasticsearchClientResolver.class);
+
 		JacksonJsonpMapper jacksonJsonpMapper = new JacksonJsonpMapper();
 
 		ElasticsearchTransport elasticsearchTransport = Mockito.mock(
@@ -101,23 +105,20 @@ public class StatsClusterRequestExecutorTest {
 				JsonpDeserializer<?> jsonpDeserializer =
 					jsonEndpoint.responseDeserializer();
 
-				try (JsonParser jsonParser = jacksonJsonpMapper.jsonProvider(
-					).createParser(
+				JsonProvider jsonProvider = jacksonJsonpMapper.jsonProvider();
+
+				try (JsonParser jsonParser = jsonProvider.createParser(
 						new StringReader(
 							ResourceUtil.getResourceAsString(
 								getClass(),
 								"StatsClusterRequestExecutorTest-clusterStats." +
-									"json"))
-					)) {
+									"json")))) {
 
 					return jsonpDeserializer.deserialize(
 						jsonParser, jacksonJsonpMapper);
 				}
 			}
 		);
-
-		ElasticsearchClientResolver elasticsearchClientResolver = Mockito.mock(
-			ElasticsearchClientResolver.class);
 
 		Mockito.when(
 			elasticsearchClientResolver.getElasticsearchClient(
