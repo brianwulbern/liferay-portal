@@ -5,16 +5,31 @@
 
 package com.liferay.portal.search.elasticsearch8.internal.search.engine.adapter.cluster;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.JsonpDeserializer;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.JsonEndpoint;
+
+import com.liferay.portal.search.elasticsearch8.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch8.internal.connection.ElasticsearchConnectionFixture;
+import com.liferay.portal.search.elasticsearch8.internal.util.ResourceUtil;
+import com.liferay.portal.search.engine.adapter.cluster.ClusterHealthStatus;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import jakarta.json.stream.JsonParser;
+
+import java.io.StringReader;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import org.mockito.Mockito;
 
 /**
  * @author Dylan Rebelak
@@ -59,6 +74,72 @@ public class StatsClusterRequestExecutorTest {
 			0, statsClusterResponse.getAvailableSpaceInBytes());
 		Assert.assertNotNull(statsClusterResponse.getClusterHealthStatus());
 		Assert.assertNotEquals(0, statsClusterResponse.getUsedSpaceInBytes());
+	}
+
+	@Test
+	public void testClusterRequestExecutionWithoutOpenFileDescriptors()
+		throws Exception {
+
+		JacksonJsonpMapper jacksonJsonpMapper = new JacksonJsonpMapper();
+
+		ElasticsearchTransport elasticsearchTransport = Mockito.mock(
+			ElasticsearchTransport.class);
+
+		Mockito.when(
+			elasticsearchTransport.jsonpMapper()
+		).thenReturn(
+			jacksonJsonpMapper
+		);
+
+		Mockito.when(
+			elasticsearchTransport.performRequest(
+				Mockito.any(), Mockito.any(), Mockito.any())
+		).then(
+			invocation -> {
+				JsonEndpoint<?, ?, ?> jsonEndpoint = invocation.getArgument(1);
+
+				JsonpDeserializer<?> jsonpDeserializer =
+					jsonEndpoint.responseDeserializer();
+
+				try (JsonParser jsonParser = jacksonJsonpMapper.jsonProvider(
+					).createParser(
+						new StringReader(
+							ResourceUtil.getResourceAsString(
+								getClass(),
+								"StatsClusterRequestExecutorTest-clusterStats." +
+									"json"))
+					)) {
+
+					return jsonpDeserializer.deserialize(
+						jsonParser, jacksonJsonpMapper);
+				}
+			}
+		);
+
+		ElasticsearchClientResolver elasticsearchClientResolver = Mockito.mock(
+			ElasticsearchClientResolver.class);
+
+		Mockito.when(
+			elasticsearchClientResolver.getElasticsearchClient(
+				Mockito.any(), Mockito.anyBoolean())
+		).thenReturn(
+			new ElasticsearchClient(elasticsearchTransport)
+		);
+
+		StatsClusterRequestExecutor statsClusterRequestExecutor =
+			new StatsClusterRequestExecutor(elasticsearchClientResolver);
+
+		StatsClusterResponse statsClusterResponse =
+			statsClusterRequestExecutor.execute(
+				new StatsClusterRequest(new String[0]));
+
+		Assert.assertEquals(
+			192573853696L, statsClusterResponse.getAvailableSpaceInBytes());
+		Assert.assertEquals(
+			ClusterHealthStatus.GREEN,
+			statsClusterResponse.getClusterHealthStatus());
+		Assert.assertEquals(
+			802036301824L, statsClusterResponse.getUsedSpaceInBytes());
 	}
 
 	private static final String _NODE_ID = "liferay_sidecar";
