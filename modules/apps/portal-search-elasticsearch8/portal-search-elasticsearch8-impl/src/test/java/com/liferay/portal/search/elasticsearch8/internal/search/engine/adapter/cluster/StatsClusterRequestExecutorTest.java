@@ -107,12 +107,12 @@ public class StatsClusterRequestExecutorTest {
 
 				JsonProvider jsonProvider = jacksonJsonpMapper.jsonProvider();
 
+				String json = ResourceUtil.getResourceAsString(
+					getClass(),
+					"StatsClusterRequestExecutorTest-clusterStats.json");
+
 				try (JsonParser jsonParser = jsonProvider.createParser(
-						new StringReader(
-							ResourceUtil.getResourceAsString(
-								getClass(),
-								"StatsClusterRequestExecutorTest-clusterStats." +
-									"json")))) {
+						new StringReader(json))) {
 
 					return jsonpDeserializer.deserialize(
 						jsonParser, jacksonJsonpMapper);

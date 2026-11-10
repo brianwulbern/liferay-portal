@@ -98,9 +98,10 @@ public class StatsClusterRequestExecutor {
 			return "/_cluster/stats";
 		}
 
-		return "/_cluster/stats/nodes/" +
-			StringUtil.merge(
-				statsClusterRequest.getNodeIds(), StringPool.COMMA);
+		String nodeIds = StringUtil.merge(
+			statsClusterRequest.getNodeIds(), StringPool.COMMA);
+
+		return "/_cluster/stats/nodes/" + nodeIds;
 	}
 
 	private final ElasticsearchClientResolver _elasticsearchClientResolver;
