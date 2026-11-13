@@ -18,6 +18,10 @@ export default function PreviewButton({
 		document.getElementById(`${namespace}articleId`).value
 	);
 
+	const classNameId = document.getElementById(
+		`${namespace}classNameId`
+	)?.value;
+
 	const lockRef = useRef(null);
 
 	useEffect(() => {
@@ -45,7 +49,9 @@ export default function PreviewButton({
 			aria-label={Liferay.Language.get(
 				'a-draft-will-be-saved-before-displaying-the-preview'
 			)}
-			disabled={disabled}
+			disabled={
+				disabled || (!articleId && !!classNameId && classNameId !== '0')
+			}
 			displayType="secondary"
 			onClick={() => {
 				if (lockRef.current?.isLocked()) {

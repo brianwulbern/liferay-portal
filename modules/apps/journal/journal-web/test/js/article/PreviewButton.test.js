@@ -87,4 +87,22 @@ describe('PreviewButton', () => {
 			friendlyUrlMap: {en_US: 'preview-title'},
 		});
 	});
+
+	it('enables Preview for a new article', () => {
+		renderComponent();
+
+		expect(screen.getByRole('button')).toBeEnabled();
+	});
+
+	it('disables Preview for new structure default values', () => {
+		renderComponent({classNameId: '20100'});
+
+		expect(screen.getByRole('button')).toBeDisabled();
+	});
+
+	it('enables Preview for saved structure default values', () => {
+		renderComponent({articleId: '12345', classNameId: '20100'});
+
+		expect(screen.getByRole('button')).toBeEnabled();
+	});
 });
