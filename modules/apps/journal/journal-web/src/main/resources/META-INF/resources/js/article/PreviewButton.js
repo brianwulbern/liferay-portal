@@ -98,6 +98,7 @@ export default function PreviewButton({
 							if (!articleId) {
 								Liferay.fire('asyncFormSubmission', {
 									articleId: response.articleId,
+									friendlyUrlMap,
 								});
 							}
 

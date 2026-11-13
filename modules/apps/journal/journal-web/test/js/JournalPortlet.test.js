@@ -316,4 +316,71 @@ describe('JournalPortlet', () => {
 			'12345'
 		);
 	});
+
+	it('fills the empty Friendly URL field when Preview creates the draft', async () => {
+		renderComponent();
+
+		JournalPortlet({
+			articleId: null,
+			autoSaveDraftEnabled: true,
+			autoSaveDraftURL: 'http://localhost/o/journal/auto_save_article',
+			availableLocales: ['en_US'],
+			classNameId: '0',
+			contentTitle: 'Test',
+			defaultLanguageId: 'en_US',
+			hasSavePermission: true,
+			namespace: NAMESPACE,
+		});
+
+		const [, asyncFormSubmissionHandler] =
+			global.Liferay.on.mock.calls.find(
+				([eventName]) => eventName === 'asyncFormSubmission'
+			);
+
+		asyncFormSubmissionHandler({
+			articleId: '12345',
+			friendlyUrlMap: {en_US: 'preview-title', es_ES: 'titulo'},
+		});
+
+		expect(friendlyUrlInputComponent.updateInput).toHaveBeenCalledWith(
+			'preview-title'
+		);
+		expect(
+			friendlyUrlInputComponent.updateInputLanguage
+		).toHaveBeenCalledWith('preview-title', 'en_US');
+		expect(global.Liferay.fire).toHaveBeenCalledWith(
+			'journal:update-friendly-url',
+			{friendlyURL: 'preview-title'}
+		);
+	});
+
+	it('keeps the Friendly URL the user typed when Preview creates the draft', () => {
+		friendlyUrlInputComponent.getValue.mockReturnValue('typed-url');
+
+		renderComponent();
+
+		JournalPortlet({
+			articleId: null,
+			autoSaveDraftEnabled: true,
+			autoSaveDraftURL: 'http://localhost/o/journal/auto_save_article',
+			availableLocales: ['en_US'],
+			classNameId: '0',
+			contentTitle: 'Test',
+			defaultLanguageId: 'en_US',
+			hasSavePermission: true,
+			namespace: NAMESPACE,
+		});
+
+		const [, asyncFormSubmissionHandler] =
+			global.Liferay.on.mock.calls.find(
+				([eventName]) => eventName === 'asyncFormSubmission'
+			);
+
+		asyncFormSubmissionHandler({
+			articleId: '12345',
+			friendlyUrlMap: {en_US: 'preview-title'},
+		});
+
+		expect(friendlyUrlInputComponent.updateInput).not.toHaveBeenCalled();
+	});
 });
